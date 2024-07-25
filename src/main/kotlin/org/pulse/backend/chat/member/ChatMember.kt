@@ -1,25 +1,18 @@
-package org.pulse.backend.message
+package org.pulse.backend.chat.member
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
 import org.pulse.backend.chat.Chat
-import org.pulse.backend.message.recited.MessageRecited
 import org.pulse.backend.user.User
-import java.sql.Timestamp
 
 @Entity
-class Message(
-    val timestamp: Timestamp,
-    val content: String,
+class ChatMember(
     @ManyToOne
     val chat: Chat,
     @ManyToOne
     val user: User,
-    @OneToMany(mappedBy = "message")
-    val recited: List<MessageRecited> = emptyList(),
     @Id
     @GeneratedValue
     val id: Long? = null
