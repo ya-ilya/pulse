@@ -1,0 +1,37 @@
+package org.pulse.backend.controllers
+
+import org.pulse.backend.requests.UpdateDisplayNameRequest
+import org.pulse.backend.requests.UpdateUsernameRequest
+import org.pulse.backend.entities.user.User
+import org.pulse.backend.services.UserService
+import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
+
+@RestController
+@RequestMapping("/api/me")
+class MeController(private val userService: UserService) {
+    @GetMapping
+    fun getUser(@AuthenticationPrincipal user: User): User {
+        return user
+    }
+
+    @PatchMapping("/username")
+    fun updateUsername(@AuthenticationPrincipal user: User, @RequestBody request: UpdateUsernameRequest): User {
+        if (userService.findUserByUsername(request.username).isPresent) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
+        }
+
+        return userService.updateUser(user.apply { this.username = request.username })
+    }
+
+    @PatchMapping("/displayName")
+    fun updateDisplayName(@AuthenticationPrincipal user: User, @RequestBody request: UpdateDisplayNameRequest): User {
+        return userService.updateUser(user.apply { this.username = request.displayName })
+    }
+}

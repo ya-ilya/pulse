@@ -9,5 +9,5 @@ import org.springframework.context.annotation.ComponentScan
 class PulseApplication
 
 fun main(args: Array<String>) {
-	runApplication<PulseApplication>(*args)
+    runApplication<PulseApplication>(*args)
 }
