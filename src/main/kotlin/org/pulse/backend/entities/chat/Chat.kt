@@ -1,5 +1,6 @@
 package org.pulse.backend.entities.chat
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.pulse.backend.entities.chat.member.ChatMember
 import org.pulse.backend.entities.message.Message
@@ -15,8 +16,10 @@ class Chat(
     @OneToOne(mappedBy = "comments")
     val post: Post? = null,
     @OneToMany(mappedBy = "chat")
+    @JsonIgnore
     val members: List<ChatMember> = emptyList(),
     @OneToMany(mappedBy = "chat")
+    @JsonIgnore
     val messages: List<Message> = emptyList(),
     @Id
     @GeneratedValue

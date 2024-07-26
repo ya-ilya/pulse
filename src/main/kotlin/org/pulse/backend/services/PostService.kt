@@ -10,7 +10,10 @@ import java.sql.Timestamp
 import java.time.Instant
 
 @Service
-class PostService(private val postRepository: PostRepository) {
+class PostService(
+    private val postRepository: PostRepository,
+    private val chatService: ChatService
+) {
     fun getPostById(postId: Long): Post {
         return postRepository
             .findById(postId)
@@ -30,7 +33,7 @@ class PostService(private val postRepository: PostRepository) {
                 content,
                 channel
             )
-        )
+        ).apply { this.comments = chatService.createCommentsChat(this) }
     }
 
     fun deletePost(postId: Long) {

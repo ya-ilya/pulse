@@ -7,6 +7,8 @@ import org.pulse.backend.requests.CreateChannelRequest
 import org.pulse.backend.requests.UpdateChannelRequest
 import org.pulse.backend.entities.post.Post
 import org.pulse.backend.entities.user.User
+import org.pulse.backend.requests.CreatePostRequest
+import org.pulse.backend.services.PostService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -16,7 +18,8 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/api/channels")
 class ChannelController(
     private val channelService: ChannelService,
-    private val memberService: ChannelMemberService
+    private val memberService: ChannelMemberService,
+    private val postService: PostService
 ) {
     @GetMapping
     fun getChannels(@AuthenticationPrincipal user: User): List<Channel> {
@@ -42,6 +45,17 @@ class ChannelController(
     @GetMapping("/{channelId}/posts")
     fun getPosts(@PathVariable channelId: Long): List<Post> {
         return channelService.getChannelById(channelId).posts
+    }
+
+    @PostMapping("/{channelId}/posts")
+    fun createPost(@AuthenticationPrincipal user: User, @PathVariable channelId: Long, @RequestBody request: CreatePostRequest): Post {
+        val channel = channelService.getChannelById(channelId)
+
+        if (channel.admin != user) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
+        return postService.createPost(request.content, channel)
     }
 
     @PostMapping
@@ -80,7 +94,7 @@ class ChannelController(
         val channel = channelService.getChannelById(channelId)
 
         if (channel.members.any { it.user == user }) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            throw ResponseStatusException(HttpStatus.CONFLICT)
         }
 
         memberService.createMember(channel, user)

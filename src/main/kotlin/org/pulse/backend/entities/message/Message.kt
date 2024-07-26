@@ -1,5 +1,6 @@
 package org.pulse.backend.entities.message
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.pulse.backend.entities.chat.Chat
 import org.pulse.backend.entities.message.recited.MessageRecited
@@ -15,6 +16,7 @@ class Message(
     @ManyToOne
     val user: User,
     @OneToMany(mappedBy = "message")
+    @JsonIgnore
     val recited: List<MessageRecited> = emptyList(),
     @Id
     @GeneratedValue
