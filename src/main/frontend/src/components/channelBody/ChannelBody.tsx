@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Element } from '../channels/Channels'
+import { ChannelElement } from '../channels/Channels'
 import './ChannelBody.css'
-import { ChannelTypeEnum, createChannelController, createMeController, Message, Post } from '../../api'
 import { useGatewayContext } from '../..'
+import { createMeController, createChannelController, Post, ChannelTypeEnum, Message, User } from '../../api'
 
-type ChannelBodyProps = { element: Element | null }
+type ChannelBodyProps = { element: ChannelElement | null }
 
 function formatDate(date: Date | string): string {
   if (date instanceof Date) {
@@ -28,14 +28,14 @@ function ChannelBody({ element }: ChannelBodyProps) {
   const lastEvent = useGatewayContext()
 
   function updateMessages() {
-    channelController.getMessages(element?.id!).then(response => {
-      setMessages(response.data)
+    channelController.getMessages(element?.id!).then((messages: Message[]) => {
+      setMessages(messages)
     })
   }
 
   function updatePosts() {
-    channelController.getPosts(element?.id!).then(response => {
-      setPosts(response.data)
+    channelController.getPosts(element?.id!).then((posts: Post[]) => {
+      setPosts(posts)
     })
   }
 
@@ -43,6 +43,14 @@ function ChannelBody({ element }: ChannelBodyProps) {
     if (!element) return
 
     if (lastEvent?.type == "CreateMessageEvent" && lastEvent?.channelId == element?.id) {
+      updateMessages()
+    }
+
+    if (lastEvent?.type == "UpdateMessageEvent" && lastEvent?.channelId == element?.id) {
+      updateMessages()
+    }
+
+    if (lastEvent?.type == "DeleteMessageEvent" && lastEvent?.channelId == element?.id) {
       updateMessages()
     }
 
@@ -57,8 +65,8 @@ function ChannelBody({ element }: ChannelBodyProps) {
     if (element?.type == ChannelTypeEnum.Channel) {
       updatePosts()
     } else {
-      meController.getUser().then(response => {
-        setUserId(response.data.id!)
+      meController.getUser().then((user: User) => {
+        setUserId(user.id!)
       })
 
       updateMessages()

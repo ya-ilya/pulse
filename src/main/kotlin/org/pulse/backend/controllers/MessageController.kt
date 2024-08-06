@@ -4,6 +4,7 @@ import org.pulse.backend.entities.message.Message
 import org.pulse.backend.requests.UpdateMessageRequest
 import org.pulse.backend.services.MessageService
 import org.pulse.backend.entities.user.User
+import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -11,7 +12,10 @@ import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/messages")
-class MessageController(private val messageService: MessageService) {
+class MessageController(
+    private val messageService: MessageService,
+    private val messageEventDisptacher: MessageEventDispatcher
+) {
     @GetMapping("/{messageId}")
     fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Message {
         val message = messageService.getMessageById(messageId)
@@ -35,7 +39,9 @@ class MessageController(private val messageService: MessageService) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        return messageService.updateMessage(messageId, request.content)
+        return messageService.updateMessage(messageId, request.content).also {
+            messageEventDisptacher.dispatchUpdateMessageEvent(it)
+        }
     }
 
     @DeleteMapping("/{messageId}")
@@ -46,6 +52,8 @@ class MessageController(private val messageService: MessageService) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        messageService.deleteMessage(messageId)
+        messageService.deleteMessage(messageId).also {
+            messageEventDisptacher.dispatchDeleteMessageEvent(message)
+        }
     }
 }

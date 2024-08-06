@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import './App.css'
-import Channels, { Element } from './components/channels/Channels'
+import Channels, { ChannelElement } from './components/channels/Channels'
 import ChannelBody from './components/channelBody/ChannelBody'
 import ChannelTopBar from './components/channelTopBar/ChannelTopBar'
 import ChannelBottomBar from './components/channelBottomBar/ChannelBottomBar'
 
 function App() {
-  const [element, setElement] = useState<Element | null>(null)
+  const [element, setElement] = useState<ChannelElement | null>(null)
 
   return (
     <div className='home'>

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { createMeController, createAuthenticationController, MeControllerApi, createChannelController } from './api/api.ts'
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
+import axios from 'axios'
+import { creaateAuthenticationController, createChannelController, createMeController, MeController } from './api/index.ts'
 
 export const GatewayContext = React.createContext<any | null>(null)
 
@@ -11,7 +12,7 @@ export function useGatewayContext() {
   return React.useContext(GatewayContext)
 }
 
-async function isTokenValid(token: string | null, meController: MeControllerApi): Promise<boolean> {
+async function isTokenValid(token: string | null, meController: MeController): Promise<boolean> {
   if (!token) return false
 
   const decodedToken = JSON.parse(atob(token.split('.')[1]))
@@ -28,10 +29,14 @@ async function isTokenValid(token: string | null, meController: MeControllerApi)
   return Date.now() < expirationTime && withoutErrors
 }
 
+export const axiosClient = axios.create({
+  baseURL: window.location.origin
+})
+
 var websocket: WebSocket | undefined
 
 function ProtectedRoute() {
-  const [authenticationController] = useState(createAuthenticationController())
+  const [authenticationController] = useState(creaateAuthenticationController())
   const [authenticated, setAuthenticated] = useState<boolean | null>(null)
   const [lastEvent, setLastEvent] = useState<any>(null)
 
@@ -43,19 +48,19 @@ function ProtectedRoute() {
           email: "sigma@mail.com",
           password: "sigma"
         })
-        localStorage.setItem('accessToken', sigma.data.accessToken)
+        localStorage.setItem('accessToken', sigma.accessToken)
         var chad = await authenticationController.signUp({
           username: "Chad",
           email: "chad@mail.com",
           password: "chad"
         })
         const channelController = createChannelController()
-        var groupChat = await channelController.createGroupChatChannel({ name: "Group Chat", with: [ chad.data.userId ] })
-        await channelController.createMessage({ content: "Hello, Chad!" }, groupChat.data.id!)
-        localStorage.setItem('accessToken', chad.data.accessToken)
+        var groupChat = await channelController.createGroupChat({ name: "Group Chat", with: [ chad.userId ] })
+        await channelController.createMessage(groupChat.id!, { content: "Hello, Chad!" })
+        localStorage.setItem('accessToken', chad.accessToken)
         const chadChannelController = createChannelController()
-        chadChannelController.createMessage({ content: "Oh, hello, Sigma. I love you!"}, groupChat.data.id!)
-        localStorage.setItem('accessToken', sigma.data.accessToken)
+        chadChannelController.createMessage(groupChat.id!, { content: "Oh, hello, Sigma. I love you!"})
+        localStorage.setItem('accessToken', sigma.accessToken)
       }
 
       if (await isTokenValid(localStorage.getItem('accessToken'), createMeController())) {
@@ -80,8 +85,8 @@ function ProtectedRoute() {
             refreshToken: localStorage.getItem('refreshToken')!
           })
 
-          localStorage.setItem('accessToken', response.data.accessToken)
-          localStorage.setItem('refreshToken', response.data.refreshToken)
+          localStorage.setItem('accessToken', response.accessToken)
+          localStorage.setItem('refreshToken', response.refreshToken)
           setAuthenticated(true)
         } catch (error) {
           localStorage.removeItem('accessToken')

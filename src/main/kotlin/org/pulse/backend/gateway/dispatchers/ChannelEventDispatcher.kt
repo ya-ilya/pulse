@@ -14,42 +14,35 @@ class ChannelEventDispatcher(
     private val memberService: ChannelMemberService
 ) {
     fun dispatchCreateChannelEvent(channel: Channel) = memberService.findMembersByChannel(channel).forEach { (_, user) ->
-        gateway.sentToUserSessions(
+        gateway.sendToUserSessions(
             user.id!!,
             CreateChannelEvent(channel.id!!)
         )
     }
 
-    fun dispatchCreateMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
-        gateway.sentToUserSessions(
-            user.id!!,
-            CreateMessageEvent(channel.id!!)
-        )
-    }
-
     fun dispatchCreatePostEvent(post: Post) = memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
-        gateway.sentToUserSessions(
+        gateway.sendToUserSessions(
             user.id!!,
             CreatePostEvent(channel.id!!)
         )
     }
 
     fun dispatchDeleteChannelEvent(channel: Channel) = memberService.findMembersByChannel(channel).forEach { (channel, user) ->
-        gateway.sentToUserSessions(
+        gateway.sendToUserSessions(
             user.id!!,
             DeleteChannelEvent(channel.id!!)
         )
     }
 
     fun dispatchUpdateChannelEvent(channel: Channel) = memberService.findMembersByChannel(channel).forEach { (channel, user) ->
-        gateway.sentToUserSessions(
+        gateway.sendToUserSessions(
             user.id!!,
             UpdateChannelEvent(channel.id!!)
         )
     }
 
     fun dispatchUpdateChannelMembersEvent(channel: Channel) = memberService.findMembersByChannel(channel).forEach { (channel, user) ->
-        gateway.sentToUserSessions(
+        gateway.sendToUserSessions(
             user.id!!,
             UpdateChannelMembersEvent(channel.id!!)
         )

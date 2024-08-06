@@ -68,11 +68,7 @@ class SecurityConfiguration(
                     val token = try {
                         request.getHeader(AUTHORIZATION_HEADER).removePrefix(BEARER_PREFIX)
                     } catch (ex: Exception) {
-                        try {
-                            request.getHeader(WEBSOCKET_PROTOCOL_HEADER)
-                        } catch (ex1: Exception) {
-                            null
-                        }
+                        null
                     }
 
                     if (token == null) {
@@ -111,6 +107,5 @@ class SecurityConfiguration(
     private companion object {
         const val BEARER_PREFIX = "Bearer "
         const val AUTHORIZATION_HEADER = "Authorization"
-        const val WEBSOCKET_PROTOCOL_HEADER = "sec-websocket-protocol"
     }
 }

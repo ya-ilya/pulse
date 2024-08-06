@@ -48,7 +48,7 @@ class Gateway(
         return activeSessions.firstOrNull { it.session == session }
     }
 
-    fun sentToUserSessions(userId: UUID, event: GatewayEvent) {
+    fun sendToUserSessions(userId: UUID, event: GatewayEvent) {
         get(userId)?.forEach { it.sendEvent(event) }
     }
 }

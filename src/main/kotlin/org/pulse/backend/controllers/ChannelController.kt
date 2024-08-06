@@ -6,6 +6,7 @@ import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.post.Post
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
+import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.pulse.backend.requests.*
 import org.pulse.backend.services.*
 import org.springframework.http.HttpStatus
@@ -21,7 +22,8 @@ class ChannelController(
     private val postService: PostService,
     private val userService: UserService,
     private val messageService: MessageService,
-    private val eventDispatcher: ChannelEventDispatcher
+    private val channelEventDispatcher: ChannelEventDispatcher,
+    private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping
     fun getChannels(@AuthenticationPrincipal user: User): List<Channel> {
@@ -93,7 +95,7 @@ class ChannelController(
         }
 
         return messageService.createMessage(request.content, channel, user).also {
-            eventDispatcher.dispatchCreateMessageEvent(it)
+            messageEventDispatcher.dispatchCreateMessageEvent(it)
         }
     }
 
@@ -110,14 +112,14 @@ class ChannelController(
         }
 
         return postService.createPost(request.content, channel).also {
-            eventDispatcher.dispatchCreatePostEvent(it)
+            channelEventDispatcher.dispatchCreatePostEvent(it)
         }
     }
 
     @PostMapping
     fun createChannel(@AuthenticationPrincipal user: User, @RequestBody request: CreateChannelRequest): Channel {
         return channelService.createChannel(request.name, user).also {
-            eventDispatcher.dispatchCreateChannelEvent(it)
+            channelEventDispatcher.dispatchCreateChannelEvent(it)
         }
     }
 
@@ -127,7 +129,7 @@ class ChannelController(
             user,
             userService.getUserById(request.with)
         ).also {
-            eventDispatcher.dispatchCreateChannelEvent(it)
+            channelEventDispatcher.dispatchCreateChannelEvent(it)
         }
     }
 
@@ -138,7 +140,7 @@ class ChannelController(
             user,
             request.with.map { userService.getUserById(it) }
         ).also {
-            eventDispatcher.dispatchCreateChannelEvent(it)
+            channelEventDispatcher.dispatchCreateChannelEvent(it)
         }
     }
 
@@ -159,7 +161,7 @@ class ChannelController(
         }
 
         return channelService.updateChannel(channelId, request.name).also {
-            eventDispatcher.dispatchUpdateChannelEvent(it)
+            channelEventDispatcher.dispatchUpdateChannelEvent(it)
         }
     }
 
@@ -176,7 +178,7 @@ class ChannelController(
         }
 
         channelService.deleteChannel(channelId).also {
-            eventDispatcher.dispatchDeleteChannelEvent(channel)
+            channelEventDispatcher.dispatchDeleteChannelEvent(channel)
         }
     }
 
@@ -195,7 +197,7 @@ class ChannelController(
         memberService.createMember(channel, user)
 
         return channelService.getChannelById(channelId).also {
-            eventDispatcher.dispatchUpdateChannelMembersEvent(it)
+            channelEventDispatcher.dispatchUpdateChannelMembersEvent(it)
         }
     }
 }

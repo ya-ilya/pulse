@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react"
 import "./Channels.css"
 import { FiMenu } from "react-icons/fi"
-import { ChannelTypeEnum, createChannelController } from "../../api"
 import { useGatewayContext } from "../.."
+import { Channel, ChannelTypeEnum, createChannelController } from "../../api"
 
-export interface Element {
+export interface ChannelElement {
   name: string
   type: ChannelTypeEnum
   lastMessage: string
   id: number
 }
 
-type ChannelsProps = { setElement: (element: Element | null) => void }
+type ChannelsProps = { setElement: (element: ChannelElement | null) => void }
 
 function Channels({ setElement }: ChannelsProps) {
   const [channelController] = useState(createChannelController())
   const [query, setQuery] = useState("")
-  const [elements, setElements] = useState<Element[]>([])
+  const [elements, setElements] = useState<ChannelElement[]>([])
   const lastEvent = useGatewayContext()
 
   function updateChannels() {
-    channelController.getChannels().then(response => {
-      setElements(response.data.map(channel => ({ name: channel.name, type: channel.type, id: channel.id }) as Element))
+    channelController.getChannels().then((channels: Channel[]) => {
+      setElements(channels.map((channel: Channel) => ({ name: channel.name, type: channel.type, id: channel.id }) as ChannelElement))
     })
   }
 

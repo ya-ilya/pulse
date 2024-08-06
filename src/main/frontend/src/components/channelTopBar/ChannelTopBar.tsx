@@ -1,7 +1,7 @@
-import { Element } from "../channels/Channels"
+import { ChannelElement } from "../channels/Channels"
 import './ChannelTopBar.css'
 
-type ChannelTopBarProps = { element: Element | null }
+type ChannelTopBarProps = { element: ChannelElement | null }
 
 function ChannelTopBar({ element }: ChannelTopBarProps) {
   if (!element) {
