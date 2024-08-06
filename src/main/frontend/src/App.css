@@ -1,0 +1,21 @@
+* {
+  font-family: "Roboto", -apple-system, apple color emoji, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;;
+}
+
+.home {
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.channel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

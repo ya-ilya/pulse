@@ -16,7 +16,7 @@ class MessageController(private val messageService: MessageService) {
     fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Message {
         val message = messageService.getMessageById(messageId)
 
-        if (!message.chat.members.any { it.user == user }) {
+        if (!message.channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found")
         }
 
@@ -31,7 +31,7 @@ class MessageController(private val messageService: MessageService) {
     ): Message {
         val message = messageService.getMessageById(messageId)
 
-        if (message.user != user) {
+        if (message.user.id != user.id) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
@@ -42,7 +42,7 @@ class MessageController(private val messageService: MessageService) {
     fun deleteMessage(@AuthenticationPrincipal user: User, @PathVariable messageId: Long) {
         val message = messageService.getMessageById(messageId)
 
-        if (message.user != user && message.chat.admin != user) {
+        if (message.user.id != user.id && message.channel.admin?.id != user.id) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 

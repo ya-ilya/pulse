@@ -1,0 +1,64 @@
+.channelBody {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: lightgray;
+  gap: 8px;
+}
+
+.channelBody .dateContainer {
+  width: 97%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.channelBody .date {
+  display: flex;
+  background-color: white;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.channelBody .messageContainer {
+  width: 97%;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+}
+
+.channelBody .message {
+  max-width: 40%;
+  padding: 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  background-color: white;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 8px;
+}
+
+.channelBody .messageLeft {
+  margin-left: 0;
+}
+
+.channelBody .messageRight {
+  margin-left: auto;
+}
+
+.channelBody .message .content {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.channelBody .message .timestamp {
+  font-size: 12px;
+  font-weight: 400;
+  color: lightgray;
+  position: relative;
+  top: 8px;
+}

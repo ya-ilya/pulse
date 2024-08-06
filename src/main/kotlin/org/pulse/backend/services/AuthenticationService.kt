@@ -41,7 +41,8 @@ class AuthenticationService(
 
         return AuthenticationResponse(
             generateAccessToken(user)!!,
-            generateRefreshToken(user)!!
+            generateRefreshToken(user)!!,
+            user.id!!
         )
     }
 
@@ -63,7 +64,8 @@ class AuthenticationService(
 
         return AuthenticationResponse(
             generateAccessToken(user)!!,
-            generateRefreshToken(user)!!
+            generateRefreshToken(user)!!,
+            user.id!!
         )
     }
 
@@ -78,7 +80,8 @@ class AuthenticationService(
 
         return AuthenticationResponse(
             generateAccessToken(user)!!,
-            generateRefreshToken(user)!!
+            generateRefreshToken(user)!!,
+            user.id!!
         )
     }
 

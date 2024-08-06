@@ -1,19 +1,19 @@
 package org.pulse.backend.entities.channel.member
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.user.User
 
 @Entity
 class ChannelMember(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     val channel: Channel,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     val user: User,
     @Id
     @GeneratedValue
     val id: Long? = null
-)
+) {
+    operator fun component1() = channel
+    operator fun component2() = user
+}

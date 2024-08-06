@@ -1,9 +1,9 @@
 package org.pulse.backend.entities.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import org.pulse.backend.entities.channel.member.ChannelMember
-import org.pulse.backend.entities.chat.member.ChatMember
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
@@ -11,6 +11,7 @@ import java.util.*
 @Entity
 class User(
     @get:JvmName("usernameField")
+    @get:JsonProperty("username")
     var username: String,
     val displayName: String,
     @JsonIgnore
@@ -22,12 +23,9 @@ class User(
     var accessToken: String? = null,
     @JsonIgnore
     var refreshToken: String? = null,
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @JsonIgnore
-    val chats: List<ChatMember> = emptyList(),
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    val channels: List<ChannelMember> = emptyList(),
+    val channels: MutableList<ChannelMember> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null

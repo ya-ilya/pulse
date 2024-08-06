@@ -1,0 +1,81 @@
+.channels {
+  height: 100%;
+  width: 25%;
+  margin: 0;
+  border: solid;
+  border-width: 0px 1px 0px 0px;
+  border-color: rgba(230, 230, 230, 50);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.channels .searchContainer {
+  height: 48px;
+  width: 100%;
+  border: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: rgba(230, 230, 230, 50);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.channels .search {
+  background-color: rgba(230, 230, 230, 120);
+  width: 80%;
+  height: 50%;
+  border-radius: 20px;
+  border: 1px solid rgba(230, 230, 230, 50);
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  gap: 5px;
+}
+
+.channels .search .input {
+  background-color: rgba(230, 230, 230, 120);
+  border-color: transparent;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.channels .search .input:focus {
+  outline: none;
+}
+
+.channels .search .icon {
+  background-color: inherit;
+  text-decoration: inherit;
+}
+
+.channels .search .icon:visited, .channels .search .icon:hover, .channels .search .icon:link {
+  text-decoration: inherit;
+  color: inherit;
+  cursor: auto;
+}
+
+.channels .search .icon:hover {
+  cursor: pointer;
+}
+
+.channels .channel {
+  height: 56px;
+  width: 100%;
+  border: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: rgba(230, 230, 230, 50);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 500;
+  padding-left: 10px;
+}
+
+.channels .channel:hover {
+  cursor: pointer;
+}

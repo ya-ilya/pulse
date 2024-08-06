@@ -12,7 +12,7 @@ import java.time.Instant
 @Service
 class PostService(
     private val postRepository: PostRepository,
-    private val chatService: ChatService
+    private val channelService: ChannelService
 ) {
     fun getPostById(postId: Long): Post {
         return postRepository
@@ -33,7 +33,7 @@ class PostService(
                 content,
                 channel
             )
-        ).apply { this.comments = chatService.createCommentsChat(this) }
+        ).apply { this.comments = channelService.createCommentsChannel(this) }
     }
 
     fun deletePost(postId: Long) {

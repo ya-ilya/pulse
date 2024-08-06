@@ -3,7 +3,6 @@ package org.pulse.backend.entities.post
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.pulse.backend.entities.channel.Channel
-import org.pulse.backend.entities.chat.Chat
 import org.pulse.backend.entities.post.recited.PostRecited
 import java.sql.Timestamp
 
@@ -13,12 +12,12 @@ class Post(
     var content: String,
     @ManyToOne
     val channel: Channel,
-    @OneToOne(mappedBy = "post")
+    @OneToOne
     @JsonIgnore
-    var comments: Chat? = null,
+    var comments: Channel? = null,
     @OneToMany(mappedBy = "post")
     @JsonIgnore
-    val recited: List<PostRecited> = emptyList(),
+    val recited: MutableList<PostRecited>  = mutableListOf(),
     @Id
     @GeneratedValue
     val id: Long? = null

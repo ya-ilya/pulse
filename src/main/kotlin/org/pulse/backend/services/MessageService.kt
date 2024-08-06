@@ -1,6 +1,6 @@
 package org.pulse.backend.services
 
-import org.pulse.backend.entities.chat.Chat
+import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.message.MessageRepository
 import org.pulse.backend.entities.user.User
@@ -24,12 +24,12 @@ class MessageService(private val messageRepository: MessageRepository) {
         )
     }
 
-    fun createMessage(content: String, chat: Chat, user: User): Message {
+    fun createMessage(content: String, channel: Channel, user: User): Message {
         return messageRepository.save(
             Message(
                 Timestamp.from(Instant.now()),
                 content,
-                chat,
+                channel,
                 user
             )
         )

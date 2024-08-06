@@ -23,7 +23,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.filter.OncePerRequestFilter
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
@@ -66,31 +65,40 @@ class SecurityConfiguration(
                     response: HttpServletResponse,
                     filterChain: FilterChain
                 ) {
-                    val authHeader = request.getHeader(HEADER_NAME)
-                    if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith(BEARER_PREFIX)) {
+                    val token = try {
+                        request.getHeader(AUTHORIZATION_HEADER).removePrefix(BEARER_PREFIX)
+                    } catch (ex: Exception) {
+                        try {
+                            request.getHeader(WEBSOCKET_PROTOCOL_HEADER)
+                        } catch (ex1: Exception) {
+                            null
+                        }
+                    }
+
+                    if (token == null) {
                         filterChain.doFilter(request, response)
                         return
                     }
 
-                    val jwt = authHeader.substring(BEARER_PREFIX.length)
                     val email = try {
-                        authenticationService.extractEmail(jwt)
+                        authenticationService.extractEmail(token)
                     } catch (ex: Exception) {
                         ""
                     }
-                    if (email.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
-                        val user = userService.findUserByEmail(email).get()
 
-                        if (authenticationService.isAccessTokenValid(jwt, user)) {
-                            val context = SecurityContextHolder.createEmptyContext()
-                            val authToken = UsernamePasswordAuthenticationToken(
-                                user,
-                                user.password,
-                                user.authorities
-                            )
-                            authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                            context.authentication = authToken
-                            SecurityContextHolder.setContext(context)
+                    if (email.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
+                        userService.findUserByEmail(email).ifPresent { user ->
+                            if (authenticationService.isAccessTokenValid(token, user)) {
+                                val context = SecurityContextHolder.createEmptyContext()
+                                val authToken = UsernamePasswordAuthenticationToken(
+                                    user,
+                                    user.password,
+                                    user.authorities
+                                )
+                                authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                                context.authentication = authToken
+                                SecurityContextHolder.setContext(context)
+                            }
                         }
                     }
 
@@ -102,6 +110,7 @@ class SecurityConfiguration(
 
     private companion object {
         const val BEARER_PREFIX = "Bearer "
-        const val HEADER_NAME = "Authorization"
+        const val AUTHORIZATION_HEADER = "Authorization"
+        const val WEBSOCKET_PROTOCOL_HEADER = "sec-websocket-protocol"
     }
 }
