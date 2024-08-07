@@ -2,7 +2,7 @@ package org.pulse.backend.gateway.events
 
 import org.pulse.backend.gateway.GatewayEvent
 
-class DeleteMessageEvent(
+class DeletePostEvent(
     val channelId: Long,
-    val messageId: Long
+    val postId: Long
 ) : GatewayEvent

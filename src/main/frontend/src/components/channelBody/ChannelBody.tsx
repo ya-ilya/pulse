@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChannelElement } from '../channels/Channels'
 import './ChannelBody.css'
 import { useGatewayContext } from '../..'
-import { createMeController, createChannelController, Post, ChannelTypeEnum, Message, User } from '../../api'
+import { createMeController, createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController } from '../../api'
 
 type ChannelBodyProps = { element: ChannelElement | null }
 
@@ -22,40 +22,62 @@ function formatDate(date: Date | string): string {
 function ChannelBody({ element }: ChannelBodyProps) {
   const [meController] = useState(createMeController())
   const [channelController] = useState(createChannelController())
+  const [messageController] = useState(createMessageController())
+  const [postController] = useState(createPostController())
   const [userId, setUserId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Message[] | null>(null)
-  const [posts, setPosts] = useState<Post[] | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
   const lastEvent = useGatewayContext()
-
-  function updateMessages() {
-    channelController.getMessages(element?.id!).then((messages: Message[]) => {
-      setMessages(messages)
-    })
-  }
-
-  function updatePosts() {
-    channelController.getPosts(element?.id!).then((posts: Post[]) => {
-      setPosts(posts)
-    })
-  }
 
   useEffect(() => {
     if (!element) return
 
     if (lastEvent?.type == "CreateMessageEvent" && lastEvent?.channelId == element?.id) {
-      updateMessages()
+      messageController.getMessageById(lastEvent.messageId).then(message => {
+        setMessages(messages => [ ...messages, message ])
+      })
     }
 
     if (lastEvent?.type == "UpdateMessageEvent" && lastEvent?.channelId == element?.id) {
-      updateMessages()
+      messageController.getMessageById(lastEvent.messageId).then(message => {
+        setMessages(messages => {
+          const newMessages = [ ...messages ]
+          newMessages[messages.findIndex(value => value.id == message.id)] = message
+          return newMessages
+        })
+      })
     }
 
     if (lastEvent?.type == "DeleteMessageEvent" && lastEvent?.channelId == element?.id) {
-      updateMessages()
+      setMessages(messages => {
+        const newMessages = [ ...messages ]
+        newMessages.splice(messages.findIndex(value => value.id == lastEvent.messageId), 1)
+        return newMessages
+      })
     }
 
     if (lastEvent?.type == "CreatePostEvent" && lastEvent?.channelId == element?.id) {
-      updatePosts()
+      postController.getPostById(lastEvent.postId).then(post => {
+        setPosts(posts => [ ...posts, post ])
+      })
+    }
+
+    if (lastEvent?.type == "UpdatePostEvent" && lastEvent?.channelId == element?.id) {
+      postController.getPostById(lastEvent.postId).then(post => {
+        setPosts(posts => {
+          const newPosts = [ ...posts ]
+          newPosts[posts.findIndex(value => value.id == post.id)] = post
+          return newPosts
+        })
+      })
+    }
+
+    if (lastEvent?.type == "DeletePostEvent" && lastEvent?.channelId == element?.id) {
+      setPosts(posts => {
+        const newPosts = [ ...posts ]
+        newPosts.splice(posts.findIndex(value => value.id == lastEvent.postId), 1)
+        return newPosts
+      })
     }
   }, [lastEvent])
 
@@ -63,13 +85,14 @@ function ChannelBody({ element }: ChannelBodyProps) {
     if (!element) return
 
     if (element?.type == ChannelTypeEnum.Channel) {
-      updatePosts()
-    } else {
-      meController.getUser().then((user: User) => {
-        setUserId(user.id!)
+      channelController.getPosts(element?.id!).then(posts => {
+        setPosts(posts)
       })
-
-      updateMessages()
+    } else {
+      meController.getUser().then(user => { setUserId(user.id!) })
+      channelController.getMessages(element?.id!).then(messages => {
+        setMessages(messages)
+      })
     }
   }, [element])
 
@@ -80,7 +103,7 @@ function ChannelBody({ element }: ChannelBodyProps) {
   return (
     <div className='channelBody'>
       { element.type == ChannelTypeEnum.Channel ? (
-        posts?.map(post => (
+        posts.map(post => (
           <div className='messageContainer'>
             <div className='message messageLeft'>
               <div className='content'>{post.content}</div>
@@ -89,7 +112,7 @@ function ChannelBody({ element }: ChannelBodyProps) {
           </div>
         ))
       ) : (
-        messages?.map(message => (
+        messages.map(message => (
           <div className='messageContainer'>
             <div className={message.user.id == userId ? 'message messageRight' : 'message messageLeft'}>
               <div className='content'>{message.content}</div>

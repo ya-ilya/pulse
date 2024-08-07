@@ -16,21 +16,21 @@ class MessageEventDispatcher(
     fun dispatchCreateMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
         gateway.sendToUserSessions(
             user.id!!,
-            CreateMessageEvent(channel.id!!)
+            CreateMessageEvent(channel.id!!, message.id!!)
         )
     }
 
     fun dispatchDeleteMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user ) ->
         gateway.sendToUserSessions(
             user.id!!,
-            DeleteMessageEvent(channel.id!!)
+            DeleteMessageEvent(channel.id!!, message.id!!)
         )
     }
 
     fun dispatchUpdateMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
         gateway.sendToUserSessions(
             user.id!!,
-            UpdateMessageEvent(channel.id!!)
+            UpdateMessageEvent(channel.id!!, message.id!!)
         )
     }
 }

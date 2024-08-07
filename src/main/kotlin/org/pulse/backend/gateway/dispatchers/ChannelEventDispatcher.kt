@@ -1,8 +1,6 @@
 package org.pulse.backend.gateway.dispatchers
 
 import org.pulse.backend.entities.channel.Channel
-import org.pulse.backend.entities.message.Message
-import org.pulse.backend.entities.post.Post
 import org.pulse.backend.gateway.Gateway
 import org.pulse.backend.gateway.events.*
 import org.pulse.backend.services.ChannelMemberService
@@ -17,13 +15,6 @@ class ChannelEventDispatcher(
         gateway.sendToUserSessions(
             user.id!!,
             CreateChannelEvent(channel.id!!)
-        )
-    }
-
-    fun dispatchCreatePostEvent(post: Post) = memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            CreatePostEvent(channel.id!!)
         )
     }
 

@@ -5,6 +5,7 @@ import org.pulse.backend.entities.post.Post
 import org.pulse.backend.requests.UpdatePostRequest
 import org.pulse.backend.services.PostService
 import org.pulse.backend.entities.user.User
+import org.pulse.backend.gateway.dispatchers.PostEventDispatcher
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.springframework.http.HttpStatus
@@ -17,7 +18,8 @@ import org.springframework.web.server.ResponseStatusException
 class PostController(
     private val postService: PostService,
     private val memberService: ChannelMemberService,
-    private val channelService: ChannelService
+    private val channelService: ChannelService,
+    private val postEventDispatcher: PostEventDispatcher
 ) {
     @GetMapping("/{postId}")
     fun getPostById(@PathVariable postId: Long): Post {
@@ -58,7 +60,9 @@ class PostController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        return postService.updatePost(postId, request.content)
+        return postService.updatePost(postId, request.content).also {
+            postEventDispatcher.dispatchUpdatePostEvent(it)
+        }
     }
 
     @DeleteMapping("/{postId}")
@@ -69,6 +73,8 @@ class PostController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        postService.deletePost(postId)
+        postService.deletePost(postId).also {
+            postEventDispatcher.dispatchUpdatePostEvent(post)
+        }
     }
 }

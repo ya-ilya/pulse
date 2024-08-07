@@ -64,17 +64,19 @@ function ProtectedRoute() {
       }
 
       if (await isTokenValid(localStorage.getItem('accessToken'), createMeController())) {
-        websocket = new WebSocket(`${window.location.origin}/gateway`)
+        if (websocket == undefined || websocket.readyState == websocket.CLOSED) {
+          websocket = new WebSocket(`${window.location.origin}/gateway`)
 
-        websocket.onopen = () => {
-          websocket?.send(localStorage.getItem('accessToken')!)
-        }
+          websocket.onopen = () => {
+            websocket?.send(localStorage.getItem('accessToken')!)
+          }
 
-        websocket.onmessage = (event) => {
-          const data = JSON.parse(event.data)
+          websocket.onmessage = (event) => {
+            const data = JSON.parse(event.data)
 
-          if (data["type"]) {
-            setLastEvent(data)
+            if (data["type"]) {
+              setLastEvent(data)
+            }
           }
         }
 

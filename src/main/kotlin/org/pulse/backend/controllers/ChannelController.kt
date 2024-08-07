@@ -7,6 +7,7 @@ import org.pulse.backend.entities.post.Post
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
+import org.pulse.backend.gateway.dispatchers.PostEventDispatcher
 import org.pulse.backend.requests.*
 import org.pulse.backend.services.*
 import org.springframework.http.HttpStatus
@@ -23,7 +24,8 @@ class ChannelController(
     private val userService: UserService,
     private val messageService: MessageService,
     private val channelEventDispatcher: ChannelEventDispatcher,
-    private val messageEventDispatcher: MessageEventDispatcher
+    private val messageEventDispatcher: MessageEventDispatcher,
+    private val postEventDispatcher: PostEventDispatcher
 ) {
     @GetMapping
     fun getChannels(@AuthenticationPrincipal user: User): List<Channel> {
@@ -112,7 +114,7 @@ class ChannelController(
         }
 
         return postService.createPost(request.content, channel).also {
-            channelEventDispatcher.dispatchCreatePostEvent(it)
+            postEventDispatcher.dispatchCreatePostEvent(it)
         }
     }
 
