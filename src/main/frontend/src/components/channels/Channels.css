@@ -26,8 +26,8 @@
 .channels .search {
   background-color: rgba(230, 230, 230, 120);
   width: 80%;
-  height: 50%;
-  border-radius: 20px;
+  height: 70%;
+  border-radius: 15px;
   border: 1px solid rgba(230, 230, 230, 50);
   display: flex;
   align-items: center;
@@ -74,6 +74,10 @@
   align-items: center;
   font-weight: 500;
   padding-left: 10px;
+}
+
+.channels .selectedChannel {
+  background-color: rgba(230, 230, 230, 50);
 }
 
 .channels .channel:hover {

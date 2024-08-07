@@ -3,12 +3,9 @@
 }
 
 .home {
-  overflow-x: hidden;
   width: 100%;
   height: 100%;
   position: absolute;
-  left: 0;
-  top: 0;
   display: flex;
   flex-direction: row;
 }

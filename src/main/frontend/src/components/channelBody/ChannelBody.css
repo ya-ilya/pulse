@@ -24,7 +24,7 @@
 }
 
 .channelBody .messageContainer {
-  width: 97%;
+  width: 100%;
   height: fit-content;
   display: flex;
   flex-direction: row;

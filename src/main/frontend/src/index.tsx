@@ -5,12 +5,7 @@ import './index.css'
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 import axios from 'axios'
 import { creaateAuthenticationController, createChannelController, createMeController, MeController } from './api/index.ts'
-
-export const GatewayContext = React.createContext<any | null>(null)
-
-export function useGatewayContext() {
-  return React.useContext(GatewayContext)
-}
+import { createGatway, GatewayContext, isGatewayOpen } from './gateway/index.ts'
 
 async function isTokenValid(token: string | null, meController: MeController): Promise<boolean> {
   if (!token) return false
@@ -32,8 +27,6 @@ async function isTokenValid(token: string | null, meController: MeController): P
 export const axiosClient = axios.create({
   baseURL: window.location.origin
 })
-
-var websocket: WebSocket | undefined
 
 function ProtectedRoute() {
   const [authenticationController] = useState(creaateAuthenticationController())
@@ -64,20 +57,8 @@ function ProtectedRoute() {
       }
 
       if (await isTokenValid(localStorage.getItem('accessToken'), createMeController())) {
-        if (websocket == undefined || websocket.readyState == websocket.CLOSED) {
-          websocket = new WebSocket(`${window.location.origin}/gateway`)
-
-          websocket.onopen = () => {
-            websocket?.send(localStorage.getItem('accessToken')!)
-          }
-
-          websocket.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-
-            if (data["type"]) {
-              setLastEvent(data)
-            }
-          }
+        if (!isGatewayOpen()) {
+          createGatway(`${window.location.origin}/gateway`, setLastEvent)
         }
 
         setAuthenticated(true)

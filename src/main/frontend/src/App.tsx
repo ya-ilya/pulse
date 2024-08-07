@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div className='home'>
-      <Channels setElement={setElement}/>
+      <Channels element={element} setElement={setElement}/>
       <div className='channel'>
         <ChannelTopBar element={element}/>
         <ChannelBody element={element}/>
