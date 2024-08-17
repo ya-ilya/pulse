@@ -17,7 +17,7 @@ class Post(
     var comments: Channel? = null,
     @OneToMany(mappedBy = "post")
     @JsonIgnore
-    val recited: MutableList<PostRecited>  = mutableListOf(),
+    val recited: MutableList<PostRecited> = mutableListOf(),
     @Id
     @GeneratedValue
     val id: Long? = null

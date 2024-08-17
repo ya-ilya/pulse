@@ -6,6 +6,7 @@
   padding: 16px;
   background-color: lightgray;
   gap: 8px;
+  overflow: auto;
 }
 
 .channelBody .dateContainer {
@@ -34,8 +35,8 @@
   max-width: 40%;
   padding: 6px;
   display: flex;
-  flex-direction: row;
-  gap: 8px;
+  flex-direction: column;
+  gap: 3px;
   background-color: white;
   width: fit-content;
   height: fit-content;
@@ -50,12 +51,23 @@
   margin-left: auto;
 }
 
-.channelBody .message .content {
+.channelBody .message .user {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.channelBody .message .inner {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.channelBody .message .inner .content {
   font-size: 16px;
   font-weight: 500;
 }
 
-.channelBody .message .timestamp {
+.channelBody .message .inner .timestamp {
   font-size: 12px;
   font-weight: 400;
   color: lightgray;

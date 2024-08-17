@@ -13,24 +13,27 @@ class MessageEventDispatcher(
     private val gateway: Gateway,
     private val memberService: ChannelMemberService
 ) {
-    fun dispatchCreateMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            CreateMessageEvent(channel.id!!, message.id!!)
-        )
-    }
+    fun dispatchCreateMessageEvent(message: Message) =
+        memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                CreateMessageEvent(channel.id!!, message.id!!)
+            )
+        }
 
-    fun dispatchDeleteMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user ) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            DeleteMessageEvent(channel.id!!, message.id!!)
-        )
-    }
+    fun dispatchDeleteMessageEvent(message: Message) =
+        memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                DeleteMessageEvent(channel.id!!, message.id!!)
+            )
+        }
 
-    fun dispatchUpdateMessageEvent(message: Message) = memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            UpdateMessageEvent(channel.id!!, message.id!!)
-        )
-    }
+    fun dispatchUpdateMessageEvent(message: Message) =
+        memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                UpdateMessageEvent(channel.id!!, message.id!!)
+            )
+        }
 }

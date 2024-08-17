@@ -1,6 +1,7 @@
 package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.pulse.backend.gateway.events.AuthenticationEvent
 import org.pulse.backend.services.AuthenticationService
 import org.pulse.backend.services.UserService
 import org.springframework.stereotype.Component
@@ -29,10 +30,19 @@ class Gateway(
             ""
         }
 
+        var state = false
+
         userService.findUserByEmail(email).ifPresent { user ->
             if (authenticationService.isAccessTokenValid(message.payload, user)) {
                 this[session]?.userId = user.id
+                state = true
             }
+        }
+
+        this[session]?.sendEvent(AuthenticationEvent(state))
+
+        if (!state) {
+            session.close()
         }
     }
 

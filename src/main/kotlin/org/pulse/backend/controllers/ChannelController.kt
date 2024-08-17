@@ -85,7 +85,11 @@ class ChannelController(
     }
 
     @PostMapping("/{channelId}/messages")
-    fun createMessage(@AuthenticationPrincipal user: User, @PathVariable channelId: Long, @RequestBody request: CreateMessageRequest): Message {
+    fun createMessage(
+        @AuthenticationPrincipal user: User,
+        @PathVariable channelId: Long,
+        @RequestBody request: CreateMessageRequest
+    ): Message {
         val channel = channelService.getChannelById(channelId)
 
         if (!channel.members.any { it.user.id == user.id }) {
@@ -102,7 +106,11 @@ class ChannelController(
     }
 
     @PostMapping("/{channelId}/posts")
-    fun createPost(@AuthenticationPrincipal user: User, @PathVariable channelId: Long, @RequestBody request: CreatePostRequest): Post {
+    fun createPost(
+        @AuthenticationPrincipal user: User,
+        @PathVariable channelId: Long,
+        @RequestBody request: CreatePostRequest
+    ): Post {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel) {
@@ -126,7 +134,10 @@ class ChannelController(
     }
 
     @PostMapping("/privateChat")
-    fun createPrivateChatChannel(@AuthenticationPrincipal user: User, @RequestBody request: CreatePrivateChatRequest): Channel  {
+    fun createPrivateChatChannel(
+        @AuthenticationPrincipal user: User,
+        @RequestBody request: CreatePrivateChatRequest
+    ): Channel {
         return channelService.createPrivateChatChannel(
             user,
             userService.getUserById(request.with)
@@ -136,7 +147,10 @@ class ChannelController(
     }
 
     @PostMapping("/groupChat")
-    fun createGroupChatChannel(@AuthenticationPrincipal user: User, @RequestBody request: CreateGroupChatRequest): Channel {
+    fun createGroupChatChannel(
+        @AuthenticationPrincipal user: User,
+        @RequestBody request: CreateGroupChatRequest
+    ): Channel {
         return channelService.createGroupChatChannel(
             request.name,
             user,

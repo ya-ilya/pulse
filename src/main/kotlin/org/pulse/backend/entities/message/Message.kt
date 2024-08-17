@@ -17,7 +17,7 @@ class Message(
     val user: User,
     @OneToMany(mappedBy = "message")
     @JsonIgnore
-    val recited: MutableList<MessageRecited>  = mutableListOf(),
+    val recited: MutableList<MessageRecited> = mutableListOf(),
     @Id
     @GeneratedValue
     val id: Long? = null

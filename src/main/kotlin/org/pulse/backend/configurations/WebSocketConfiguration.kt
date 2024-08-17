@@ -12,6 +12,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 class WebSocketConfiguration(private val gateway: Gateway) : WebSocketConfigurer {
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
-        registry.addHandler(gateway, "/gateway")
+        registry.addHandler(gateway, "/api/gateway")
     }
 }

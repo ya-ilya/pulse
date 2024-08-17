@@ -4,85 +4,44 @@ import App from './App.tsx'
 import './index.css'
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 import axios from 'axios'
-import { creaateAuthenticationController, createChannelController, createMeController, MeController } from './api/index.ts'
 import { createGatway, GatewayContext, isGatewayOpen } from './gateway/index.ts'
-
-async function isTokenValid(token: string | null, meController: MeController): Promise<boolean> {
-  if (!token) return false
-
-  const decodedToken = JSON.parse(atob(token.split('.')[1]))
-  const expirationTime = decodedToken.exp * 1000
-
-  let withoutErrors = true
-
-  try {
-    await meController.getUser()
-  } catch (error) {
-    withoutErrors = false
-  }
-
-  return Date.now() < expirationTime && withoutErrors
-}
+import Login from './components/login/Login.tsx'
 
 export const axiosClient = axios.create({
   baseURL: window.location.origin
 })
 
 function ProtectedRoute() {
-  const [authenticationController] = useState(creaateAuthenticationController())
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null)
+  const [authenticated, setAuthenticated] = useState<boolean>()
   const [lastEvent, setLastEvent] = useState<any>(null)
 
   useEffect(() => {
     const check = async () => {
-      if (!localStorage.getItem('accessToken')) {
-        var sigma = await authenticationController.signUp({
-          username: "Sigma",
-          email: "sigma@mail.com",
-          password: "sigma"
-        })
-        localStorage.setItem('accessToken', sigma.accessToken)
-        var chad = await authenticationController.signUp({
-          username: "Chad",
-          email: "chad@mail.com",
-          password: "chad"
-        })
-        const channelController = createChannelController()
-        var groupChat = await channelController.createGroupChat({ name: "Group Chat", with: [ chad.userId ] })
-        await channelController.createMessage(groupChat.id!, { content: "Hello, Chad!" })
-        localStorage.setItem('accessToken', chad.accessToken)
-        const chadChannelController = createChannelController()
-        chadChannelController.createMessage(groupChat.id!, { content: "Oh, hello, Sigma. I love you!"})
-        localStorage.setItem('accessToken', sigma.accessToken)
-      }
-
-      if (await isTokenValid(localStorage.getItem('accessToken'), createMeController())) {
+      if (localStorage.getItem('accessToken')) {
         if (!isGatewayOpen()) {
-          createGatway(`${window.location.origin}/gateway`, setLastEvent)
+          createGatway(`${window.location.origin}/api/gateway`, setLastEvent)
         }
-
-        setAuthenticated(true)
       } else {
-        try {
-          const response = await authenticationController.refreshToken({
-            refreshToken: localStorage.getItem('refreshToken')!
-          })
-
-          localStorage.setItem('accessToken', response.accessToken)
-          localStorage.setItem('refreshToken', response.refreshToken)
-          setAuthenticated(true)
-        } catch (error) {
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
-          setAuthenticated(false)
-        }
+        setAuthenticated(false)
       }
     }
 
     check()
-  })
+  }, [])
 
-  if (authenticated === null) {
+  useEffect(() => {
+    if (lastEvent?.type == "AuthenticationEvent") {
+      if (lastEvent.state === true) {
+        setAuthenticated(true)
+      } else {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        setAuthenticated(false)
+      }
+    }
+  }, [lastEvent])
+
+  if (authenticated === undefined) {
     return <div></div>
   }
 
@@ -101,9 +60,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <div>
-        Login Page
-      </div>
+      <Login/>
     )
   },
   {

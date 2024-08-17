@@ -1,6 +1,6 @@
 package org.pulse.backend.responses
 
-import java.util.UUID
+import java.util.*
 
 class AuthenticationResponse(
     val accessToken: String,

@@ -13,24 +13,27 @@ class PostEventDispatcher(
     private val gateway: Gateway,
     private val memberService: ChannelMemberService
 ) {
-    fun dispatchCreatePostEvent(post: Post) = memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            CreatePostEvent(channel.id!!, post.id!!)
-        )
-    }
+    fun dispatchCreatePostEvent(post: Post) =
+        memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                CreatePostEvent(channel.id!!, post.id!!)
+            )
+        }
 
-    fun dispatchDeletePostEvent(post: Post) = memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            DeletePostEvent(channel.id!!, post.id!!)
-        )
-    }
+    fun dispatchDeletePostEvent(post: Post) =
+        memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                DeletePostEvent(channel.id!!, post.id!!)
+            )
+        }
 
-    fun dispatchUpdatePostEvent(post: Post) = memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
-        gateway.sendToUserSessions(
-            user.id!!,
-            UpdatePostEvent(channel.id!!, post.id!!)
-        )
-    }
+    fun dispatchUpdatePostEvent(post: Post) =
+        memberService.findMembersByChannel(post.channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                UpdatePostEvent(channel.id!!, post.id!!)
+            )
+        }
 }

@@ -1,11 +1,11 @@
 package org.pulse.backend.controllers
 
-import org.pulse.backend.services.UserService
 import org.pulse.backend.entities.user.User
+import org.pulse.backend.services.UserService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/api/users")

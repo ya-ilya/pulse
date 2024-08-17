@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -29,7 +31,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 class SecurityConfiguration(
     private val userService: UserService,
     private val authenticationService: AuthenticationService,
-    private val authenticationProvider: AuthenticationProvider
+    private val passwordEncoder: PasswordEncoder
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? {
@@ -52,13 +54,14 @@ class SecurityConfiguration(
             }
             .authorizeHttpRequests { request ->
                 request
+                    .requestMatchers("/api/gateway").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }
             .sessionManagement { manager: SessionManagementConfigurer<HttpSecurity?> ->
                 manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
-            .authenticationProvider(authenticationProvider)
+            .authenticationProvider(authenticationProvider())
             .addFilterBefore(object : OncePerRequestFilter() {
                 override fun doFilterInternal(
                     request: HttpServletRequest,
@@ -102,6 +105,14 @@ class SecurityConfiguration(
                 }
             }, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
+    }
+
+    @Bean
+    fun authenticationProvider(): AuthenticationProvider {
+        val authenticationProvider = DaoAuthenticationProvider()
+        authenticationProvider.setUserDetailsService(userService)
+        authenticationProvider.setPasswordEncoder(passwordEncoder)
+        return authenticationProvider
     }
 
     private companion object {

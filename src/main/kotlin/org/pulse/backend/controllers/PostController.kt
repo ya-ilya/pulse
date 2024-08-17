@@ -2,12 +2,12 @@ package org.pulse.backend.controllers
 
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.post.Post
-import org.pulse.backend.requests.UpdatePostRequest
-import org.pulse.backend.services.PostService
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.PostEventDispatcher
+import org.pulse.backend.requests.UpdatePostRequest
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
+import org.pulse.backend.services.PostService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*

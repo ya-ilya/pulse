@@ -18,4 +18,8 @@ export function createGatway(url: string, setLastEvent: (event: any) => void) {
       setLastEvent(data)
     }
   }
+
+  websocket.onclose = () => {
+    window.location.reload()
+  }
 }

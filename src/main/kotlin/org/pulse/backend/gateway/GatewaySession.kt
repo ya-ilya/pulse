@@ -5,7 +5,7 @@ import org.pulse.backend.entities.user.User
 import org.pulse.backend.services.UserService
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
-import java.util.UUID
+import java.util.*
 
 class GatewaySession(
     val session: WebSocketSession,

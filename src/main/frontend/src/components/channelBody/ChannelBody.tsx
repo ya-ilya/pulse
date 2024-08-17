@@ -4,7 +4,7 @@ import './ChannelBody.css'
 import { createMeController, createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController } from '../../api'
 import { useGatewayContext } from '../../gateway'
 
-type ChannelBodyProps = { element: ChannelElement | null }
+type ChannelBodyProps = { element: ChannelElement | undefined }
 
 function formatDate(date: Date | string): string {
   if (date instanceof Date) {
@@ -24,9 +24,21 @@ function ChannelBody({ element }: ChannelBodyProps) {
   const [channelController] = useState(createChannelController())
   const [messageController] = useState(createMessageController())
   const [postController] = useState(createPostController())
-  const [userId, setUserId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string>()
   const [messages, setMessages] = useState<Message[]>([])
   const [posts, setPosts] = useState<Post[]>([])
+
+  useEffect(() => {
+    var channelBody = document.getElementsByClassName("channelBody")[0]
+
+    if (!channelBody) {
+      return
+    }
+
+    if (channelBody.scrollHeight - channelBody.clientHeight <= channelBody.scrollTop + 1) {
+      channelBody.scrollTop = channelBody.scrollHeight - channelBody.clientHeight;
+    }
+  }, [messages, posts])
 
   useGatewayContext({
     "CreateMessageEvent": (event) => {
@@ -98,8 +110,10 @@ function ChannelBody({ element }: ChannelBodyProps) {
         posts.map(post => (
           <div className='messageContainer'>
             <div className='message messageLeft'>
-              <div className='content'>{post.content}</div>
-              <div className='timestamp'>{formatDate(post.timestamp)}</div>
+              <div className='inner'>
+                <div className='content'>{post.content}</div>
+                <div className='timestamp'>{formatDate(post.timestamp)}</div>
+              </div>
             </div>
           </div>
         ))
@@ -107,8 +121,11 @@ function ChannelBody({ element }: ChannelBodyProps) {
         messages.map(message => (
           <div className='messageContainer'>
             <div className={message.user.id == userId ? 'message messageRight' : 'message messageLeft'}>
-              <div className='content'>{message.content}</div>
-              <div className='timestamp'>{formatDate(message.timestamp)}</div>
+              { element.type != ChannelTypeEnum.PrivateChat && <div className='user'>{message.user.displayName}</div> }
+              <div className='inner'>
+                <div className='content'>{message.content}</div>
+                <div className='timestamp'>{formatDate(message.timestamp)}</div>
+              </div>
             </div>
           </div>
         ))

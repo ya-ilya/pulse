@@ -11,12 +11,16 @@ export interface ChannelElement {
 }
 
 function channelElement(channel: Channel): ChannelElement {
-  return { name: channel.name!, type: channel.type!, id: channel.id! }
+  return { name: channel.name ?? 'TODO: Private Chat Name', type: channel.type!, id: channel.id! }
 }
 
-type ChannelsProps = { element: ChannelElement | null, setElement: (element: ChannelElement | null) => void }
+type ChannelsProps = {
+  element: ChannelElement | undefined,
+  setElement: (element: ChannelElement | undefined) => void,
+  setShowSidebar: (showSidebar: boolean) => void
+}
 
-function Channels({ element, setElement }: ChannelsProps) {
+function Channels({ element, setElement, setShowSidebar }: ChannelsProps) {
   const [channelController] = useState(createChannelController())
   const [query, setQuery] = useState("")
   const [elements, setElements] = useState<ChannelElement[]>([])
@@ -54,7 +58,7 @@ function Channels({ element, setElement }: ChannelsProps) {
   return (
     <div className="channels">
       <div className="searchContainer">
-        <FiMenu/>
+        <FiMenu onClick={() => setShowSidebar(true)}/>
         <div className='search'>
           <input className='input' type='text' placeholder='Search' value={query} onChange={(event) => setQuery(event.target.value)}/>
         </div>

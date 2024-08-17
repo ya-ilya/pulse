@@ -18,13 +18,13 @@ class Channel(
     val post: Post? = null,
     @JsonIgnore
     @OneToMany(mappedBy = "channel", fetch = FetchType.EAGER)
-    val members: MutableList<ChannelMember>  = mutableListOf(),
+    val members: MutableList<ChannelMember> = mutableListOf(),
     @JsonIgnore
     @OneToMany(mappedBy = "channel")
-    val messages: MutableList<Message>  = mutableListOf(),
+    val messages: MutableList<Message> = mutableListOf(),
     @JsonIgnore
     @OneToMany(mappedBy = "channel")
-    val posts: MutableList<Post>  = mutableListOf(),
+    val posts: MutableList<Post> = mutableListOf(),
     @Id
     @GeneratedValue
     val id: Long? = null

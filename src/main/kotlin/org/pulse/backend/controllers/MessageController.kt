@@ -1,10 +1,10 @@
 package org.pulse.backend.controllers
 
 import org.pulse.backend.entities.message.Message
-import org.pulse.backend.requests.UpdateMessageRequest
-import org.pulse.backend.services.MessageService
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
+import org.pulse.backend.requests.UpdateMessageRequest
+import org.pulse.backend.services.MessageService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
