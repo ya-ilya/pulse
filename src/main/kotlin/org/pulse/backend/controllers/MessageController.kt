@@ -14,14 +14,14 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/api/messages")
 class MessageController(
     private val messageService: MessageService,
-    private val messageEventDisptacher: MessageEventDispatcher
+    private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping("/{messageId}")
     fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Message {
         val message = messageService.getMessageById(messageId)
 
         if (!message.channel.members.any { it.user.id == user.id }) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found")
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
         }
 
         return message
@@ -40,7 +40,7 @@ class MessageController(
         }
 
         return messageService.updateMessage(messageId, request.content).also {
-            messageEventDisptacher.dispatchUpdateMessageEvent(it)
+            messageEventDispatcher.dispatchUpdateMessageContentEvent(it)
         }
     }
 
@@ -53,7 +53,7 @@ class MessageController(
         }
 
         messageService.deleteMessage(messageId).also {
-            messageEventDisptacher.dispatchDeleteMessageEvent(message)
+            messageEventDispatcher.dispatchDeleteMessageEvent(message)
         }
     }
 }

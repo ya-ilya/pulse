@@ -19,7 +19,11 @@ export class UserController {
     })
   }
 
-  async getUserById(userId: number): Promise<User> {
+  async getUserById(userId: string): Promise<User> {
     return (await this.client.get(`/${userId}`)).data
+  }
+
+  async getUserByUsername(username: string): Promise<User> {
+    return (await this.client.get(`/by-username/${username}`)).data
   }
 }

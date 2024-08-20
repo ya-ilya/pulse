@@ -1,0 +1,102 @@
+.createGroupDialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 200px;
+  height: fit-content;
+  z-index: 20;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.createGroupDialog .header {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.createGroupDialog .nameInput {
+  border: solid;
+  border-color: rgb(230, 230, 230);
+  border-width: 0px;
+  border-bottom-width: 1px;
+  font-size: 18px;
+}
+
+.createGroupDialog .nameInput:focus {
+  outline: none;
+  border-color: gray;
+}
+
+.createGroupDialog .users {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+  border: 1px solid gray;
+  border-radius: 12px;
+}
+
+.createGroupDialog .users .header {
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.createGroupDialog .users .list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+}
+
+.createGroupDialog .users .list .element {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.createGroupDialog .users .list .element:hover {
+  cursor: pointer;
+}
+
+.createGroupDialog .users .addUser {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.createGroupDialog .users .addUser .usernameInput {
+  border: solid;
+  border-color: rgb(230, 230, 230);
+  border-width: 0px;
+  border-bottom-width: 1px;
+  font-size: 18px;
+  width: 100%;
+}
+
+.createGroupDialog .users .addUser .usernameInput:focus {
+  outline: none;
+  border-color: gray;
+}
+
+.createGroupDialog .users .addUser .button {
+  border: 1px solid black;
+  border-radius: 4px;
+}
+
+.createGroupDialog .submit {
+  background-color: rgb(230, 230, 230);
+  border-color: transparent;
+  border-radius: 8px;
+  font-size: 18px;
+}

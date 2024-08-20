@@ -1,0 +1,43 @@
+.createChannelDialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 200px;
+  height: fit-content;
+  z-index: 20;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.createChannelDialog .header {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.createChannelDialog .nameInput {
+  border: solid;
+  border-color: rgb(230, 230, 230);
+  border-width: 0px;
+  border-bottom-width: 1px;
+  font-size: 18px;
+}
+
+.createChannelDialog .nameInput:focus {
+  outline: none;
+  border-color: gray;
+}
+
+.createChannelDialog .submit {
+  background-color: rgb(230, 230, 230);
+  border-color: transparent;
+  border-radius: 8px;
+  font-size: 18px;
+}

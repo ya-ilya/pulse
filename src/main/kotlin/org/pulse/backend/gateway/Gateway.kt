@@ -59,6 +59,12 @@ class Gateway(
     }
 
     fun sendToUserSessions(userId: UUID, event: GatewayEvent) {
-        get(userId)?.forEach { it.sendEvent(event) }
+        get(userId)?.forEach {
+            try {
+                it.sendEvent(event)
+            } catch (ex: Exception) {
+                it.session.close()
+            }
+        }
     }
 }

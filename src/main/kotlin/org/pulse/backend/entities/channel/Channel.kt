@@ -6,11 +6,12 @@ import org.pulse.backend.entities.channel.member.ChannelMember
 import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.post.Post
 import org.pulse.backend.entities.user.User
+import org.springframework.security.core.context.SecurityContextHolder
 
 @Entity
 class Channel(
     val type: ChannelType? = null,
-    var name: String? = null,
+    name: String? = null,
     @ManyToOne
     val admin: User? = null,
     @OneToOne(mappedBy = "comments")
@@ -28,4 +29,17 @@ class Channel(
     @Id
     @GeneratedValue
     val id: Long? = null
-)
+) {
+    var name: String? = name
+        get() {
+            if (field == null && type == ChannelType.PrivateChat) {
+                val principal = SecurityContextHolder.getContext().authentication.principal
+
+                if (principal != null && principal is User) {
+                    return members.map { it.user }.first { it.id != principal.id }.username
+                }
+            }
+
+            return field
+        }
+}

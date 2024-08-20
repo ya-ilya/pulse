@@ -21,6 +21,11 @@ class UserService(
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
     }
 
+    fun getUserByUsername(username: String): User {
+        return findUserByUsername(username)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
+    }
+
     fun findUserByUsername(username: String): Optional<User> {
         return userRepository.findByUsername(username)
     }

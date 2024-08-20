@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChannelElement } from "../channels/Channels";
 import "./ChannelBottomBar.css"
 import { IoSend } from "react-icons/io5";
@@ -8,24 +8,6 @@ type ChannelBottomBarProps = { element: ChannelElement | undefined }
 
 function ChannelBottomBar({ element }: ChannelBottomBarProps) {
   const [message, setMessage] = useState("")
-
-  useEffect(() => {
-    const focusOnTextInput = () => {
-      const messageInput = document.getElementsByClassName('messageInput').item(0)
-
-      if (messageInput) {
-        (messageInput as HTMLElement).focus()
-      }
-    }
-
-    document.addEventListener('click', focusOnTextInput)
-    document.addEventListener('DOMContentLoaded', focusOnTextInput)
-
-    return () => {
-      document.removeEventListener('click', focusOnTextInput)
-      document.removeEventListener('DOMContentLoaded', focusOnTextInput)
-    }
-  }, [])
 
   if (!element) {
     return <div></div>

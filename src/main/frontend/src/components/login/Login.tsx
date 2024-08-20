@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { creaateAuthenticationController } from "../../api"
+import { creaateAuthenticationController, createMeController } from "../../api"
 import { Navigate } from "react-router-dom"
 import './Login.css'
 
 function Login() {
   const [authenticationController] = useState(creaateAuthenticationController())
+
   const [email, setEmail] = useState<string>("ilya@mail.com")
   const [password, setPassword] = useState<string>("password")
   const [done, setDone] = useState(localStorage.getItem('accessToken') != null)
@@ -15,7 +16,11 @@ function Login() {
       .then(response => {
         localStorage.setItem('accessToken', response.accessToken)
         localStorage.setItem('refreshToken', response.refreshToken)
-        setDone(true)
+
+        createMeController().getUser().then(user => {
+          localStorage.setItem('user', JSON.stringify(user))
+          setDone(true)
+        })
       })
   }
 

@@ -11,6 +11,7 @@ export class PostController {
 
   constructor(client: Axios, token: string) {
     this.client = axios.create({
+      ...client.defaults,
       baseURL: client.defaults.baseURL + "/api/posts",
       headers: {
         'Authorization': `Bearer ${token}`
@@ -28,6 +29,10 @@ export class PostController {
 
   async joinComments(postId: number): Promise<Channel> {
     return (await this.client.get(`/${postId}/comments/join`)).data
+  }
+
+  async recitePost(postId: number) {
+    (await this.client.get(`/${postId}/recite`))
   }
 
   async updateMessage(postId: number, body: UpdatePostRequest): Promise<Post> {

@@ -61,7 +61,7 @@ class PostController(
         }
 
         return postService.updatePost(postId, request.content).also {
-            postEventDispatcher.dispatchUpdatePostEvent(it)
+            postEventDispatcher.dispatchUpdatePostContentEvent(it)
         }
     }
 
@@ -74,7 +74,7 @@ class PostController(
         }
 
         postService.deletePost(postId).also {
-            postEventDispatcher.dispatchUpdatePostEvent(post)
+            postEventDispatcher.dispatchUpdatePostContentEvent(post)
         }
     }
 }

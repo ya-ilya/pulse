@@ -47,6 +47,10 @@ class AuthenticationService(
     }
 
     fun signUp(username: String, email: String, password: String): AuthenticationResponse {
+        if (userService.findUserByUsername(username).isPresent) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
+        }
+
         if (userService.findUserByEmail(email).isPresent) {
             throw ResponseStatusException(HttpStatus.CONFLICT)
         }

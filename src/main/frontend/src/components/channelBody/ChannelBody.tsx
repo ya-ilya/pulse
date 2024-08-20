@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ChannelElement } from '../channels/Channels'
 import './ChannelBody.css'
-import { createMeController, createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController } from '../../api'
+import { createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController } from '../../api'
 import { useGatewayContext } from '../../gateway'
+import { AuthenticationContext } from '../..'
 
 type ChannelBodyProps = { element: ChannelElement | undefined }
 
@@ -20,13 +21,14 @@ function formatDate(date: Date | string): string {
 }
 
 function ChannelBody({ element }: ChannelBodyProps) {
-  const [meController] = useState(createMeController())
   const [channelController] = useState(createChannelController())
   const [messageController] = useState(createMessageController())
   const [postController] = useState(createPostController())
-  const [userId, setUserId] = useState<string>()
+
   const [messages, setMessages] = useState<Message[]>([])
   const [posts, setPosts] = useState<Post[]>([])
+
+  const self = useContext(AuthenticationContext)
 
   useEffect(() => {
     var channelBody = document.getElementsByClassName("channelBody")[0]
@@ -46,13 +48,11 @@ function ChannelBody({ element }: ChannelBodyProps) {
         setMessages(messages => [ ...messages, message ])
       })
     },
-    "UpdateMessageEvent": (event) => {
-      messageController.getMessageById(event.messageId).then(message => {
-        setMessages(messages => {
-          const newMessages = [ ...messages ]
-          newMessages[messages.findIndex(value => value.id == message.id)] = message
-          return newMessages
-        })
+    "UpdateMessageContentEvent": (event) => {
+      setMessages(messages => {
+        const newMessages = [ ...messages ]
+        newMessages[messages.findIndex(value => value.id == event.messageId)].content = event.content
+        return newMessages
       })
     },
     "DeleteMessageEvent": (event) => {
@@ -67,13 +67,11 @@ function ChannelBody({ element }: ChannelBodyProps) {
         setPosts(posts => [ ...posts, post ])
       })
     },
-    "UpdatePostEvent": (event) => {
-      postController.getPostById(event.postId).then(post => {
-        setPosts(posts => {
-          const newPosts = [ ...posts ]
-          newPosts[posts.findIndex(value => value.id == post.id)] = post
-          return newPosts
-        })
+    "UpdatePostContentEvent": (event) => {
+      setPosts(posts => {
+        const newPosts = [ ...posts ]
+        newPosts[posts.findIndex(value => value.id == event.postId)].content = event.content
+        return newPosts
       })
     },
     "DeletePostEvent": (event) => {
@@ -83,17 +81,19 @@ function ChannelBody({ element }: ChannelBodyProps) {
         return newPosts
       })
     },
-  }, () => element != null)
+  }, (event) => element != null && event.channelId == element.id)
 
   useEffect(() => {
     if (!element) return
+
+    setPosts([])
+    setMessages([])
 
     if (element?.type == ChannelTypeEnum.Channel) {
       channelController.getPosts(element?.id!).then(posts => {
         setPosts(posts)
       })
     } else {
-      meController.getUser().then(user => { setUserId(user.id!) })
       channelController.getMessages(element?.id!).then(messages => {
         setMessages(messages)
       })
@@ -120,7 +120,7 @@ function ChannelBody({ element }: ChannelBodyProps) {
       ) : (
         messages.map(message => (
           <div className='messageContainer'>
-            <div className={message.user.id == userId ? 'message messageRight' : 'message messageLeft'}>
+            <div className={message.user.id == self?.id ? 'message messageRight' : 'message messageLeft'}>
               { element.type != ChannelTypeEnum.PrivateChat && <div className='user'>{message.user.displayName}</div> }
               <div className='inner'>
                 <div className='content'>{message.content}</div>

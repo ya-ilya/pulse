@@ -31,6 +31,11 @@ class PulseApplication(
             ilya,
             listOf(pavel)
         )
+
+        val privateChat = channelService.createPrivateChatChannel(
+            ilya,
+            pavel
+        )
     }
 }
 

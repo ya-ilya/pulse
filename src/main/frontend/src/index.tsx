@@ -6,10 +6,13 @@ import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-rou
 import axios from 'axios'
 import { createGatway, GatewayContext, isGatewayOpen } from './gateway/index.ts'
 import Login from './components/login/Login.tsx'
+import { User } from './api/index.ts'
 
 export const axiosClient = axios.create({
   baseURL: window.location.origin
 })
+
+export const AuthenticationContext = React.createContext<User | null>(null)
 
 function ProtectedRoute() {
   const [authenticated, setAuthenticated] = useState<boolean>()
@@ -50,9 +53,11 @@ function ProtectedRoute() {
   }
 
   return (
-    <GatewayContext.Provider value={lastEvent}>
-      <Outlet/>
-    </GatewayContext.Provider>
+    <AuthenticationContext.Provider value={JSON.parse(localStorage.getItem("user")!)}>
+      <GatewayContext.Provider value={lastEvent}>
+        <Outlet/>
+      </GatewayContext.Provider>
+    </AuthenticationContext.Provider>
   )
 }
 

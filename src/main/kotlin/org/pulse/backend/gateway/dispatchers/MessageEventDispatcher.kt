@@ -4,7 +4,7 @@ import org.pulse.backend.entities.message.Message
 import org.pulse.backend.gateway.Gateway
 import org.pulse.backend.gateway.events.CreateMessageEvent
 import org.pulse.backend.gateway.events.DeleteMessageEvent
-import org.pulse.backend.gateway.events.UpdateMessageEvent
+import org.pulse.backend.gateway.events.UpdateMessageContentEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 
@@ -29,11 +29,11 @@ class MessageEventDispatcher(
             )
         }
 
-    fun dispatchUpdateMessageEvent(message: Message) =
+    fun dispatchUpdateMessageContentEvent(message: Message) =
         memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                UpdateMessageEvent(channel.id!!, message.id!!)
+                UpdateMessageContentEvent(channel.id!!, message.id!!, message.content)
             )
         }
 }

@@ -11,7 +11,7 @@ export interface ChannelElement {
 }
 
 function channelElement(channel: Channel): ChannelElement {
-  return { name: channel.name ?? 'TODO: Private Chat Name', type: channel.type!, id: channel.id! }
+  return { name: channel.name!, type: channel.type!, id: channel.id! }
 }
 
 type ChannelsProps = {
@@ -22,6 +22,7 @@ type ChannelsProps = {
 
 function Channels({ element, setElement, setShowSidebar }: ChannelsProps) {
   const [channelController] = useState(createChannelController())
+
   const [query, setQuery] = useState("")
   const [elements, setElements] = useState<ChannelElement[]>([])
 
@@ -57,13 +58,13 @@ function Channels({ element, setElement, setShowSidebar }: ChannelsProps) {
 
   return (
     <div className="channels">
-      <div className="searchContainer">
+      <div className="topBar">
         <FiMenu onClick={() => setShowSidebar(true)}/>
         <div className='search'>
           <input className='input' type='text' placeholder='Search' value={query} onChange={(event) => setQuery(event.target.value)}/>
         </div>
       </div>
-      { elements && elements.map(value => <div className={value.id == element?.id ? "channel selectedChannel" : "channel"} onClick={() => setElement(value)}>{value.name}</div>) }
+      { elements && elements.filter(value => value.name.includes(query)).map(value => <div className={value.id == element?.id ? "channel selectedChannel" : "channel"} onClick={() => setElement(value)}>{value.name}</div>) }
     </div>
   )
 }

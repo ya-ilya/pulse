@@ -74,7 +74,7 @@ class ChannelController(
     }
 
     @GetMapping("/{channelId}/posts")
-    fun getPosts(@PathVariable channelId: Long): List<Post> {
+    fun getPosts(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<Post> {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel) {
