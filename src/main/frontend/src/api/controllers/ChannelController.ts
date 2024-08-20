@@ -36,7 +36,7 @@ export class ChannelController {
   }
 
   async getPosts(channelId: number): Promise<Post[]> {
-    return (await this.client.get(`/${channelId}/post`)).data
+    return (await this.client.get(`/${channelId}/posts`)).data
   }
 
   async createMessage(channelId: number, body: CreateMessageRequest): Promise<Message> {

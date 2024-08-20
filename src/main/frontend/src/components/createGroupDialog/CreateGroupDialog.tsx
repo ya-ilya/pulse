@@ -4,7 +4,10 @@ import './CreateGroupDialog.css'
 import { AuthenticationContext } from '../..'
 import { FaUser } from 'react-icons/fa'
 
-type CreateGroupDialogProps = { showCreateGroupDialog: boolean, setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void }
+type CreateGroupDialogProps = {
+  showCreateGroupDialog: boolean,
+  setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void
+}
 
 function CreateGroupDialog({ showCreateGroupDialog, setShowCreateGroupDialog }: CreateGroupDialogProps) {
   const [channelController] = useState(createChannelController())

@@ -7,9 +7,18 @@ import axios from 'axios'
 import { createGatway, GatewayContext, isGatewayOpen } from './gateway/index.ts'
 import Login from './components/login/Login.tsx'
 import { User } from './api/index.ts'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 export const axiosClient = axios.create({
   baseURL: window.location.origin
+})
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity
+    }
+  }
 })
 
 export const AuthenticationContext = React.createContext<User | null>(null)
@@ -55,7 +64,9 @@ function ProtectedRoute() {
   return (
     <AuthenticationContext.Provider value={JSON.parse(localStorage.getItem("user")!)}>
       <GatewayContext.Provider value={lastEvent}>
-        <Outlet/>
+        <QueryClientProvider client={queryClient}>
+          <Outlet/>
+        </QueryClientProvider>
       </GatewayContext.Provider>
     </AuthenticationContext.Provider>
   )

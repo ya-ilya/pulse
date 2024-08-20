@@ -2,6 +2,7 @@ package org.pulse.backend.gateway.events
 
 import org.pulse.backend.gateway.GatewayEvent
 
-class UpdateChannelEvent(
-    val channelId: Long
+class UpdateChannelNameEvent(
+    val channelId: Long,
+    val name: String
 ) : GatewayEvent

@@ -2,7 +2,10 @@ import { useState } from "react"
 import { createChannelController } from "../../api"
 import './CreateChannelDialog.css'
 
-type CreateChannelDialogProps = { showCreateChannelDialog: boolean, setShowCreateChannelDialog: (showCreateChannelDialog: boolean) => void }
+type CreateChannelDialogProps = {
+ showCreateChannelDialog: boolean,
+ setShowCreateChannelDialog: (showCreateChannelDialog: boolean) => void
+}
 
 function CreateChannelDialog({ showCreateChannelDialog, setShowCreateChannelDialog }: CreateChannelDialogProps) {
   const [channelController] = useState(createChannelController())

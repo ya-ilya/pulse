@@ -1,70 +1,68 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import "./Channels.css"
 import { FiMenu } from "react-icons/fi"
-import { Channel, ChannelTypeEnum, createChannelController } from "../../api"
+import { Channel, createChannelController } from "../../api"
 import { useGatewayContext } from "../../gateway"
-
-export interface ChannelElement {
-  name: string
-  type: ChannelTypeEnum
-  id: number
-}
-
-function channelElement(channel: Channel): ChannelElement {
-  return { name: channel.name!, type: channel.type!, id: channel.id! }
-}
+import { useQuery, useQueryClient } from "react-query"
 
 type ChannelsProps = {
-  element: ChannelElement | undefined,
-  setElement: (element: ChannelElement | undefined) => void,
+  channel: Channel | undefined,
+  setChannel: (channel: Channel | undefined) => void,
   setShowSidebar: (showSidebar: boolean) => void
 }
 
-function Channels({ element, setElement, setShowSidebar }: ChannelsProps) {
+function Channels({ channel, setChannel, setShowSidebar }: ChannelsProps) {
+  const queryClient = useQueryClient()
+
   const [channelController] = useState(createChannelController())
 
-  const [query, setQuery] = useState("")
-  const [elements, setElements] = useState<ChannelElement[]>([])
+  const [filterQuery, setFilterQuery] = useState("")
+  
+  const channelsQuery = useQuery({
+    queryKey: ["channels"],
+    queryFn: () => channelController.getChannels(),
+    keepPreviousData: true
+  })
 
   useGatewayContext({
     "CreateChannelEvent": (event) => {
       channelController.getChannelById(event.channelId).then(channel => {
-        setElements(elements => [ ...elements, channelElement(channel) ])
+        queryClient.setQueriesData(["channels"], (channels: Channel[] | undefined) => {
+          if (!channels) return [ channel ]
+
+          return [ ...channels, channel ]
+        }) 
       })
     },
-    "UpdateChannelEvent": (event) => {
-      channelController.getChannelById(event.channelId).then(channel => {
-        setElements(elements => {
-          const newElements = [ ...elements ]
-          newElements[elements.findIndex(value => value.id == channel.id)] = channelElement(channel)
-          return newElements
-        })
+    "UpdateChannelNameEvent": (event) => {
+      queryClient.setQueriesData(["channels"], (channels: Channel[] | undefined) => {
+        if (!channels) return []
+
+        const newElements = [ ...channels ]
+        newElements[channels.findIndex(value => value.id == event.channelId)].name = event.name
+        return newElements
       })
     },
     "DeleteChannelEvent": (event) => {
-      setElements(elements => {
-        const newElements = [ ...elements ]
-        newElements.splice(elements.findIndex(value => value.id == event.channelId), 1)
+      queryClient.setQueriesData(["channels"], (channels: Channel[] | undefined) => {
+        if (!channels) return []
+
+        const newElements = [ ...channels ]
+        newElements.splice(channels.findIndex(value => value.id == event.channelId), 1)
         return newElements
       })
     }
   })
-
-  useEffect(() => {
-    channelController.getChannels().then(channels => {
-      setElements(channels.map(channel => channelElement(channel)))
-    })
-  }, [])
 
   return (
     <div className="channels">
       <div className="topBar">
         <FiMenu onClick={() => setShowSidebar(true)}/>
         <div className='search'>
-          <input className='input' type='text' placeholder='Search' value={query} onChange={(event) => setQuery(event.target.value)}/>
+          <input className='input' type='text' placeholder='Search' value={filterQuery} onChange={(event) => setFilterQuery(event.target.value)}/>
         </div>
       </div>
-      { elements && elements.filter(value => value.name.includes(query)).map(value => <div className={value.id == element?.id ? "channel selectedChannel" : "channel"} onClick={() => setElement(value)}>{value.name}</div>) }
+      { channelsQuery.data?.filter(value => value.name?.includes(filterQuery)).map(value => <div className={value.id == channel?.id ? "channel selectedChannel" : "channel"} onClick={() => setChannel(value)}>{value.name}</div>) }
     </div>
   )
 }

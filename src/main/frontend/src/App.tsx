@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import './App.css'
-import Channels, { ChannelElement } from './components/channels/Channels'
+import Channels from './components/channels/Channels'
 import ChannelBody from './components/channelBody/ChannelBody'
 import ChannelTopBar from './components/channelTopBar/ChannelTopBar'
 import ChannelBottomBar from './components/channelBottomBar/ChannelBottomBar'
 import { Sidebar } from './components/sidebar/Sidebar'
 import CreateChannelDialog from './components/createChannelDialog/CreateChannelDialog'
 import CreateGroupDialog from './components/createGroupDialog/CreateGroupDialog'
+import { Channel } from './api'
 
 function App() {
-  const [element, setElement] = useState<ChannelElement>()
+  const [channel, setChannel] = useState<Channel>()
   const [showSidebar, setShowSidebar] = useState<boolean>(false)
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState<boolean>(false)
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState<boolean>(false)
@@ -26,11 +27,11 @@ function App() {
   return (
     <div className='home'>
       <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} setShowCreateChannelDialog={setShowCreateChannelDialog} setShowCreateGroupDialog={setShowCreateGroupDialog}/>
-      <Channels element={element} setElement={setElement} setShowSidebar={setShowSidebar}/>
+      <Channels channel={channel} setChannel={setChannel} setShowSidebar={setShowSidebar}/>
       <div className='channel'>
-        <ChannelTopBar element={element}/>
-        <ChannelBody element={element}/>
-        <ChannelBottomBar element={element}/>
+        <ChannelTopBar channel={channel}/>
+        <ChannelBody channel={channel}/>
+        <ChannelBottomBar channel={channel}/>
       </div>
       <CreateChannelDialog showCreateChannelDialog={showCreateChannelDialog} setShowCreateChannelDialog={setShowCreateChannelDialog}/>
       <CreateGroupDialog showCreateGroupDialog={showCreateGroupDialog} setShowCreateGroupDialog={setShowCreateGroupDialog}/>

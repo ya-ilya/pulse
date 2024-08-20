@@ -177,7 +177,7 @@ class ChannelController(
         }
 
         return channelService.updateChannel(channelId, request.name).also {
-            channelEventDispatcher.dispatchUpdateChannelEvent(it)
+            channelEventDispatcher.dispatchUpdateChannelNameEvent(it)
         }
     }
 

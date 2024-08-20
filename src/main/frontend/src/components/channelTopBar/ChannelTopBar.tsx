@@ -1,16 +1,18 @@
-import { ChannelElement } from "../channels/Channels"
+import { Channel } from "../../api"
 import './ChannelTopBar.css'
 
-type ChannelTopBarProps = { element: ChannelElement | undefined }
+type ChannelTopBarProps = {
+  channel: Channel | undefined
+}
 
-function ChannelTopBar({ element }: ChannelTopBarProps) {
-  if (!element) {
+function ChannelTopBar({ channel }: ChannelTopBarProps) {
+  if (!channel) {
     return <div></div>
   }
 
   return (
     <div className="channelTopBar">
-      {element?.name}
+      {channel?.name}
     </div>
   )
 }

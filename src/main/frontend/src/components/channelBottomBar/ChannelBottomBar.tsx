@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { ChannelElement } from "../channels/Channels";
 import "./ChannelBottomBar.css"
 import { IoSend } from "react-icons/io5";
-import { ChannelTypeEnum, createChannelController } from "../../api";
+import { Channel, ChannelTypeEnum, createChannelController } from "../../api";
 
-type ChannelBottomBarProps = { element: ChannelElement | undefined }
+type ChannelBottomBarProps = {
+  channel: Channel | undefined
+}
 
-function ChannelBottomBar({ element }: ChannelBottomBarProps) {
+function ChannelBottomBar({ channel }: ChannelBottomBarProps) {
   const [message, setMessage] = useState("")
 
-  if (!element) {
+  if (!channel) {
     return <div></div>
   }
 
@@ -19,11 +20,11 @@ function ChannelBottomBar({ element }: ChannelBottomBarProps) {
     }
 
     createChannelController()
-      .createMessage(element?.id!, { content: message })
+      .createMessage(channel?.id!, { content: message })
       .then(() => setMessage(""))
   }
 
-  return element?.type != ChannelTypeEnum.Channel ? (
+  return channel?.type != ChannelTypeEnum.Channel ? (
     <div className="channelBottomBar">
       <input className="messageInput" type='text' placeholder='Search' onKeyDown={(event) => event.key == "Enter" && createMessage()} value={message} onChange={(event) => setMessage(event.target.value)}/>
       <div className="icon" onClick={createMessage}><IoSend/></div>

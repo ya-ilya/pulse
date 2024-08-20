@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
-import { ChannelElement } from '../channels/Channels'
 import './ChannelBody.css'
-import { createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController } from '../../api'
+import { createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController, Channel } from '../../api'
 import { useGatewayContext } from '../../gateway'
 import { AuthenticationContext } from '../..'
+import { useQuery, useQueryClient } from 'react-query'
 
-type ChannelBodyProps = { element: ChannelElement | undefined }
+type ChannelBodyProps = {
+  channel: Channel | undefined
+}
 
 function formatDate(date: Date | string): string {
   if (date instanceof Date) {
@@ -20,13 +22,24 @@ function formatDate(date: Date | string): string {
   }
 }
 
-function ChannelBody({ element }: ChannelBodyProps) {
+function ChannelBody({ channel }: ChannelBodyProps) {
+  const queryClient = useQueryClient()
+
   const [channelController] = useState(createChannelController())
   const [messageController] = useState(createMessageController())
   const [postController] = useState(createPostController())
 
-  const [messages, setMessages] = useState<Message[]>([])
-  const [posts, setPosts] = useState<Post[]>([])
+  const messagesQuery = useQuery({
+    queryKey: ["messages", channel],
+    queryFn: () => (channel && channel.type != ChannelTypeEnum.Channel) ? channelController.getMessages(channel?.id!)! : [],
+    keepPreviousData: true
+  })
+  
+  const postsQuery = useQuery({
+    queryKey: ["posts", channel],
+    queryFn: () => (channel && channel.type == ChannelTypeEnum.Channel) ? channelController.getPosts(channel?.id!)! : [],
+    keepPreviousData: true
+  })
 
   const self = useContext(AuthenticationContext)
 
@@ -40,23 +53,31 @@ function ChannelBody({ element }: ChannelBodyProps) {
     if (channelBody.scrollHeight - channelBody.clientHeight <= channelBody.scrollTop + 1) {
       channelBody.scrollTop = channelBody.scrollHeight - channelBody.clientHeight;
     }
-  }, [messages, posts])
+  }, [messagesQuery.data, postsQuery.data])
 
   useGatewayContext({
     "CreateMessageEvent": (event) => {
       messageController.getMessageById(event.messageId).then(message => {
-        setMessages(messages => [ ...messages, message ])
+        queryClient.setQueryData(["messages", channel], (messages: Message[] | undefined) => {
+          if (!messages) return [ message ]
+
+          return [ ...messages, message ]
+        })
       })
     },
     "UpdateMessageContentEvent": (event) => {
-      setMessages(messages => {
+      queryClient.setQueriesData(["messages", channel], (messages: Message[] | undefined) => {
+        if (!messages) return [ ]
+
         const newMessages = [ ...messages ]
         newMessages[messages.findIndex(value => value.id == event.messageId)].content = event.content
         return newMessages
       })
     },
     "DeleteMessageEvent": (event) => {
-      setMessages(messages => {
+      queryClient.setQueriesData(["messages", channel], (messages: Message[] | undefined) => {
+        if (!messages) return [ ]
+
         const newMessages = [ ...messages ]
         newMessages.splice(messages.findIndex(value => value.id == event.messageId), 1)
         return newMessages
@@ -64,50 +85,41 @@ function ChannelBody({ element }: ChannelBodyProps) {
     },
     "CreatePostEvent": (event) => {
       postController.getPostById(event.postId).then(post => {
-        setPosts(posts => [ ...posts, post ])
+        queryClient.setQueryData(["posts", channel], (posts: Post[] | undefined) => {
+          if (!posts) return [ post ]
+
+          return [ ...posts, post ]
+        })
       })
     },
     "UpdatePostContentEvent": (event) => {
-      setPosts(posts => {
+      queryClient.setQueriesData(["posts", channel], (posts: Post[] | undefined) => {
+        if (!posts) return [ ]
+
         const newPosts = [ ...posts ]
         newPosts[posts.findIndex(value => value.id == event.postId)].content = event.content
         return newPosts
       })
     },
     "DeletePostEvent": (event) => {
-      setPosts(posts => {
+      queryClient.setQueriesData(["posts", channel], (posts: Post[] | undefined) => {
+        if (!posts) return [ ]
+
         const newPosts = [ ...posts ]
         newPosts.splice(posts.findIndex(value => value.id == event.postId), 1)
         return newPosts
       })
     },
-  }, (event) => element != null && event.channelId == element.id)
+  }, (event) => channel != null && event.channelId == channel.id)
 
-  useEffect(() => {
-    if (!element) return
-
-    setPosts([])
-    setMessages([])
-
-    if (element?.type == ChannelTypeEnum.Channel) {
-      channelController.getPosts(element?.id!).then(posts => {
-        setPosts(posts)
-      })
-    } else {
-      channelController.getMessages(element?.id!).then(messages => {
-        setMessages(messages)
-      })
-    }
-  }, [element])
-
-  if (!element) {
+  if (!channel) {
     return <div></div>
   }
 
   return (
     <div className='channelBody'>
-      { element.type == ChannelTypeEnum.Channel ? (
-        posts.map(post => (
+      { channel.type == ChannelTypeEnum.Channel ? (
+        postsQuery.data?.map(post => (
           <div className='messageContainer'>
             <div className='message messageLeft'>
               <div className='inner'>
@@ -118,10 +130,10 @@ function ChannelBody({ element }: ChannelBodyProps) {
           </div>
         ))
       ) : (
-        messages.map(message => (
+        messagesQuery.data?.map(message => (
           <div className='messageContainer'>
             <div className={message.user.id == self?.id ? 'message messageRight' : 'message messageLeft'}>
-              { element.type != ChannelTypeEnum.PrivateChat && <div className='user'>{message.user.displayName}</div> }
+              { channel.type != ChannelTypeEnum.PrivateChat && <div className='user'>{message.user.displayName}</div> }
               <div className='inner'>
                 <div className='content'>{message.content}</div>
                 <div className='timestamp'>{formatDate(message.timestamp)}</div>
