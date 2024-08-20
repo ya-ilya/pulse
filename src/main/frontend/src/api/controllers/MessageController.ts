@@ -1,5 +1,5 @@
 import axios, { Axios } from "axios"
-import { Message, UpdateMessageRequest } from "../models"
+import { Channel, Message, UpdateMessageRequest } from "../models"
 import { axiosClient } from "../.."
 
 export function createMessageController() {
@@ -21,6 +21,14 @@ export class MessageController {
 
   async getMessageById(messageId: number): Promise<Message> {
     return (await this.client.get(`/${messageId}`)).data
+  }
+
+  async getComments(messageId: number): Promise<Channel> {
+    return (await this.client.get(`/${messageId}/comments`)).data
+  }
+
+  async joinComments(messageId: number): Promise<Channel> {
+    return (await this.client.get(`/${messageId}/comments/join`)).data
   }
 
   async updateMessage(messageId: number, body: UpdateMessageRequest): Promise<Message> {

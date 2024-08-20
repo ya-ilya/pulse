@@ -3,7 +3,7 @@ package org.pulse.backend.services
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.channel.ChannelRepository
 import org.pulse.backend.entities.channel.ChannelType
-import org.pulse.backend.entities.post.Post
+import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.user.User
 import org.springframework.stereotype.Service
 
@@ -50,8 +50,8 @@ class ChannelService(
         return channelRepository.findById(channel.id!!).get()
     }
 
-    fun createCommentsChannel(post: Post): Channel {
-        return channelRepository.save(Channel(ChannelType.CommentsChat, admin = post.channel.admin))
+    fun createCommentsChannel(message: Message): Channel {
+        return channelRepository.save(Channel(ChannelType.CommentsChat, post = message, admin = message.channel.admin))
     }
 
     fun deleteChannel(channelId: Long) {

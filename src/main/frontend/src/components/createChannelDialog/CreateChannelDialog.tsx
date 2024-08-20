@@ -26,11 +26,11 @@ function CreateChannelDialog({ showCreateChannelDialog, setShowCreateChannelDial
   }
 
   return (
-    <form className="createChannelDialog" onSubmit={handleSubmit} style={{ visibility: showCreateChannelDialog ? "visible" : "hidden" }}>
+    <div className="createChannelDialog" style={{ visibility: showCreateChannelDialog ? "visible" : "hidden" }}>
       <div className="header">Create channel</div>
       <input type="text" className="nameInput" placeholder="Channel name" value={name} onChange={(event) => setName(event.target.value)}/>
-      <button type="submit" className="submit" disabled={loading}>Done</button>
-    </form>
+      <button type="button" className="submit" onClick={handleSubmit} disabled={loading}>Done</button>
+    </div>
   )
 }
 

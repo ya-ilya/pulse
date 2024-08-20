@@ -41,6 +41,7 @@
   width: fit-content;
   height: fit-content;
   border-radius: 8px;
+  word-break: break-all;
 }
 
 .channelBody .messageLeft {

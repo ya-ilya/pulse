@@ -26,7 +26,7 @@ function CreateGroupDialog({ showCreateGroupDialog, setShowCreateGroupDialog }: 
     }
 
     setLoading(true)
-    channelController.createGroupChat({ name: name, with: [] }).then(() => {
+    channelController.createGroupChat({ name: name, with: users.map(user => user.id!) }).then(() => {
       setShowCreateGroupDialog(false)
     }).finally(() => setLoading(false))
   }
@@ -48,7 +48,7 @@ function CreateGroupDialog({ showCreateGroupDialog, setShowCreateGroupDialog }: 
   }
 
   return (
-    <form className="createGroupDialog" onSubmit={handleSubmit} style={{ visibility: showCreateGroupDialog ? "visible" : "hidden" }}>
+    <div className="createGroupDialog" style={{ visibility: showCreateGroupDialog ? "visible" : "hidden" }}>
       <div className="header">Create group</div>
       <input type="text" className="nameInput" placeholder="Group name" value={name} onChange={(event) => setName(event.target.value)}/>
       <div className="users">
@@ -66,8 +66,8 @@ function CreateGroupDialog({ showCreateGroupDialog, setShowCreateGroupDialog }: 
           <button type="button" className="button" onClick={handleAddUser}>+</button>
         </div>
       </div>
-      <button type="submit" className="submit" disabled={loading}>Done</button>
-    </form>
+      <button type="button" className="submit" onClick={handleSubmit} disabled={loading}>Done</button>
+    </div>
   )
 }
 

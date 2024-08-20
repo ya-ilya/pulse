@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import './ChannelBody.css'
-import { createChannelController, Post, ChannelTypeEnum, Message, createMessageController, createPostController, Channel } from '../../api'
+import { createChannelController, ChannelTypeEnum, Message, createMessageController, Channel } from '../../api'
 import { useGatewayContext } from '../../gateway'
 import { AuthenticationContext } from '../..'
 import { useQuery, useQueryClient } from 'react-query'
@@ -27,33 +27,32 @@ function ChannelBody({ channel }: ChannelBodyProps) {
 
   const [channelController] = useState(createChannelController())
   const [messageController] = useState(createMessageController())
-  const [postController] = useState(createPostController())
 
   const messagesQuery = useQuery({
     queryKey: ["messages", channel],
-    queryFn: () => (channel && channel.type != ChannelTypeEnum.Channel) ? channelController.getMessages(channel?.id!)! : [],
-    keepPreviousData: true
-  })
-  
-  const postsQuery = useQuery({
-    queryKey: ["posts", channel],
-    queryFn: () => (channel && channel.type == ChannelTypeEnum.Channel) ? channelController.getPosts(channel?.id!)! : [],
+    queryFn: () => channel ? channelController.getMessages(channel?.id!)! : [],
     keepPreviousData: true
   })
 
   const self = useContext(AuthenticationContext)
 
+  function scrollToBottom() {
+    const messageContainers = document.getElementsByClassName("messageContainer")
+
+    if (messageContainers.length > 0) {
+      messageContainers[messageContainers.length - 1].scrollIntoView({ behavior: "instant", block: "end" })
+    }
+  }
+
   useEffect(() => {
-    var channelBody = document.getElementsByClassName("channelBody")[0]
+    scrollToBottom()
+  }, [])
 
-    if (!channelBody) {
-      return
+  useEffect(() => {
+    if (messagesQuery.isSuccess) {
+      scrollToBottom()
     }
-
-    if (channelBody.scrollHeight - channelBody.clientHeight <= channelBody.scrollTop + 1) {
-      channelBody.scrollTop = channelBody.scrollHeight - channelBody.clientHeight;
-    }
-  }, [messagesQuery.data, postsQuery.data])
+  }, [messagesQuery.isSuccess])
 
   useGatewayContext({
     "CreateMessageEvent": (event) => {
@@ -63,6 +62,8 @@ function ChannelBody({ channel }: ChannelBodyProps) {
 
           return [ ...messages, message ]
         })
+
+        scrollToBottom()
       })
     },
     "UpdateMessageContentEvent": (event) => {
@@ -82,34 +83,7 @@ function ChannelBody({ channel }: ChannelBodyProps) {
         newMessages.splice(messages.findIndex(value => value.id == event.messageId), 1)
         return newMessages
       })
-    },
-    "CreatePostEvent": (event) => {
-      postController.getPostById(event.postId).then(post => {
-        queryClient.setQueryData(["posts", channel], (posts: Post[] | undefined) => {
-          if (!posts) return [ post ]
-
-          return [ ...posts, post ]
-        })
-      })
-    },
-    "UpdatePostContentEvent": (event) => {
-      queryClient.setQueriesData(["posts", channel], (posts: Post[] | undefined) => {
-        if (!posts) return [ ]
-
-        const newPosts = [ ...posts ]
-        newPosts[posts.findIndex(value => value.id == event.postId)].content = event.content
-        return newPosts
-      })
-    },
-    "DeletePostEvent": (event) => {
-      queryClient.setQueriesData(["posts", channel], (posts: Post[] | undefined) => {
-        if (!posts) return [ ]
-
-        const newPosts = [ ...posts ]
-        newPosts.splice(posts.findIndex(value => value.id == event.postId), 1)
-        return newPosts
-      })
-    },
+    }
   }, (event) => channel != null && event.channelId == channel.id)
 
   if (!channel) {
@@ -118,22 +92,11 @@ function ChannelBody({ channel }: ChannelBodyProps) {
 
   return (
     <div className='channelBody'>
-      { channel.type == ChannelTypeEnum.Channel ? (
-        postsQuery.data?.map(post => (
-          <div className='messageContainer'>
-            <div className='message messageLeft'>
-              <div className='inner'>
-                <div className='content'>{post.content}</div>
-                <div className='timestamp'>{formatDate(post.timestamp)}</div>
-              </div>
-            </div>
-          </div>
-        ))
-      ) : (
+      {
         messagesQuery.data?.map(message => (
           <div className='messageContainer'>
-            <div className={message.user.id == self?.id ? 'message messageRight' : 'message messageLeft'}>
-              { channel.type != ChannelTypeEnum.PrivateChat && <div className='user'>{message.user.displayName}</div> }
+            <div className={message.user?.id == self?.id ? 'message messageRight' : 'message messageLeft'}>
+              { (channel.type != ChannelTypeEnum.PrivateChat && channel.type != ChannelTypeEnum.Channel) && <div className='user'>{message.user?.displayName}</div> }
               <div className='inner'>
                 <div className='content'>{message.content}</div>
                 <div className='timestamp'>{formatDate(message.timestamp)}</div>
@@ -141,7 +104,7 @@ function ChannelBody({ channel }: ChannelBodyProps) {
             </div>
           </div>
         ))
-      ) }
+      }
     </div>
   )
 }

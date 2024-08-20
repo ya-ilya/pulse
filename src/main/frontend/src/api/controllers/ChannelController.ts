@@ -1,5 +1,5 @@
 import axios, { Axios } from "axios"
-import { Channel, CreateChannelRequest, CreateGroupChatRequest, CreateMessageRequest, CreatePostRequest, CreatePrivateChatRequest, Message, Post, UpdateChannelRequest, User } from "../models"
+import { Channel, CreateChannelRequest, CreateGroupChatRequest, CreateMessageRequest, CreatePrivateChatRequest, Message, UpdateChannelRequest, User } from "../models"
 import { axiosClient } from "../.."
 
 export function createChannelController() {
@@ -35,16 +35,8 @@ export class ChannelController {
     return (await this.client.get(`/${channelId}/messages`)).data
   }
 
-  async getPosts(channelId: number): Promise<Post[]> {
-    return (await this.client.get(`/${channelId}/posts`)).data
-  }
-
   async createMessage(channelId: number, body: CreateMessageRequest): Promise<Message> {
     return (await this.client.post(`/${channelId}/messages`, body)).data
-  }
-
-  async createPost(channelId: number, body: CreatePostRequest): Promise<Post> {
-    return (await this.client.post(`/${channelId}/posts`, body)).data
   }
 
   async createChannel(body: CreateChannelRequest): Promise<Channel> {

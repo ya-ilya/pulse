@@ -58,6 +58,10 @@ class Gateway(
         return activeSessions.firstOrNull { it.session == session }
     }
 
+    fun isOnline(userId: UUID): Boolean {
+        return get(userId)?.isNotEmpty() == true
+    }
+
     fun sendToUserSessions(userId: UUID, event: GatewayEvent) {
         get(userId)?.forEach {
             try {

@@ -1,9 +1,13 @@
 package org.pulse.backend.controllers
 
+import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.message.Message
+import org.pulse.backend.entities.message.MessageType
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.pulse.backend.requests.UpdateMessageRequest
+import org.pulse.backend.services.ChannelMemberService
+import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.MessageService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -14,17 +18,41 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/api/messages")
 class MessageController(
     private val messageService: MessageService,
+    private val memberService: ChannelMemberService,
+    private val channelService: ChannelService,
     private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping("/{messageId}")
     fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Message {
         val message = messageService.getMessageById(messageId)
 
-        if (!message.channel.members.any { it.user.id == user.id }) {
+        if (message.type == MessageType.Message && !message.channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
         }
 
         return message
+    }
+
+    @GetMapping("/{messageId}/comments")
+    fun getComments(@PathVariable messageId: Long): Channel {
+        return messageService.getMessageById(messageId).comments!!
+    }
+
+    @GetMapping("/{messageId}/comments/join")
+    fun joinComments(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Channel {
+        val message = messageService.getMessageById(messageId)
+
+        if (!message.channel.members.any { it.user.id == user.id }) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
+        if (message.comments!!.members.any { it.user.id == user.id }) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
+        }
+
+        memberService.createMember(message.comments!!, user)
+
+        return channelService.getChannelById(message.comments!!.id!!)
     }
 
     @PatchMapping("/{messageId}")
@@ -35,7 +63,11 @@ class MessageController(
     ): Message {
         val message = messageService.getMessageById(messageId)
 
-        if (message.user.id != user.id) {
+        if (message.type == MessageType.Message && message.user?.id != user.id) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
+        if (message.type == MessageType.Post && message.channel.admin?.id != user.id) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
@@ -48,7 +80,7 @@ class MessageController(
     fun deleteMessage(@AuthenticationPrincipal user: User, @PathVariable messageId: Long) {
         val message = messageService.getMessageById(messageId)
 
-        if (message.user.id != user.id && message.channel.admin?.id != user.id) {
+        if (message.user?.id != user.id && message.channel.admin?.id != user.id) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 

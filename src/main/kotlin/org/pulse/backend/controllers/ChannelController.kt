@@ -3,11 +3,9 @@ package org.pulse.backend.controllers
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.channel.ChannelType
 import org.pulse.backend.entities.message.Message
-import org.pulse.backend.entities.post.Post
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
-import org.pulse.backend.gateway.dispatchers.PostEventDispatcher
 import org.pulse.backend.requests.*
 import org.pulse.backend.services.*
 import org.springframework.http.HttpStatus
@@ -20,12 +18,10 @@ import org.springframework.web.server.ResponseStatusException
 class ChannelController(
     private val channelService: ChannelService,
     private val memberService: ChannelMemberService,
-    private val postService: PostService,
     private val userService: UserService,
     private val messageService: MessageService,
     private val channelEventDispatcher: ChannelEventDispatcher,
-    private val messageEventDispatcher: MessageEventDispatcher,
-    private val postEventDispatcher: PostEventDispatcher
+    private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping
     fun getChannels(@AuthenticationPrincipal user: User): List<Channel> {
@@ -62,26 +58,11 @@ class ChannelController(
     fun getMessages(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<Message> {
         val channel = channelService.getChannelById(channelId)
 
-        if (!channel.members.any { it.user.id == user.id }) {
+        if (channel.type != ChannelType.Channel && !channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
 
-        if (channel.type == ChannelType.Channel) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
-        }
-
         return channel.messages
-    }
-
-    @GetMapping("/{channelId}/posts")
-    fun getPosts(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<Post> {
-        val channel = channelService.getChannelById(channelId)
-
-        if (channel.type != ChannelType.Channel) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
-        }
-
-        return channel.posts
     }
 
     @PostMapping("/{channelId}/messages")
@@ -96,33 +77,18 @@ class ChannelController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
 
-        if (channel.type == ChannelType.Channel) {
+        if (channel.type == ChannelType.Channel && channel.admin?.id != user.id) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
 
-        return messageService.createMessage(request.content, channel, user).also {
-            messageEventDispatcher.dispatchCreateMessageEvent(it)
-        }
-    }
-
-    @PostMapping("/{channelId}/posts")
-    fun createPost(
-        @AuthenticationPrincipal user: User,
-        @PathVariable channelId: Long,
-        @RequestBody request: CreatePostRequest
-    ): Post {
-        val channel = channelService.getChannelById(channelId)
-
-        if (channel.type != ChannelType.Channel) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
-        }
-
-        if (channel.admin!!.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
-
-        return postService.createPost(request.content, channel).also {
-            postEventDispatcher.dispatchCreatePostEvent(it)
+        return if (channel.type == ChannelType.Channel) {
+            messageService.createPost(request.content, channel).also {
+                messageEventDispatcher.dispatchCreateMessageEvent(it)
+            }
+        } else {
+            messageService.createMessage(request.content, channel, user).also {
+                messageEventDispatcher.dispatchCreateMessageEvent(it)
+            }
         }
     }
 
