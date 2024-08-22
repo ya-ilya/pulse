@@ -29,7 +29,7 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
 
   function scrollToBottom() {
     const messageContainers =
-      document.getElementsByClassName("messageContainer");
+      document.getElementsByClassName("message-container");
 
     if (messageContainers.length > 0) {
       messageContainers[messageContainers.length - 1].scrollIntoView({
@@ -93,9 +93,9 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
   );
 
   return (
-    <RemoveScroll className="channelBody" shards={[ref]}>
+    <RemoveScroll className="channel-body" shards={[ref]}>
       {messagesQuery.data?.map((message) => (
-        <div className="messageContainer">
+        <div className="message-container">
           <div
             className={`message ${
               message.user?.id == self?.id

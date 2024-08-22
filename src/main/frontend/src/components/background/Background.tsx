@@ -1,5 +1,7 @@
 import "./Background.css";
 
+import useViewportSize from "../../hooks/useViewportSize";
+
 type BackgroundProps = {
   variables: boolean[];
   setters: ((value: boolean) => void)[];
@@ -7,6 +9,8 @@ type BackgroundProps = {
 };
 
 function Background(props: BackgroundProps) {
+  const [, viewportHeight] = useViewportSize() ?? [];
+
   const visible = props.variables.find((variable) => variable);
 
   return (
@@ -14,14 +18,17 @@ function Background(props: BackgroundProps) {
       className="background"
       onClick={(event) => {
         if ((event.target as Element).classList.contains("background")) {
-          props.setters.forEach((setter) => setter.call(undefined, false))
+          props.setters.forEach((setter) => setter.call(undefined, false));
         }
       }}
-      style={{ visibility: visible ? "visible" : "hidden" }}
+      style={{
+        visibility: visible ? "visible" : "hidden",
+        maxHeight: viewportHeight,
+      }}
     >
       {props.children}
     </div>
   );
 }
 
-export default Background
+export default Background;

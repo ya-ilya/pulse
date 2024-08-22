@@ -34,9 +34,9 @@ function ChannelBottomBar(props: ChannelBottomBarProps) {
 
   return props.channel?.type != api.ChannelType.Channel ||
     props.channel.admin?.id == self!.id ? (
-    <div className="channelBottomBar">
+    <div className="channel-bottom-bar">
       <input
-        className="messageInput"
+        className="message-input"
         type="text"
         placeholder="Message"
         onKeyDown={(event) => event.key == "Enter" && createMessage()}

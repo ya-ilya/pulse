@@ -26,7 +26,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   const channelsQuery = useQuery({
     queryKey: ["channels"],
-    queryFn: () => channelController.getChannels()
+    queryFn: () => channelController.getChannels(),
   });
 
   const [, viewportHeight] = useViewportSize() ?? [];
@@ -88,7 +88,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         maxHeight: viewportHeight,
       }}
     >
-      <div className="topBar">
+      <div className="top-bar">
         <FiMenu onClick={() => props.setShowSidebar(true)} />
         <div className="search">
           <input
@@ -105,11 +105,9 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
           ?.filter((value) => value.name?.includes(filter))
           .map((value) => (
             <div
-              className={
-                value.id == props.channel?.id
-                  ? "channel selectedChannel"
-                  : "channel"
-              }
+              className={`channel ${
+                value.id == props.channel?.id ? "--selected-channel" : ""
+              }`}
               onClick={() => {
                 props.setChannel(value);
                 props.setShowChannel(true);

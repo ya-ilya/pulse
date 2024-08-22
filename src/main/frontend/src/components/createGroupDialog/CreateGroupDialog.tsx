@@ -58,13 +58,13 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
 
   return (
     <div
-      className="createGroupDialog"
+      className="create-group-dialog"
       style={{ visibility: props.showCreateGroupDialog ? "visible" : "hidden" }}
     >
       <div className="header">Create group</div>
       <input
         type="text"
-        className="nameInput"
+        className="name-input"
         placeholder="Group name"
         value={name}
         onChange={(event) => setName(event.target.value)}
@@ -84,10 +84,10 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
             </div>
           ))}
         </div>
-        <div className="addUser">
+        <div className="add-user">
           <input
             type="text"
-            className="usernameInput"
+            className="username-input"
             placeholder="Username"
             value={username}
             onChange={(event) => setUsername(event.target.value)}

@@ -29,13 +29,13 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
 
   return (
     <div
-      className="createChannelDialog"
+      className="create-channel-dialog"
       style={{ visibility: props.showCreateChannelDialog ? "visible" : "hidden" }}
     >
       <div className="header">Create channel</div>
       <input
         type="text"
-        className="nameInput"
+        className="name-input"
         placeholder="Channel name"
         value={name}
         onChange={(event) => setName(event.target.value)}

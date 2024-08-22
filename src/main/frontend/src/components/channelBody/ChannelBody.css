@@ -1,4 +1,4 @@
-.channelBody {
+.channel-body {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -9,29 +9,14 @@
   background-color: lightgray;
 }
 
-.channelBody .dateContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 97%;
-}
-
-.channelBody .date {
-  display: flex;
-  background-color: white;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.channelBody .messageContainer {
+.channel-body .message-container {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: fit-content;
 }
 
-.channelBody .message {
+.channel-body .message {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -44,31 +29,31 @@
   word-break: break-all;
 }
 
-.channelBody .--message-left {
+.channel-body .--message-left {
   margin-left: 0;
 }
 
-.channelBody .--message-right {
+.channel-body .--message-right {
   margin-left: auto;
 }
 
-.channelBody .message .user {
+.channel-body .message .user {
   font-size: 16px;
   font-weight: bold;
 }
 
-.channelBody .message .inner {
+.channel-body .message .inner {
   display: flex;
   flex-direction: row;
   gap: 8px;
 }
 
-.channelBody .message .inner .content {
+.channel-body .message .inner .content {
   font-size: 16px;
   font-weight: 500;
 }
 
-.channelBody .message .inner .timestamp {
+.channel-body .message .inner .timestamp {
   position: relative;
   top: 8px;
   font-size: 12px;

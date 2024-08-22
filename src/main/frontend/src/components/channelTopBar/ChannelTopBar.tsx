@@ -17,7 +17,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
   }
 
   return (
-    <div className="channelTopBar">
+    <div className="channel-top-bar">
       {isMobile && <BiArrowBack onClick={() => props.setShowChannel(false)} />}
       <div className="name">{props.channel?.name}</div>
     </div>

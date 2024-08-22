@@ -1,4 +1,4 @@
-.createChannelDialog {
+.create-channel-dialog {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -14,7 +14,7 @@
   border-radius: 12px;
 }
 
-.createChannelDialog .header {
+.create-channel-dialog .header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,7 +22,7 @@
   font-weight: bold;
 }
 
-.createChannelDialog .nameInput {
+.create-channel-dialog .name-input {
   border: solid;
   border-width: 0px;
   border-bottom-width: 1px;
@@ -30,12 +30,12 @@
   font-size: 18px;
 }
 
-.createChannelDialog .nameInput:focus {
+.create-channel-dialog .name-input:focus {
   outline: none;
   border-color: gray;
 }
 
-.createChannelDialog .submit {
+.create-channel-dialog .submit {
   background-color: rgb(230, 230, 230);
   border-color: transparent;
   border-radius: 8px;

@@ -1,4 +1,4 @@
-.createGroupDialog {
+.create-group-dialog {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -14,7 +14,7 @@
   border-radius: 12px;
 }
 
-.createGroupDialog .header {
+.create-group-dialog .header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,7 +22,7 @@
   font-weight: bold;
 }
 
-.createGroupDialog .nameInput {
+.create-group-dialog .name-input {
   border: solid;
   border-width: 0px;
   border-bottom-width: 1px;
@@ -30,12 +30,12 @@
   font-size: 18px;
 }
 
-.createGroupDialog .nameInput:focus {
+.create-group-dialog .name-input:focus {
   outline: none;
   border-color: gray;
 }
 
-.createGroupDialog .users {
+.create-group-dialog .users {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -44,38 +44,38 @@
   border-radius: 12px;
 }
 
-.createGroupDialog .users .header {
+.create-group-dialog .users .header {
   display: flex;
   align-items: center;
   font-size: 20px;
   font-weight: 500;
 }
 
-.createGroupDialog .users .list {
+.create-group-dialog .users .list {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 4px;
 }
 
-.createGroupDialog .users .list .element {
+.create-group-dialog .users .list .element {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 4px;
 }
 
-.createGroupDialog .users .list .element:hover {
+.create-group-dialog .users .list .element:hover {
   cursor: pointer;
 }
 
-.createGroupDialog .users .addUser {
+.create-group-dialog .users .add-user {
   display: flex;
   flex-direction: row;
   gap: 4px;
 }
 
-.createGroupDialog .users .addUser .usernameInput {
+.create-group-dialog .users .add-user .username-input {
   width: 100%;
   border: solid;
   border-width: 0px;
@@ -84,17 +84,17 @@
   font-size: 18px;
 }
 
-.createGroupDialog .users .addUser .usernameInput:focus {
+.create-group-dialog .users .add-user .username-input:focus {
   outline: none;
   border-color: gray;
 }
 
-.createGroupDialog .users .addUser .button {
+.create-group-dialog .users .add-user .button {
   border: 1px solid black;
   border-radius: 4px;
 }
 
-.createGroupDialog .submit {
+.create-group-dialog .submit {
   background-color: rgb(230, 230, 230);
   border-color: transparent;
   border-radius: 8px;

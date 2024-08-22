@@ -1,4 +1,4 @@
-.channelTopBar {
+.channel-top-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -12,7 +12,7 @@
   border-color: rgb(230, 230, 230);
 }
 
-.channelTopBar .name {
+.channel-top-bar .name {
   display: flex;
   align-items: center;
 }

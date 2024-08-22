@@ -16,7 +16,7 @@ function Sidebar(props: SidebarProps) {
 
   return (
     <div
-      className={isMobile ? "sidebar sidebarMobile" : "sidebar"}
+      className={`sidebar ${isMobile ? "--sidebar-mobile" : ""}`}
       style={{ left: props.showSidebar ? "0" : "-100%" }}
     >
       <div
@@ -43,4 +43,4 @@ function Sidebar(props: SidebarProps) {
   );
 }
 
-export default Sidebar
+export default Sidebar;
