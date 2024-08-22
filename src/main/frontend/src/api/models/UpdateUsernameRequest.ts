@@ -1,3 +1,3 @@
 export interface UpdateUsernameRequest {
-    username: string;
+  username: string;
 }

@@ -1,38 +1,55 @@
+import "./ChannelBottomBar.css";
+
+import * as api from "../../api";
+
 import { useContext, useState } from "react";
-import "./ChannelBottomBar.css"
-import { IoSend } from "react-icons/io5";
-import { Channel, ChannelTypeEnum, createChannelController } from "../../api";
+
 import { AuthenticationContext } from "../..";
+import { IoSend } from "react-icons/io5";
 
 type ChannelBottomBarProps = {
-  channel: Channel | undefined
-}
+  channel: api.Channel | undefined;
+};
 
 function ChannelBottomBar({ channel }: ChannelBottomBarProps) {
-  const [message, setMessage] = useState("")
+  const channelController = api.useChannelController();
 
-  const self = useContext(AuthenticationContext)
+  const [message, setMessage] = useState("");
+
+  const self = useContext(AuthenticationContext);
 
   if (!channel) {
-    return <div></div>
+    return <div></div>;
   }
 
   function createMessage() {
     if (message.length <= 2) {
-      return
+      return;
     }
 
-    createChannelController()
+    channelController
       .createMessage(channel?.id!, { content: message })
-      .then(() => setMessage(""))
+      .then(() => setMessage(""));
   }
 
-  return (channel?.type != ChannelTypeEnum.Channel || channel.admin?.id == self!.id) ? (
+  return channel?.type != api.ChannelTypeEnum.Channel ||
+    channel.admin?.id == self!.id ? (
     <div className="channelBottomBar">
-      <input className="messageInput" type='text' placeholder='Search' onKeyDown={(event) => event.key == "Enter" && createMessage()} value={message} onChange={(event) => setMessage(event.target.value)}/>
-      <div className="icon" onClick={createMessage}><IoSend/></div>
+      <input
+        className="messageInput"
+        type="text"
+        placeholder="Message"
+        onKeyDown={(event) => event.key == "Enter" && createMessage()}
+        value={message}
+        onChange={(event) => setMessage(event.target.value)}
+      />
+      <div className="icon" onClick={createMessage}>
+        <IoSend />
+      </div>
     </div>
-  ) : <div></div>
+  ) : (
+    <div></div>
+  );
 }
 
-export default ChannelBottomBar
+export default ChannelBottomBar;

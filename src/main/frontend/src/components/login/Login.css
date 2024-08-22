@@ -1,7 +1,7 @@
 .login {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   background-color: rgb(230, 230, 230);
@@ -10,18 +10,18 @@
 .login .form {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   width: fit-content;
   height: fit-content;
-  gap: 8px;
+  padding: 16px;
   background-color: white;
   border-radius: 12px;
-  padding: 16px;
 }
 
 .login .form .header {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 100%;
   padding: 8px;
   font-size: 22px;
@@ -30,9 +30,9 @@
 
 .login .form .input {
   border: solid;
-  border-color: rgb(230, 230, 230);
   border-width: 0px;
   border-bottom-width: 1px;
+  border-color: rgb(230, 230, 230);
   font-size: 18px;
 }
 

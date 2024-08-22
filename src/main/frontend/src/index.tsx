@@ -1,97 +1,108 @@
-import React, { useEffect, useState } from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
-import axios from 'axios'
-import { createGatway, GatewayContext, isGatewayOpen } from './gateway/index.ts'
-import Login from './components/login/Login.tsx'
-import { User } from './api/index.ts'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import "./index.css";
+
+import {
+  GatewayContext,
+  createGatway,
+  isGatewayOpen,
+} from "./gateway/index.ts";
+import {
+  Navigate,
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import React, { useEffect, useState } from "react";
+
+import App from "./App.tsx";
+import Login from "./components/login/Login.tsx";
+import ReactDOM from "react-dom/client";
+import { User } from "./api/index.ts";
+import axios from "axios";
 
 export const axiosClient = axios.create({
-  baseURL: window.location.origin
-})
+  baseURL: window.location.origin,
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity
-    }
-  }
-})
+      staleTime: Infinity,
+    },
+  },
+});
 
-export const AuthenticationContext = React.createContext<User | null>(null)
+export const AuthenticationContext = React.createContext<User | null>(null);
 
 function ProtectedRoute() {
-  const [authenticated, setAuthenticated] = useState<boolean>()
-  const [lastEvent, setLastEvent] = useState<any>(null)
+  const [authenticated, setAuthenticated] = useState<boolean>();
+  const [lastEvent, setLastEvent] = useState<any>(null);
 
   useEffect(() => {
     const check = async () => {
-      if (localStorage.getItem('accessToken')) {
+      if (localStorage.getItem("accessToken")) {
         if (!isGatewayOpen()) {
-          createGatway(`${window.location.origin}/api/gateway`, setLastEvent)
+          createGatway(`${window.location.origin}/api/gateway`, setLastEvent);
         }
       } else {
-        setAuthenticated(false)
+        setAuthenticated(false);
       }
-    }
+    };
 
-    check()
-  }, [])
+    check();
+  }, []);
 
   useEffect(() => {
     if (lastEvent?.type == "AuthenticationEvent") {
       if (lastEvent.state === true) {
-        setAuthenticated(true)
+        setAuthenticated(true);
       } else {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        setAuthenticated(false)
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        setAuthenticated(false);
       }
     }
-  }, [lastEvent])
+  }, [lastEvent]);
 
   if (authenticated === undefined) {
-    return <div></div>
+    return <div></div>;
   }
 
   if (!authenticated) {
-    return <Navigate to="/login" replace/>
+    return <Navigate to="/login" replace />;
   }
 
   return (
-    <AuthenticationContext.Provider value={JSON.parse(localStorage.getItem("user")!)}>
+    <AuthenticationContext.Provider
+      value={JSON.parse(localStorage.getItem("user")!)}
+    >
       <GatewayContext.Provider value={lastEvent}>
         <QueryClientProvider client={queryClient}>
-          <Outlet/>
+          <Outlet />
         </QueryClientProvider>
       </GatewayContext.Provider>
     </AuthenticationContext.Provider>
-  )
+  );
 }
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: (
-      <Login/>
-    )
+    element: <Login />,
   },
   {
-    element: <ProtectedRoute/>,
+    element: <ProtectedRoute />,
     children: [
       {
         path: "/",
-        element: <App/>
-      }
-    ]
-  }
-])
+        element: <App />,
+      },
+    ],
+  },
+]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <RouterProvider router={router} />
   </React.StrictMode>
-)
+);

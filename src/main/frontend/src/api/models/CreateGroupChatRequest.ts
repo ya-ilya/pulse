@@ -1,4 +1,4 @@
 export interface CreateGroupChatRequest {
-    name: string;
-    with: Array<string>;
+  name: string;
+  with: Array<string>;
 }

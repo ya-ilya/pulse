@@ -1,112 +1,142 @@
-import { useContext, useEffect, useState } from 'react'
-import './ChannelBody.css'
-import { createChannelController, ChannelTypeEnum, Message, createMessageController, Channel } from '../../api'
-import { useGatewayContext } from '../../gateway'
-import { AuthenticationContext } from '../..'
-import { useQuery, useQueryClient } from 'react-query'
+import "./ChannelBody.css";
+
+import * as api from "../../api";
+
+import { forwardRef, useContext, useEffect } from "react";
+import { useQuery, useQueryClient } from "react-query";
+
+import { AuthenticationContext } from "../..";
+import { RemoveScroll } from "react-remove-scroll";
+import { useGatewayContext } from "../../gateway";
 
 type ChannelBodyProps = {
-  channel: Channel | undefined
-}
+  channel: api.Channel | undefined;
+};
 
 function formatDate(date: Date | string): string {
   if (date instanceof Date) {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
   } else {
-    date = new Date(date)
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`
+    date = new Date(date);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
   }
 }
 
-function ChannelBody({ channel }: ChannelBodyProps) {
-  const queryClient = useQueryClient()
+const ChannelBody = forwardRef(function ChannelBody(
+  { channel }: ChannelBodyProps,
+  ref: any
+) {
+  const queryClient = useQueryClient();
 
-  const [channelController] = useState(createChannelController())
-  const [messageController] = useState(createMessageController())
+  const channelController = api.useChannelController();
+  const messageController = api.useMessageController();
 
   const messagesQuery = useQuery({
     queryKey: ["messages", channel],
-    queryFn: () => channel ? channelController.getMessages(channel?.id!)! : [],
-    keepPreviousData: true
-  })
+    queryFn: () =>
+      channel ? channelController.getMessages(channel?.id!)! : [],
+    keepPreviousData: true,
+  });
 
-  const self = useContext(AuthenticationContext)
+  const self = useContext(AuthenticationContext);
 
   function scrollToBottom() {
-    const messageContainers = document.getElementsByClassName("messageContainer")
+    const messageContainers =
+      document.getElementsByClassName("messageContainer");
 
     if (messageContainers.length > 0) {
-      messageContainers[messageContainers.length - 1].scrollIntoView({ behavior: "instant", block: "end" })
+      messageContainers[messageContainers.length - 1].scrollIntoView({
+        behavior: "instant",
+        block: "end",
+      });
     }
   }
 
   useEffect(() => {
-    scrollToBottom()
-  }, [])
+    scrollToBottom();
+  }, [messagesQuery.data]);
 
-  useEffect(() => {
-    if (messagesQuery.isSuccess) {
-      scrollToBottom()
-    }
-  }, [messagesQuery.isSuccess])
+  useGatewayContext(
+    {
+      CreateMessageEvent: (event) => {
+        messageController.getMessageById(event.messageId).then((message) => {
+          queryClient.setQueriesData(
+            ["messages", channel],
+            (messages: api.Message[] | undefined) => {
+              if (!messages) return [message];
 
-  useGatewayContext({
-    "CreateMessageEvent": (event) => {
-      messageController.getMessageById(event.messageId).then(message => {
-        queryClient.setQueryData(["messages", channel], (messages: Message[] | undefined) => {
-          if (!messages) return [ message ]
+              return [...messages, message];
+            }
+          );
+        });
+      },
+      UpdateMessageContentEvent: (event) => {
+        queryClient.setQueriesData(
+          ["messages", channel],
+          (messages: api.Message[] | undefined) => {
+            if (!messages) return [];
 
-          return [ ...messages, message ]
-        })
+            const newMessages = [...messages];
+            newMessages[
+              messages.findIndex((value) => value.id == event.messageId)
+            ].content = event.content;
+            return newMessages;
+          }
+        );
+      },
+      DeleteMessageEvent: (event) => {
+        queryClient.setQueriesData(
+          ["messages", channel],
+          (messages: api.Message[] | undefined) => {
+            if (!messages) return [];
 
-        scrollToBottom()
-      })
+            const newMessages = [...messages];
+            newMessages.splice(
+              messages.findIndex((value) => value.id == event.messageId),
+              1
+            );
+            return newMessages;
+          }
+        );
+      },
     },
-    "UpdateMessageContentEvent": (event) => {
-      queryClient.setQueriesData(["messages", channel], (messages: Message[] | undefined) => {
-        if (!messages) return [ ]
-
-        const newMessages = [ ...messages ]
-        newMessages[messages.findIndex(value => value.id == event.messageId)].content = event.content
-        return newMessages
-      })
-    },
-    "DeleteMessageEvent": (event) => {
-      queryClient.setQueriesData(["messages", channel], (messages: Message[] | undefined) => {
-        if (!messages) return [ ]
-
-        const newMessages = [ ...messages ]
-        newMessages.splice(messages.findIndex(value => value.id == event.messageId), 1)
-        return newMessages
-      })
-    }
-  }, (event) => channel != null && event.channelId == channel.id)
+    (event) => channel != null && event.channelId == channel.id
+  );
 
   if (!channel) {
-    return <div></div>
+    return <div></div>;
   }
 
   return (
-    <div className='channelBody'>
-      {
-        messagesQuery.data?.map(message => (
-          <div className='messageContainer'>
-            <div className={message.user?.id == self?.id ? 'message messageRight' : 'message messageLeft'}>
-              { (channel.type != ChannelTypeEnum.PrivateChat && channel.type != ChannelTypeEnum.Channel) && <div className='user'>{message.user?.displayName}</div> }
-              <div className='inner'>
-                <div className='content'>{message.content}</div>
-                <div className='timestamp'>{formatDate(message.timestamp)}</div>
+    <RemoveScroll shards={ref} forwardProps>
+      <div className="channelBody">
+        {messagesQuery.data?.map((message) => (
+          <div className="messageContainer">
+            <div
+              className={
+                message.user?.id == self?.id
+                  ? "message messageRight"
+                  : "message messageLeft"
+              }
+            >
+              {channel.type != api.ChannelTypeEnum.PrivateChat &&
+                channel.type != api.ChannelTypeEnum.Channel && (
+                  <div className="user">{message.user?.displayName}</div>
+                )}
+              <div className="inner">
+                <div className="content">{message.content}</div>
+                <div className="timestamp">{formatDate(message.timestamp)}</div>
               </div>
             </div>
           </div>
-        ))
-      }
-    </div>
-  )
-}
+        ))}
+      </div>
+    </RemoveScroll>
+  );
+});
 
-export default ChannelBody
+export default ChannelBody;

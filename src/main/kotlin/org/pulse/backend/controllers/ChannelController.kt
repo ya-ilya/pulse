@@ -104,10 +104,13 @@ class ChannelController(
         @AuthenticationPrincipal user: User,
         @RequestBody request: CreatePrivateChatRequest
     ): Channel {
-        return channelService.createPrivateChatChannel(
-            user,
-            userService.getUserById(request.with)
-        ).also {
+        val other = userService.getUserById(request.with)
+
+        if (user.channels.any { it.channel.type == ChannelType.PrivateChat && it.channel.members.any { it.user.id == other.id } }) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
+        }
+
+        return channelService.createPrivateChatChannel(user, other).also {
             channelEventDispatcher.dispatchCreateChannelEvent(it)
         }
     }

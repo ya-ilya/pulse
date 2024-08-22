@@ -1,2 +1,2 @@
-export * from './Gateway'
-export * from './GatwayContext'
+export * from "./Gateway";
+export * from "./GatwayContext";

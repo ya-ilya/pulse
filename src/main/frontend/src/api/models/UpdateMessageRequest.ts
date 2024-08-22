@@ -1,3 +1,3 @@
 export interface UpdateMessageRequest {
-    content: string;
+  content: string;
 }

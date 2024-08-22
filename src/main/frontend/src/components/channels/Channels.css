@@ -1,46 +1,53 @@
 .channels {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
   width: 20%;
   min-width: 20%;
   max-width: 20%;
+  height: 100%;
   margin: 0;
   border: solid;
   border-width: 0px 1px 0px 0px;
   border-color: rgb(230, 230, 230);
-  display: flex;
-  flex-direction: column;
+}
+
+.channelsMobile {
+  box-sizing: content-box;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
 }
 
 .channels .topBar {
-  height: 48px;
-  width: 100%;
-  border: solid;
-  border-width: 0px 0px 1px 0px;
-  border-color: rgb(230, 230, 230);
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  height: 48px;
+  border: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: rgb(230, 230, 230);
 }
 
 .channels .topBar .search {
-  background-color: rgb(230, 230, 230);
-  width: 80%;
-  height: 70%;
-  border-radius: 15px;
-  border: 1px solid rgb(230, 230, 230);
   display: flex;
   align-items: center;
-  padding: 5px;
   gap: 5px;
+  width: 80%;
+  height: 70%;
+  padding: 5px;
+  background-color: rgb(230, 230, 230);
+  border: 1px solid rgb(230, 230, 230);
+  border-radius: 15px;
 }
 
 .channels .topBar .search .input {
-  background-color: rgb(230, 230, 230);
-  border-color: transparent;
-  border: none;
   width: 100%;
+  background-color: rgb(230, 230, 230);
+  border: none;
+  border-color: transparent;
   font-size: 14px;
   font-weight: 400;
 }
@@ -55,26 +62,35 @@
 }
 
 .channels .topBar .search .icon:visited, .channels .search .icon:hover, .channels .search .icon:link {
-  text-decoration: inherit;
-  color: inherit;
   cursor: auto;
+  color: inherit;
+  text-decoration: inherit;
 }
 
 .channels .topBar .search .icon:hover {
   cursor: pointer;
 }
 
-.channels .channel {
-  height: 56px;
+.channels .list {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   width: 100%;
-  border: solid;
-  border-width: 0px 0px 1px 0px;
-  border-color: rgb(230, 230, 230);
+  height: 100%;
+}
+
+.channels .channel {
   display: flex;
   flex-direction: row;
   align-items: center;
-  font-weight: 500;
+  width: 100%;
+  height: 56px;
+  min-height: 56px;
   padding-left: 10px;
+  border: solid;
+  border-width: 0px 0px 1px 0px;
+  border-color: rgb(230, 230, 230);
+  font-weight: 500;
 }
 
 .channels .selectedChannel {

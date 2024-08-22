@@ -1,65 +1,99 @@
-import axios, { Axios } from "axios"
-import { Channel, CreateChannelRequest, CreateGroupChatRequest, CreateMessageRequest, CreatePrivateChatRequest, Message, UpdateChannelRequest, User } from "../models"
-import { axiosClient } from "../.."
+import {
+  Channel,
+  CreateChannelRequest,
+  CreateGroupChatRequest,
+  CreateMessageRequest,
+  CreatePrivateChatRequest,
+  Message,
+  UpdateChannelRequest,
+  User,
+} from "../models";
+import axios, { Axios } from "axios";
+import { useEffect, useState } from "react";
+
+import { axiosClient } from "../..";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+
+export function useChannelController() {
+  const [channelController, setChannelController] = useState(
+    createChannelController()
+  );
+  const [token] = useLocalStorage("accessToken");
+
+  useEffect(() => {
+    setChannelController(createChannelController());
+  }, [token]);
+
+  return channelController;
+}
 
 export function createChannelController() {
-  return new ChannelController(axiosClient, localStorage.getItem('accessToken')!)
+  return new ChannelController(
+    axiosClient,
+    localStorage.getItem("accessToken")!
+  );
 }
 
 export class ChannelController {
-  client: Axios
+  client: Axios;
 
   constructor(client: Axios, token: string) {
     this.client = axios.create({
       ...client.defaults,
       baseURL: client.defaults.baseURL + "/api/channels",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   async getChannels(): Promise<Channel[]> {
-    return (await this.client.get('')).data
+    return (await this.client.get("")).data;
   }
 
   async getChannelById(channelId: number): Promise<Channel> {
-    return (await this.client.get(`/${channelId}`)).data
+    return (await this.client.get(`/${channelId}`)).data;
   }
 
   async getChannelMembers(channelId: number): Promise<User[]> {
-    return (await this.client.get(`/${channelId}/members`)).data
+    return (await this.client.get(`/${channelId}/members`)).data;
   }
 
   async getMessages(channelId: number): Promise<Message[]> {
-    return (await this.client.get(`/${channelId}/messages`)).data
+    return (await this.client.get(`/${channelId}/messages`)).data;
   }
 
-  async createMessage(channelId: number, body: CreateMessageRequest): Promise<Message> {
-    return (await this.client.post(`/${channelId}/messages`, body)).data
+  async createMessage(
+    channelId: number,
+    body: CreateMessageRequest
+  ): Promise<Message> {
+    return (await this.client.post(`/${channelId}/messages`, body)).data;
   }
 
   async createChannel(body: CreateChannelRequest): Promise<Channel> {
-    return (await this.client.post('', body)).data
+    return (await this.client.post("", body)).data;
   }
 
   async createPrivateChat(body: CreatePrivateChatRequest): Promise<Channel> {
-    return (await this.client.post('/privateChat', body)).data
+    return (await this.client.post("/privateChat", body)).data;
   }
 
   async createGroupChat(body: CreateGroupChatRequest): Promise<Channel> {
-    return (await this.client.post('/groupChat', body)).data
+    return (await this.client.post("/groupChat", body)).data;
   }
 
-  async updateChannel(channelId: number, body: UpdateChannelRequest): Promise<Channel> {
-    return (await this.client.patch(`/${channelId}`, body)).data
+  async updateChannel(
+    channelId: number,
+    body: UpdateChannelRequest
+  ): Promise<Channel> {
+    return (await this.client.patch(`/${channelId}`, body)).data;
   }
 
   async deleteChannel(channelId: number) {
-    this.client.delete(`/${channelId}`)
+    this.client.delete(`/${channelId}`);
   }
-  
+
   async join(channelId: number): Promise<Channel> {
-    return (await this.client.get(`/${channelId}/join`)).data
+    return (await this.client.get(`/${channelId}/join`)).data;
   }
 }

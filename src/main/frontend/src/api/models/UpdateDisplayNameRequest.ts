@@ -1,3 +1,3 @@
 export interface UpdateDisplayNameRequest {
-    displayName: string;
+  displayName: string;
 }

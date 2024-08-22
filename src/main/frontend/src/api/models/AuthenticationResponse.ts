@@ -1,5 +1,5 @@
 export interface AuthenticationResponse {
-    accessToken: string;
-    refreshToken: string;
-    userId: string;
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
 }

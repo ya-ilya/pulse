@@ -26,11 +26,13 @@ class PulseApplication(
             "password"
         )
 
-        val groupChat = channelService.createGroupChatChannel(
-            "Group Chat",
-            ilya,
-            listOf(pavel)
-        )
+        for (i in 0..100) {
+            val groupChat = channelService.createGroupChatChannel(
+                "Group Chat $i",
+                ilya,
+                listOf(pavel)
+            )
+        }
 
         val privateChat = channelService.createPrivateChatChannel(
             ilya,

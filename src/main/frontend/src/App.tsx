@@ -1,43 +1,76 @@
-import { useState } from 'react'
-import './App.css'
-import Channels from './components/channels/Channels'
-import ChannelBody from './components/channelBody/ChannelBody'
-import ChannelTopBar from './components/channelTopBar/ChannelTopBar'
-import ChannelBottomBar from './components/channelBottomBar/ChannelBottomBar'
-import { Sidebar } from './components/sidebar/Sidebar'
-import CreateChannelDialog from './components/createChannelDialog/CreateChannelDialog'
-import CreateGroupDialog from './components/createGroupDialog/CreateGroupDialog'
-import { Channel } from './api'
+import "./App.css";
+
+import * as api from "./api";
+
+import { useRef, useState } from "react";
+
+import Channel from "./components/channel/Channel";
+import Channels from "./components/channels/Channels";
+import CreateChannelDialog from "./components/createChannelDialog/CreateChannelDialog";
+import CreateGroupDialog from "./components/createGroupDialog/CreateGroupDialog";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import useOnScreenKeyboardScrollFix from "./hooks/useOnScreenKeyboardScrollFix";
 
 function App() {
-  const [channel, setChannel] = useState<Channel>()
-  const [showSidebar, setShowSidebar] = useState<boolean>(false)
-  const [showCreateChannelDialog, setShowCreateChannelDialog] = useState<boolean>(false)
-  const [showCreateGroupDialog, setShowCreateGroupDialog] = useState<boolean>(false)
+  const [channel, setChannel] = useState<api.Channel>();
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [showChannel, setShowChannel] = useState(false);
+  const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
+  const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false);
+
+  const channelsRef = useRef();
+
+  useOnScreenKeyboardScrollFix();
 
   function hideDialogs() {
-    setShowCreateChannelDialog(false)
-    setShowCreateGroupDialog(false)
+    setShowSidebar(false);
+    setShowCreateChannelDialog(false);
+    setShowCreateGroupDialog(false);
   }
 
   function isBackgroundVisible() {
-    return showSidebar || showCreateChannelDialog || showCreateGroupDialog
+    return showSidebar || showCreateChannelDialog || showCreateGroupDialog;
   }
 
   return (
-    <div className='home'>
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} setShowCreateChannelDialog={setShowCreateChannelDialog} setShowCreateGroupDialog={setShowCreateGroupDialog}/>
-      <Channels channel={channel} setChannel={setChannel} setShowSidebar={setShowSidebar}/>
-      <div className='channel'>
-        <ChannelTopBar channel={channel}/>
-        <ChannelBody channel={channel}/>
-        <ChannelBottomBar channel={channel}/>
-      </div>
-      <CreateChannelDialog showCreateChannelDialog={showCreateChannelDialog} setShowCreateChannelDialog={setShowCreateChannelDialog}/>
-      <CreateGroupDialog showCreateGroupDialog={showCreateGroupDialog} setShowCreateGroupDialog={setShowCreateGroupDialog}/>
-      <div className='background' onClick={() => { setShowSidebar(false); hideDialogs() }} style={{ visibility: isBackgroundVisible() ? "visible" : "hidden", background: "rgba(0, 0, 0, 0.5)" }}/>
+    <div className="home">
+      <Sidebar
+        showSidebar={showSidebar}
+        setShowSidebar={setShowSidebar}
+        setShowCreateChannelDialog={setShowCreateChannelDialog}
+        setShowCreateGroupDialog={setShowCreateGroupDialog}
+      />
+      <Channels
+        ref={channelsRef}
+        channel={channel}
+        setChannel={setChannel}
+        setShowSidebar={setShowSidebar}
+        setShowChannel={setShowChannel}
+      />
+      <Channel
+        ref={channelsRef}
+        channel={channel}
+        showChannel={showChannel}
+        setShowChannel={setShowChannel}
+      />
+      <CreateChannelDialog
+        showCreateChannelDialog={showCreateChannelDialog}
+        setShowCreateChannelDialog={setShowCreateChannelDialog}
+      />
+      <CreateGroupDialog
+        showCreateGroupDialog={showCreateGroupDialog}
+        setShowCreateGroupDialog={setShowCreateGroupDialog}
+      />
+      <div
+        className="background"
+        onClick={hideDialogs}
+        style={{
+          visibility: isBackgroundVisible() ? "visible" : "hidden",
+          background: "rgba(0, 0, 0, 0.5)",
+        }}
+      />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

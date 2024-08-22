@@ -1,3 +1,3 @@
 export interface CreateMessageRequest {
-    content: string;
+  content: string;
 }

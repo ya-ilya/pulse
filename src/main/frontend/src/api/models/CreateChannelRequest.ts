@@ -1,3 +1,3 @@
 export interface CreateChannelRequest {
-    name: string;
+  name: string;
 }
