@@ -7,39 +7,22 @@ import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { RemoveScroll } from "react-remove-scroll";
+import { formatDate } from "../../utils/DateUtils";
 import { useGatewayContext } from "../../gateway";
 
 type ChannelBodyProps = {
-  channel: api.Channel | undefined;
+  channel?: api.Channel;
 };
 
-function formatDate(date: Date | string): string {
-  if (date instanceof Date) {
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  } else {
-    date = new Date(date);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
-}
-
-const ChannelBody = forwardRef(function ChannelBody(
-  { channel }: ChannelBodyProps,
-  ref: any
-) {
+const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
   const queryClient = useQueryClient();
-
   const channelController = api.useChannelController();
   const messageController = api.useMessageController();
 
   const messagesQuery = useQuery({
-    queryKey: ["messages", channel],
+    queryKey: ["messages", props.channel],
     queryFn: () =>
-      channel ? channelController.getMessages(channel?.id!)! : [],
-    keepPreviousData: true,
+      props.channel ? channelController.getMessages(props.channel?.id!)! : []
   });
 
   const self = useContext(AuthenticationContext);
@@ -65,7 +48,7 @@ const ChannelBody = forwardRef(function ChannelBody(
       CreateMessageEvent: (event) => {
         messageController.getMessageById(event.messageId).then((message) => {
           queryClient.setQueriesData(
-            ["messages", channel],
+            ["messages", props.channel],
             (messages: api.Message[] | undefined) => {
               if (!messages) return [message];
 
@@ -76,7 +59,7 @@ const ChannelBody = forwardRef(function ChannelBody(
       },
       UpdateMessageContentEvent: (event) => {
         queryClient.setQueriesData(
-          ["messages", channel],
+          ["messages", props.channel],
           (messages: api.Message[] | undefined) => {
             if (!messages) return [];
 
@@ -90,7 +73,7 @@ const ChannelBody = forwardRef(function ChannelBody(
       },
       DeleteMessageEvent: (event) => {
         queryClient.setQueriesData(
-          ["messages", channel],
+          ["messages", props.channel],
           (messages: api.Message[] | undefined) => {
             if (!messages) return [];
 
@@ -104,37 +87,33 @@ const ChannelBody = forwardRef(function ChannelBody(
         );
       },
     },
-    (event) => channel != null && event.channelId == channel.id
+    (event) => {
+      return props.channel != null && event.channelId == props.channel.id;
+    }
   );
 
-  if (!channel) {
-    return <div></div>;
-  }
-
   return (
-    <RemoveScroll shards={ref} forwardProps>
-      <div className="channelBody">
-        {messagesQuery.data?.map((message) => (
-          <div className="messageContainer">
-            <div
-              className={
-                message.user?.id == self?.id
-                  ? "message messageRight"
-                  : "message messageLeft"
-              }
-            >
-              {channel.type != api.ChannelTypeEnum.PrivateChat &&
-                channel.type != api.ChannelTypeEnum.Channel && (
-                  <div className="user">{message.user?.displayName}</div>
-                )}
-              <div className="inner">
-                <div className="content">{message.content}</div>
-                <div className="timestamp">{formatDate(message.timestamp)}</div>
-              </div>
+    <RemoveScroll className="channelBody" shards={[ref]}>
+      {messagesQuery.data?.map((message) => (
+        <div className="messageContainer">
+          <div
+            className={`message ${
+              message.user?.id == self?.id
+                ? "--message-right"
+                : "--message-left"
+            }`}
+          >
+            {props.channel?.type != api.ChannelType.PrivateChat &&
+              props.channel?.type != api.ChannelType.Channel && (
+                <div className="user">{message.user?.displayName}</div>
+              )}
+            <div className="inner">
+              <div className="content">{message.content}</div>
+              <div className="timestamp">{formatDate(message.timestamp)}</div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </RemoveScroll>
   );
 });

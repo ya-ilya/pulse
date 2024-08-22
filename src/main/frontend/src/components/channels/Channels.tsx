@@ -8,30 +8,28 @@ import { useQuery, useQueryClient } from "react-query";
 import { FiMenu } from "react-icons/fi";
 import { useGatewayContext } from "../../gateway";
 import { useIsMobile } from "../../hooks";
+import useViewportSize from "../../hooks/useViewportSize";
 
 type ChannelsProps = {
-  channel: api.Channel | undefined;
+  channel?: api.Channel;
   setChannel: (channel: api.Channel | undefined) => void;
   setShowSidebar: (showSidebar: boolean) => void;
+  showChannel: boolean;
   setShowChannel: (showChannel: boolean) => void;
 };
 
-const Channels = forwardRef(function Channels(
-  { channel, setChannel, setShowSidebar, setShowChannel }: ChannelsProps,
-  ref: any
-) {
+const Channels = forwardRef((props: ChannelsProps, ref: any) => {
   const queryClient = useQueryClient();
-
   const channelController = api.useChannelController();
 
-  const [filterQuery, setFilterQuery] = useState("");
+  const [filter, setFilter] = useState("");
 
   const channelsQuery = useQuery({
     queryKey: ["channels"],
-    queryFn: () => channelController.getChannels(),
-    keepPreviousData: true,
+    queryFn: () => channelController.getChannels()
   });
 
+  const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
 
   useGatewayContext({
@@ -79,30 +77,42 @@ const Channels = forwardRef(function Channels(
   });
 
   return (
-    <div className={isMobile ? "channels channelsMobile" : "channels"}>
+    <div
+      className={`channels ${isMobile ? "--channels-mobile" : ""}`}
+      style={{
+        visibility: isMobile
+          ? props.showChannel
+            ? "hidden"
+            : "visible"
+          : "visible",
+        maxHeight: viewportHeight,
+      }}
+    >
       <div className="topBar">
-        <FiMenu onClick={() => setShowSidebar(true)} />
+        <FiMenu onClick={() => props.setShowSidebar(true)} />
         <div className="search">
           <input
             className="input"
             type="text"
             placeholder="Search"
-            value={filterQuery}
-            onChange={(event) => setFilterQuery(event.target.value)}
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}
           />
         </div>
       </div>
       <div className="list" ref={ref}>
         {channelsQuery.data
-          ?.filter((value) => value.name?.includes(filterQuery))
+          ?.filter((value) => value.name?.includes(filter))
           .map((value) => (
             <div
               className={
-                value.id == channel?.id ? "channel selectedChannel" : "channel"
+                value.id == props.channel?.id
+                  ? "channel selectedChannel"
+                  : "channel"
               }
               onClick={() => {
-                setChannel(value);
-                setShowChannel(true);
+                props.setChannel(value);
+                props.setShowChannel(true);
               }}
             >
               {value.name}

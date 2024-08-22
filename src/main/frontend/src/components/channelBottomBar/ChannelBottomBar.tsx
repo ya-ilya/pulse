@@ -8,17 +8,17 @@ import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
 
 type ChannelBottomBarProps = {
-  channel: api.Channel | undefined;
+  channel?: api.Channel;
 };
 
-function ChannelBottomBar({ channel }: ChannelBottomBarProps) {
+function ChannelBottomBar(props: ChannelBottomBarProps) {
   const channelController = api.useChannelController();
 
   const [message, setMessage] = useState("");
 
   const self = useContext(AuthenticationContext);
 
-  if (!channel) {
+  if (!props.channel) {
     return <div></div>;
   }
 
@@ -28,12 +28,12 @@ function ChannelBottomBar({ channel }: ChannelBottomBarProps) {
     }
 
     channelController
-      .createMessage(channel?.id!, { content: message })
+      .createMessage(props.channel?.id!, { content: message })
       .then(() => setMessage(""));
   }
 
-  return channel?.type != api.ChannelTypeEnum.Channel ||
-    channel.admin?.id == self!.id ? (
+  return props.channel?.type != api.ChannelType.Channel ||
+    props.channel.admin?.id == self!.id ? (
     <div className="channelBottomBar">
       <input
         className="messageInput"

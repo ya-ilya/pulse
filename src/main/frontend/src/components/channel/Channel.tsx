@@ -10,29 +10,29 @@ import { useIsMobile } from "../../hooks";
 import useViewportSize from "../../hooks/useViewportSize";
 
 type ChannelProps = {
-  channel: api.Channel | undefined;
+  channel?: api.Channel;
   showChannel: boolean;
   setShowChannel: (showChannel: boolean) => void;
 };
 
-const Channel = forwardRef(function Channel(
-  { channel, showChannel, setShowChannel }: ChannelProps,
-  ref: any
-) {
+const Channel = forwardRef((props: ChannelProps, ref: any) => {
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
 
   return (
     <div
-      className={isMobile ? "channelMobile" : "channel"}
+      className={`channel ${isMobile ? "--channel-mobile" : ""}`}
       style={{
-        right: !isMobile || showChannel ? "0%" : "100%",
+        right: isMobile && !props.showChannel ? "100%" : "0",
         maxHeight: viewportHeight,
       }}
     >
-      <ChannelTopBar channel={channel} setShowChannel={setShowChannel} />
-      <ChannelBody ref={ref} channel={channel} />
-      <ChannelBottomBar channel={channel} />
+      <ChannelTopBar
+        channel={props.channel}
+        setShowChannel={props.setShowChannel}
+      />
+      <ChannelBody ref={ref} channel={props.channel} />
+      <ChannelBottomBar channel={props.channel} />
     </div>
   );
 });

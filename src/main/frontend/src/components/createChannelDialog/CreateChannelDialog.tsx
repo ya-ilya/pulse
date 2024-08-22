@@ -9,10 +9,7 @@ type CreateChannelDialogProps = {
   setShowCreateChannelDialog: (showCreateChannelDialog: boolean) => void;
 };
 
-function CreateChannelDialog({
-  showCreateChannelDialog,
-  setShowCreateChannelDialog,
-}: CreateChannelDialogProps) {
+function CreateChannelDialog(props: CreateChannelDialogProps) {
   const channelController = api.useChannelController();
 
   const [name, setName] = useState("");
@@ -25,7 +22,7 @@ function CreateChannelDialog({
 
     setLoading(true);
     channelController.createChannel({ name: name }).then(() => {
-      setShowCreateChannelDialog(false);
+      props.setShowCreateChannelDialog(false);
       setLoading(false);
     });
   }
@@ -33,7 +30,7 @@ function CreateChannelDialog({
   return (
     <div
       className="createChannelDialog"
-      style={{ visibility: showCreateChannelDialog ? "visible" : "hidden" }}
+      style={{ visibility: props.showCreateChannelDialog ? "visible" : "hidden" }}
     >
       <div className="header">Create channel</div>
       <input

@@ -12,10 +12,7 @@ type CreateGroupDialogProps = {
   setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void;
 };
 
-function CreateGroupDialog({
-  showCreateGroupDialog,
-  setShowCreateGroupDialog,
-}: CreateGroupDialogProps) {
+function CreateGroupDialog(props: CreateGroupDialogProps) {
   const channelController = api.useChannelController();
   const userController = api.useUserController();
 
@@ -35,7 +32,7 @@ function CreateGroupDialog({
     channelController
       .createGroupChat({ name: name, with: users.map((user) => user.id!) })
       .then(() => {
-        setShowCreateGroupDialog(false);
+        props.setShowCreateGroupDialog(false);
       })
       .finally(() => setLoading(false));
   }
@@ -62,7 +59,7 @@ function CreateGroupDialog({
   return (
     <div
       className="createGroupDialog"
-      style={{ visibility: showCreateGroupDialog ? "visible" : "hidden" }}
+      style={{ visibility: props.showCreateGroupDialog ? "visible" : "hidden" }}
     >
       <div className="header">Create group</div>
       <input
@@ -95,7 +92,12 @@ function CreateGroupDialog({
             value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
-          <button type="button" className="button" onClick={handleAddUser}>
+          <button
+            type="button"
+            className="button"
+            onClick={handleAddUser}
+            disabled={loading}
+          >
             +
           </button>
         </div>

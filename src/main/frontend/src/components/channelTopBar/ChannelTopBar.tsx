@@ -5,21 +5,21 @@ import { Channel } from "../../api";
 import { useIsMobile } from "../../hooks";
 
 type ChannelTopBarProps = {
-  channel: Channel | undefined;
+  channel?: Channel;
   setShowChannel: (showChannel: boolean) => void;
 };
 
-function ChannelTopBar({ channel, setShowChannel }: ChannelTopBarProps) {
+function ChannelTopBar(props: ChannelTopBarProps) {
   const isMobile = useIsMobile();
 
-  if (!channel) {
+  if (!props.channel) {
     return <div></div>;
   }
 
   return (
     <div className="channelTopBar">
-      {isMobile && <BiArrowBack onClick={() => setShowChannel(false)} />}
-      <div className="name">{channel?.name}</div>
+      {isMobile && <BiArrowBack onClick={() => props.setShowChannel(false)} />}
+      <div className="name">{props.channel?.name}</div>
     </div>
   );
 }

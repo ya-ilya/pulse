@@ -44,11 +44,11 @@
   word-break: break-all;
 }
 
-.channelBody .messageLeft {
+.channelBody .--message-left {
   margin-left: 0;
 }
 
-.channelBody .messageRight {
+.channelBody .--message-right {
   margin-left: auto;
 }
 

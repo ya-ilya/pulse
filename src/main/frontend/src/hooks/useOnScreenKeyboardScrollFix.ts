@@ -10,6 +10,7 @@ const useOnScreenKeyboardScrollFix = () => {
       });
     };
 
+
     document.body.addEventListener("touchmove", handleScroll);
     window.addEventListener("scroll", handleScroll);
 

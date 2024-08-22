@@ -11,24 +11,19 @@ type SidebarProps = {
   setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void;
 };
 
-export function Sidebar({
-  showSidebar,
-  setShowSidebar,
-  setShowCreateChannelDialog,
-  setShowCreateGroupDialog,
-}: SidebarProps) {
+function Sidebar(props: SidebarProps) {
   const isMobile = useIsMobile();
 
   return (
     <div
       className={isMobile ? "sidebar sidebarMobile" : "sidebar"}
-      style={{ left: showSidebar ? "0" : "-100%" }}
+      style={{ left: props.showSidebar ? "0" : "-100%" }}
     >
       <div
         className="element"
         onClick={() => {
-          setShowSidebar(false);
-          setShowCreateGroupDialog(true);
+          props.setShowSidebar(false);
+          props.setShowCreateGroupDialog(true);
         }}
       >
         <GrGroup />
@@ -37,8 +32,8 @@ export function Sidebar({
       <div
         className="element"
         onClick={() => {
-          setShowSidebar(false);
-          setShowCreateChannelDialog(true);
+          props.setShowSidebar(false);
+          props.setShowCreateChannelDialog(true);
         }}
       >
         <LuMegaphone />
@@ -47,3 +42,5 @@ export function Sidebar({
     </div>
   );
 }
+
+export default Sidebar
