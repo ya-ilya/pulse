@@ -5,19 +5,22 @@ import * as api from "../../api";
 import ChannelBody from "../channelBody/ChannelBody";
 import ChannelBottomBar from "../channelBottomBar/ChannelBottomBar";
 import ChannelTopBar from "../channelTopBar/ChannelTopBar";
-import { forwardRef } from "react";
 import { useIsMobile } from "../../hooks";
+import { useRef } from "react";
 import useViewportSize from "../../hooks/useViewportSize";
 
 type ChannelProps = {
   channel?: api.Channel;
   showChannel: boolean;
   setShowChannel: (showChannel: boolean) => void;
+  shards: any[];
 };
 
-const Channel = forwardRef((props: ChannelProps, ref: any) => {
+function Channel(props: ChannelProps) {
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
+
+  const channelBottomBarRef = useRef();
 
   return (
     <div
@@ -31,10 +34,13 @@ const Channel = forwardRef((props: ChannelProps, ref: any) => {
         channel={props.channel}
         setShowChannel={props.setShowChannel}
       />
-      <ChannelBody ref={ref} channel={props.channel} />
-      <ChannelBottomBar channel={props.channel} />
+      <ChannelBody
+        channel={props.channel}
+        shards={[...props.shards, channelBottomBarRef]}
+      />
+      <ChannelBottomBar channel={props.channel} ref={channelBottomBarRef} />
     </div>
   );
-});
+}
 
 export default Channel;

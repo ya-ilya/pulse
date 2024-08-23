@@ -19,14 +19,14 @@ function App() {
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false);
 
-  const ref = useRef();
+  const channelsRef = useRef();
 
   useOnScreenKeyboardScrollFix();
 
   return (
     <div className="home">
       <Channels
-        ref={ref}
+        ref={channelsRef}
         channel={channel}
         setChannel={setChannel}
         setShowSidebar={setShowSidebar}
@@ -34,7 +34,7 @@ function App() {
         setShowChannel={setShowChannel}
       />
       <Channel
-        ref={ref}
+        shards={[channelsRef]}
         channel={channel}
         showChannel={showChannel}
         setShowChannel={setShowChannel}

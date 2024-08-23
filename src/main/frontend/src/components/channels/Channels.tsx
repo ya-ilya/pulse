@@ -34,16 +34,14 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   useGatewayContext({
     CreateChannelEvent: (event) => {
-      channelController.getChannelById(event.channelId).then((channel) => {
-        queryClient.setQueriesData(
-          ["channels"],
-          (channels: api.Channel[] | undefined) => {
-            if (!channels) return [channel];
+      queryClient.setQueriesData(
+        ["channels"],
+        (channels: api.Channel[] | undefined) => {
+          if (!channels) return [event.channel];
 
-            return [...channels, channel];
-          }
-        );
-      });
+          return [...channels, event.channel];
+        }
+      );
     },
     UpdateChannelNameEvent: (event) => {
       queryClient.setQueriesData(

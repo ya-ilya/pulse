@@ -2,28 +2,31 @@ import "./ChannelBody.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { RemoveScroll } from "react-remove-scroll";
 import { formatDate } from "../../utils/DateUtils";
 import { useGatewayContext } from "../../gateway";
+import { useIsMobile } from "../../hooks";
 
 type ChannelBodyProps = {
   channel?: api.Channel;
+  shards: any[];
 };
 
-const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
+function ChannelBody(props: ChannelBodyProps) {
   const queryClient = useQueryClient();
   const channelController = api.useChannelController();
-  const messageController = api.useMessageController();
 
   const messagesQuery = useQuery({
     queryKey: ["messages", props.channel],
     queryFn: () =>
-      props.channel ? channelController.getMessages(props.channel?.id!)! : []
+      props.channel ? channelController.getMessages(props.channel?.id!)! : [],
   });
+
+  const isMobile = useIsMobile();
 
   const self = useContext(AuthenticationContext);
 
@@ -46,16 +49,14 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
   useGatewayContext(
     {
       CreateMessageEvent: (event) => {
-        messageController.getMessageById(event.messageId).then((message) => {
-          queryClient.setQueriesData(
-            ["messages", props.channel],
-            (messages: api.Message[] | undefined) => {
-              if (!messages) return [message];
+        queryClient.setQueriesData(
+          ["messages", props.channel],
+          (messages: api.Message[] | undefined) => {
+            if (!messages) return [event.message];
 
-              return [...messages, message];
-            }
-          );
-        });
+            return [...messages, event.message];
+          }
+        );
       },
       UpdateMessageContentEvent: (event) => {
         queryClient.setQueriesData(
@@ -93,7 +94,7 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
   );
 
   return (
-    <RemoveScroll className="channel-body" shards={[ref]}>
+    <RemoveScroll className="channel-body" shards={props.shards}>
       {messagesQuery.data?.map((message) => (
         <div className="message-container">
           <div
@@ -101,7 +102,7 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
               message.user?.id == self?.id
                 ? "--message-right"
                 : "--message-left"
-            }`}
+            } ${isMobile ? "--message-mobile" : ""}`}
           >
             {props.channel?.type != api.ChannelType.PrivateChat &&
               props.channel?.type != api.ChannelType.Channel && (
@@ -116,6 +117,6 @@ const ChannelBody = forwardRef((props: ChannelBodyProps, ref: any) => {
       ))}
     </RemoveScroll>
   );
-});
+}
 
 export default ChannelBody;

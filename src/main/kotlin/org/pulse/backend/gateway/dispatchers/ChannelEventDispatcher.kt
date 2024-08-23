@@ -4,8 +4,8 @@ import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.gateway.Gateway
 import org.pulse.backend.gateway.events.CreateChannelEvent
 import org.pulse.backend.gateway.events.DeleteChannelEvent
-import org.pulse.backend.gateway.events.UpdateChannelNameEvent
 import org.pulse.backend.gateway.events.UpdateChannelMembersEvent
+import org.pulse.backend.gateway.events.UpdateChannelNameEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 
@@ -18,7 +18,7 @@ class ChannelEventDispatcher(
         memberService.findMembersByChannel(channel).forEach { (_, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                CreateChannelEvent(channel.id!!)
+                CreateChannelEvent(channel)
             )
         }
 

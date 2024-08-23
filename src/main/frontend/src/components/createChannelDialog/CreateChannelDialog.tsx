@@ -30,7 +30,9 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
   return (
     <div
       className="create-channel-dialog"
-      style={{ visibility: props.showCreateChannelDialog ? "visible" : "hidden" }}
+      style={{
+        visibility: props.showCreateChannelDialog ? "visible" : "hidden",
+      }}
     >
       <div className="header">Create channel</div>
       <input

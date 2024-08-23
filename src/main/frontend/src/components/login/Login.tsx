@@ -6,7 +6,7 @@ import { Navigate } from "react-router-dom";
 import { useState } from "react";
 
 function Login() {
-  const authenticationController = api.useAuthenticationController()
+  const authenticationController = api.useAuthenticationController();
 
   const [email, setEmail] = useState<string>("ilya@mail.com");
   const [password, setPassword] = useState<string>("password");
@@ -19,7 +19,8 @@ function Login() {
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
 
-        api.createMeController()
+        api
+          .createMeController()
           .getUser()
           .then((user) => {
             localStorage.setItem("user", JSON.stringify(user));

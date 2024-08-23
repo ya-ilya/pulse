@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import org.pulse.backend.entities.channel.member.ChannelMember
-import org.pulse.backend.gateway.Gateway
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.stereotype.Component
 import java.util.*
 
 @Entity

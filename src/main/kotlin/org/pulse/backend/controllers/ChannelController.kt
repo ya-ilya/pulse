@@ -7,7 +7,10 @@ import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.pulse.backend.requests.*
-import org.pulse.backend.services.*
+import org.pulse.backend.services.ChannelMemberService
+import org.pulse.backend.services.ChannelService
+import org.pulse.backend.services.MessageService
+import org.pulse.backend.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -82,11 +85,11 @@ class ChannelController(
         }
 
         return if (channel.type == ChannelType.Channel) {
-            messageService.createPost(request.content, channel).also {
+            messageService.createPost(request.content.trim(), channel).also {
                 messageEventDispatcher.dispatchCreateMessageEvent(it)
             }
         } else {
-            messageService.createMessage(request.content, channel, user).also {
+            messageService.createMessage(request.content.trim(), channel, user).also {
                 messageEventDispatcher.dispatchCreateMessageEvent(it)
             }
         }
