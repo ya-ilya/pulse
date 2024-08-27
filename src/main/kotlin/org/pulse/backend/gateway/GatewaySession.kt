@@ -16,6 +16,8 @@ class GatewaySession(
 
     val user: User get() = userService.getUserById(userId!!)
 
+    var writingThread: Thread? = null
+
     fun sendEvent(event: GatewayEvent) {
         session.sendMessage(TextMessage(objectMapper.writeValueAsString(event)))
     }

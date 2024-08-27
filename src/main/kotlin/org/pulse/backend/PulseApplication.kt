@@ -13,7 +13,10 @@ class PulseApplication(
     private val userService: UserService,
     private val channelService: ChannelService
 ) : CommandLineRunner {
+    @Suppress("UNREACHABLE_CODE")
     override fun run(vararg args: String) {
+        return
+
         val ilya = userService.createUser(
             "Ilya",
             "ilya@mail.com",

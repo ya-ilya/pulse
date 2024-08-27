@@ -38,14 +38,14 @@ function Login() {
       <div className="form">
         <div className="header">Welcome</div>
         <input
-          type="text"
+          type="email"
           placeholder="Email"
           className="input"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
         <input
-          type="text"
+          type="password"
           placeholder="Password"
           className="input"
           value={password}

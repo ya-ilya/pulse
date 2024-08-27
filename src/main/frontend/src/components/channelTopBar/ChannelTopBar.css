@@ -16,3 +16,7 @@
   display: flex;
   align-items: center;
 }
+
+.channel-top-bar .typing {
+  color: dodgerblue;
+}

@@ -2,9 +2,9 @@ package org.pulse.backend.gateway.dispatchers
 
 import org.pulse.backend.entities.message.Message
 import org.pulse.backend.gateway.Gateway
-import org.pulse.backend.gateway.events.CreateMessageEvent
-import org.pulse.backend.gateway.events.DeleteMessageEvent
-import org.pulse.backend.gateway.events.UpdateMessageContentEvent
+import org.pulse.backend.gateway.events.CreateMessageS2CEvent
+import org.pulse.backend.gateway.events.DeleteMessageS2CEvent
+import org.pulse.backend.gateway.events.UpdateMessageContentS2CEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 
@@ -17,7 +17,7 @@ class MessageEventDispatcher(
         memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                CreateMessageEvent(channel.id!!, message)
+                CreateMessageS2CEvent(channel.id!!, message)
             )
         }
 
@@ -25,7 +25,7 @@ class MessageEventDispatcher(
         memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                DeleteMessageEvent(channel.id!!, message.id!!)
+                DeleteMessageS2CEvent(channel.id!!, message.id!!)
             )
         }
 
@@ -33,7 +33,7 @@ class MessageEventDispatcher(
         memberService.findMembersByChannel(message.channel).forEach { (channel, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                UpdateMessageContentEvent(channel.id!!, message.id!!, message.content)
+                UpdateMessageContentS2CEvent(channel.id!!, message.id!!, message.content)
             )
         }
 }

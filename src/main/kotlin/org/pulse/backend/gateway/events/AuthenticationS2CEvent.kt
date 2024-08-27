@@ -2,7 +2,6 @@ package org.pulse.backend.gateway.events
 
 import org.pulse.backend.gateway.GatewayEvent
 
-class DeleteMessageEvent(
-    val channelId: Long,
-    val messageId: Long
+class AuthenticationS2CEvent(
+    val state: Boolean
 ) : GatewayEvent

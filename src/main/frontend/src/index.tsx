@@ -1,10 +1,7 @@
 import "./index.css";
 
-import {
-  GatewayContext,
-  createGatway,
-  isGatewayOpen,
-} from "./gateway/index.ts";
+import * as api from "./api/index.ts";
+
 import {
   Navigate,
   Outlet,
@@ -41,8 +38,11 @@ function ProtectedRoute() {
   useEffect(() => {
     const check = async () => {
       if (localStorage.getItem("accessToken")) {
-        if (!isGatewayOpen()) {
-          createGatway(`${window.location.origin}/api/gateway`, setLastEvent);
+        if (!api.isGatewayOpen()) {
+          api.createGatway(
+            `${window.location.origin}/api/gateway`,
+            setLastEvent
+          );
         }
       } else {
         setAuthenticated(false);
@@ -53,7 +53,7 @@ function ProtectedRoute() {
   }, []);
 
   useEffect(() => {
-    if (lastEvent?.type == "AuthenticationEvent") {
+    if (lastEvent?.type == "AuthenticationS2CEvent") {
       if (lastEvent.state === true) {
         setAuthenticated(true);
       } else {
@@ -76,11 +76,11 @@ function ProtectedRoute() {
     <AuthenticationContext.Provider
       value={JSON.parse(localStorage.getItem("user")!)}
     >
-      <GatewayContext.Provider value={lastEvent}>
+      <api.GatewayContext.Provider value={lastEvent}>
         <QueryClientProvider client={queryClient}>
           <Outlet />
         </QueryClientProvider>
-      </GatewayContext.Provider>
+      </api.GatewayContext.Provider>
     </AuthenticationContext.Provider>
   );
 }

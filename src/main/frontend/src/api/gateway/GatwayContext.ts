@@ -1,16 +1,20 @@
 import React, { useEffect } from "react";
 
+import { sendEvent } from "./Gateway";
+
 export const GatewayContext = React.createContext<any | null>(null);
 
 export function useGatewayContext(
-  events: { [type: string]: (event: any) => void },
+  events: { [type: string]: (event: any) => void } = {},
   filter: (event: any) => boolean = () => true
 ) {
   const lastEvent = React.useContext(GatewayContext);
 
   useEffect(() => {
-    if (lastEvent && lastEvent.type && filter(lastEvent)) {
-      events[lastEvent.type]?.call(undefined, lastEvent);
+    if (lastEvent && lastEvent.type && events[lastEvent.type] && filter(lastEvent)) {
+      events[lastEvent.type].call(undefined, lastEvent);
     }
   }, [lastEvent]);
+
+  return { sendEvent: sendEvent };
 }

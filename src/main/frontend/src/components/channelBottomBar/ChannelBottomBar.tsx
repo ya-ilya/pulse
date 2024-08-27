@@ -2,7 +2,7 @@ import "./ChannelBottomBar.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useContext, useState } from "react";
+import { forwardRef, useContext, useRef, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
@@ -16,8 +16,11 @@ const ChannelBottomBar = forwardRef(
     const channelController = api.useChannelController();
 
     const [message, setMessage] = useState("");
+    const lastTypingEventTime = useRef(Date.now());
 
     const self = useContext(AuthenticationContext);
+
+    const { sendEvent } = api.useGatewayContext();
 
     if (!props.channel) {
       return <div></div>;
@@ -40,7 +43,21 @@ const ChannelBottomBar = forwardRef(
           className="message-input"
           placeholder="Message"
           value={message}
-          onChange={(event) => setMessage(event.target.value)}
+          onChange={(event) => {
+            setMessage(event.target.value);
+
+            const time = Date.now();
+            if (
+              props.channel &&
+              message.length > 0 &&
+              time - lastTypingEventTime.current > 900
+            ) {
+              sendEvent("TypingC2SEvent", {
+                channelId: props.channel?.id!,
+              });
+              lastTypingEventTime.current = time;
+            }
+          }}
           ref={ref}
         />
         <div className="icon" onClick={createMessage}>

@@ -6,7 +6,6 @@ import { forwardRef, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { FiMenu } from "react-icons/fi";
-import { useGatewayContext } from "../../gateway";
 import { useIsMobile } from "../../hooks";
 import useViewportSize from "../../hooks/useViewportSize";
 
@@ -32,8 +31,8 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
 
-  useGatewayContext({
-    CreateChannelEvent: (event) => {
+  api.useGatewayContext({
+    CreateChannelS2CEvent: (event) => {
       queryClient.setQueriesData(
         ["channels"],
         (channels: api.Channel[] | undefined) => {
@@ -43,7 +42,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         }
       );
     },
-    UpdateChannelNameEvent: (event) => {
+    UpdateChannelNameS2CEvent: (event) => {
       queryClient.setQueriesData(
         ["channels"],
         (channels: api.Channel[] | undefined) => {
@@ -57,7 +56,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         }
       );
     },
-    DeleteChannelEvent: (event) => {
+    DeleteChannelS2CEvent: (event) => {
       queryClient.setQueriesData(
         ["channels"],
         (channels: api.Channel[] | undefined) => {

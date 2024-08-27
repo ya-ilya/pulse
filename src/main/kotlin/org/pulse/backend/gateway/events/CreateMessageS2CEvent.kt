@@ -1,9 +1,9 @@
 package org.pulse.backend.gateway.events
 
+import org.pulse.backend.entities.message.Message
 import org.pulse.backend.gateway.GatewayEvent
 
-class UpdateMessageContentEvent(
+class CreateMessageS2CEvent(
     val channelId: Long,
-    val messageId: Long,
-    val content: String
+    val message: Message
 ) : GatewayEvent

@@ -1,8 +1,15 @@
 package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.pulse.backend.gateway.events.AuthenticationEvent
+import org.pulse.backend.entities.channel.Channel
+import org.pulse.backend.entities.user.User
+import org.pulse.backend.gateway.events.AuthenticationC2SEvent
+import org.pulse.backend.gateway.events.AuthenticationS2CEvent
+import org.pulse.backend.gateway.events.TypingC2SEvent
+import org.pulse.backend.gateway.events.TypingS2CEvent
 import org.pulse.backend.services.AuthenticationService
+import org.pulse.backend.services.ChannelMemberService
+import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.CloseStatus
@@ -15,34 +22,88 @@ import java.util.*
 class Gateway(
     private val objectMapper: ObjectMapper,
     private val userService: UserService,
+    private val memberService: ChannelMemberService,
+    private val channelService: ChannelService,
     private val authenticationService: AuthenticationService
 ) : TextWebSocketHandler() {
     private val activeSessions = Collections.synchronizedSet<GatewaySession>(mutableSetOf())
+
+    init {
+        objectMapper.registerSubtypes(GatewayEvent::class.java)
+    }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
         activeSessions.add(GatewaySession(session, objectMapper, userService))
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
-        val email = try {
-            authenticationService.extractEmail(message.payload)
-        } catch (ex: Exception) {
-            ""
-        }
+        when (val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)) {
+            is AuthenticationC2SEvent -> {
+                val email = try {
+                    authenticationService.extractEmail(event.token)
+                } catch (ex: Exception) {
+                    ""
+                }
 
-        var state = false
+                var state = false
 
-        userService.findUserByEmail(email).ifPresent { user ->
-            if (authenticationService.isAccessTokenValid(message.payload, user)) {
-                this[session]?.userId = user.id
-                state = true
+                userService.findUserByEmail(email).ifPresent { user ->
+                    if (authenticationService.isAccessTokenValid(event.token, user)) {
+                        this[session]?.userId = user.id
+                        state = true
+                    }
+                }
+
+                this[session]?.sendEvent(AuthenticationS2CEvent(state))
+
+                if (!state) {
+                    session.close()
+                }
             }
-        }
 
-        this[session]?.sendEvent(AuthenticationEvent(state))
+            is TypingC2SEvent -> {
+                val gatewaySession = this[session]
+                var oldThreadIsInterrupted = false
 
-        if (!state) {
-            session.close()
+                if (gatewaySession!!.writingThread?.isAlive == true) {
+                    gatewaySession.writingThread!!.interrupt()
+                    oldThreadIsInterrupted = true
+                }
+
+                gatewaySession.writingThread = object : Thread() {
+                    init {
+                        start()
+                    }
+
+                    override fun run() {
+                        var thisThreadIsInterrupted = false
+
+                        if (!oldThreadIsInterrupted) {
+                            dispatchWritingEvent(
+                                channelService.getChannelById(event.channelId),
+                                gatewaySession.user,
+                                true
+                            )
+                        }
+
+                        try {
+                            sleep(1000)
+                        } catch (ex: InterruptedException) {
+                            thisThreadIsInterrupted = true
+                        }
+
+                        if (!thisThreadIsInterrupted && !isInterrupted) {
+                            dispatchWritingEvent(
+                                channelService.getChannelById(event.channelId),
+                                gatewaySession.user,
+                                false
+                            )
+                        } else {
+                            interrupt()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -71,4 +132,12 @@ class Gateway(
             }
         }
     }
+
+    fun dispatchWritingEvent(channel: Channel, user: User, state: Boolean) =
+        memberService.findMembersByChannel(channel).forEach { (channel, memberUser) ->
+            sendToUserSessions(
+                memberUser.id!!,
+                TypingS2CEvent(channel.id!!, user.id!!, state)
+            )
+        }
 }

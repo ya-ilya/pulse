@@ -8,8 +8,19 @@ import { useQuery, useQueryClient } from "react-query";
 import { AuthenticationContext } from "../..";
 import { RemoveScroll } from "react-remove-scroll";
 import { formatDate } from "../../utils/DateUtils";
-import { useGatewayContext } from "../../gateway";
 import { useIsMobile } from "../../hooks";
+
+function scrollToBottom() {
+  const messageContainers =
+    document.getElementsByClassName("message-container");
+
+  if (messageContainers.length > 0) {
+    messageContainers[messageContainers.length - 1].scrollIntoView({
+      behavior: "instant",
+      block: "end",
+    });
+  }
+}
 
 type ChannelBodyProps = {
   channel?: api.Channel;
@@ -30,25 +41,13 @@ function ChannelBody(props: ChannelBodyProps) {
 
   const self = useContext(AuthenticationContext);
 
-  function scrollToBottom() {
-    const messageContainers =
-      document.getElementsByClassName("message-container");
-
-    if (messageContainers.length > 0) {
-      messageContainers[messageContainers.length - 1].scrollIntoView({
-        behavior: "instant",
-        block: "end",
-      });
-    }
-  }
-
   useEffect(() => {
     scrollToBottom();
   }, [messagesQuery.data]);
 
-  useGatewayContext(
+  api.useGatewayContext(
     {
-      CreateMessageEvent: (event) => {
+      CreateMessageS2CEvent: (event) => {
         queryClient.setQueriesData(
           ["messages", props.channel],
           (messages: api.Message[] | undefined) => {
@@ -58,7 +57,7 @@ function ChannelBody(props: ChannelBodyProps) {
           }
         );
       },
-      UpdateMessageContentEvent: (event) => {
+      UpdateMessageContentS2CEvent: (event) => {
         queryClient.setQueriesData(
           ["messages", props.channel],
           (messages: api.Message[] | undefined) => {
@@ -72,7 +71,7 @@ function ChannelBody(props: ChannelBodyProps) {
           }
         );
       },
-      DeleteMessageEvent: (event) => {
+      DeleteMessageS2CEvent: (event) => {
         queryClient.setQueriesData(
           ["messages", props.channel],
           (messages: api.Message[] | undefined) => {
