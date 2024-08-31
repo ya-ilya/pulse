@@ -3,7 +3,7 @@ import { User } from "./User";
 
 export interface Message {
   type: MessageType;
-  timestamp: Date;
+  timestamp: string;
   content: string;
   channel: Channel;
   user?: User;
@@ -13,4 +13,5 @@ export interface Message {
 export enum MessageType {
   Message,
   Post,
+  Date
 }

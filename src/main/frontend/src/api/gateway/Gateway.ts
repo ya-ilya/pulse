@@ -8,11 +8,7 @@ export function sendEvent(type: string, event: any) {
   websocket?.send(JSON.stringify({ ...event, type: type }));
 }
 
-export function createGatway(
-  url: string,
-  setLastEvent: (event: any) => void,
-  reloadOnClose: boolean = false
-) {
+export function createGatway(url: string, setLastEvent: (event: any) => void) {
   websocket = new WebSocket(url);
 
   websocket.onopen = () => {
@@ -34,10 +30,6 @@ export function createGatway(
   };
 
   websocket.onclose = () => {
-    if (reloadOnClose) {
-      return window.location.reload();
-    }
-
-    createGatway(url, setLastEvent, true);
+    window.location.reload();
   };
 }

@@ -2,7 +2,7 @@ import "./ChannelTopBar.css";
 
 import * as api from "../../api";
 
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { BiArrowBack } from "react-icons/bi";
@@ -15,6 +15,7 @@ type ChannelTopBarProps = {
 
 function ChannelTopBar(props: ChannelTopBarProps) {
   const [isTyping, setIsTyping] = useState(false);
+  const timeout = useRef<NodeJS.Timeout>();
 
   const isMobile = useIsMobile();
 
@@ -22,8 +23,10 @@ function ChannelTopBar(props: ChannelTopBarProps) {
 
   api.useGatewayContext(
     {
-      TypingS2CEvent: (event) => {
-        setIsTyping(event.state);
+      TypingS2CEvent: () => {
+        clearTimeout(timeout.current);
+        setIsTyping(true);
+        timeout.current = setTimeout(() => setIsTyping(false), 1000);
       },
     },
     (event) => {
@@ -43,11 +46,15 @@ function ChannelTopBar(props: ChannelTopBarProps) {
   return (
     <div className="channel-top-bar">
       {isMobile && <BiArrowBack onClick={() => props.setShowChannel(false)} />}
-      <div className="name">
-        {props.channel?.name}
-      </div>
-      <div className="typing">
-        {isTyping ? "Typing..." : ""}
+      <div className="name">{props.channel?.name}</div>
+      <div
+        className="loader"
+        style={{ visibility: isTyping ? "visible" : "hidden" }}
+      >
+        Typing
+        <span className="dot">.</span>
+        <span className="dot">.</span>
+        <span className="dot">.</span>
       </div>
     </div>
   );

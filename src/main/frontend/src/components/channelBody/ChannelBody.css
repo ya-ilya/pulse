@@ -9,6 +9,15 @@
   background-color: lightgray;
 }
 
+.channel-body .date-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: fit-content;
+}
+
 .channel-body .message-container {
   display: flex;
   flex-direction: row;

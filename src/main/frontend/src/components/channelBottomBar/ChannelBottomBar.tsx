@@ -7,6 +7,8 @@ import { forwardRef, useContext, useRef, useState } from "react";
 import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
 
+const TYPING_EVENT_DELAY = 300;
+
 type ChannelBottomBarProps = {
   channel?: api.Channel;
 };
@@ -50,7 +52,7 @@ const ChannelBottomBar = forwardRef(
             if (
               props.channel &&
               message.length > 0 &&
-              time - lastTypingEventTime.current > 900
+              time - lastTypingEventTime.current > TYPING_EVENT_DELAY
             ) {
               sendEvent("TypingC2SEvent", {
                 channelId: props.channel?.id!,

@@ -62,47 +62,10 @@ class Gateway(
             }
 
             is TypingC2SEvent -> {
-                val gatewaySession = this[session]
-                var oldThreadIsInterrupted = false
-
-                if (gatewaySession!!.writingThread?.isAlive == true) {
-                    gatewaySession.writingThread!!.interrupt()
-                    oldThreadIsInterrupted = true
-                }
-
-                gatewaySession.writingThread = object : Thread() {
-                    init {
-                        start()
-                    }
-
-                    override fun run() {
-                        var thisThreadIsInterrupted = false
-
-                        if (!oldThreadIsInterrupted) {
-                            dispatchWritingEvent(
-                                channelService.getChannelById(event.channelId),
-                                gatewaySession.user,
-                                true
-                            )
-                        }
-
-                        try {
-                            sleep(1000)
-                        } catch (ex: InterruptedException) {
-                            thisThreadIsInterrupted = true
-                        }
-
-                        if (!thisThreadIsInterrupted && !isInterrupted) {
-                            dispatchWritingEvent(
-                                channelService.getChannelById(event.channelId),
-                                gatewaySession.user,
-                                false
-                            )
-                        } else {
-                            interrupt()
-                        }
-                    }
-                }
+                dispatchTypingEvent(
+                    channelService.getChannelById(event.channelId),
+                    this[session]!!.user
+                )
             }
         }
     }
@@ -133,11 +96,11 @@ class Gateway(
         }
     }
 
-    fun dispatchWritingEvent(channel: Channel, user: User, state: Boolean) =
+    fun dispatchTypingEvent(channel: Channel, user: User) =
         memberService.findMembersByChannel(channel).forEach { (channel, memberUser) ->
             sendToUserSessions(
                 memberUser.id!!,
-                TypingS2CEvent(channel.id!!, user.id!!, state)
+                TypingS2CEvent(channel.id!!, user.id!!)
             )
         }
 }
