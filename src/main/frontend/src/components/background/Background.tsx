@@ -1,11 +1,12 @@
 import "./Background.css";
 
+import { ReactNode } from "react";
 import useViewportSize from "../../hooks/useViewportSize";
 
 type BackgroundProps = {
   variables: boolean[];
   setters: ((value: boolean) => void)[];
-  children: any[];
+  children: ReactNode[];
 };
 
 function Background(props: BackgroundProps) {

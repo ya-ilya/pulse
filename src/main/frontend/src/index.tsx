@@ -33,7 +33,7 @@ export const AuthenticationContext = React.createContext<User | null>(null);
 
 function ProtectedRoute() {
   const [authenticated, setAuthenticated] = useState<boolean>();
-  const [lastEvent, setLastEvent] = useState<any>(null);
+  const [lastEvent, setLastEvent] = useState<api.GatewayEvent | null>(null);
 
   useEffect(() => {
     const check = async () => {

@@ -2,18 +2,19 @@ import "./Channel.css";
 
 import * as api from "../../api";
 
+import { MutableRefObject, useRef } from "react";
+
 import ChannelBody from "../channelBody/ChannelBody";
 import ChannelBottomBar from "../channelBottomBar/ChannelBottomBar";
 import ChannelTopBar from "../channelTopBar/ChannelTopBar";
 import { useIsMobile } from "../../hooks";
-import { useRef } from "react";
 import useViewportSize from "../../hooks/useViewportSize";
 
 type ChannelProps = {
   channel?: api.Channel;
   showChannel: boolean;
   setShowChannel: (showChannel: boolean) => void;
-  shards: any[];
+  shards: MutableRefObject<HTMLDivElement | undefined>[];
 };
 
 function Channel(props: ChannelProps) {

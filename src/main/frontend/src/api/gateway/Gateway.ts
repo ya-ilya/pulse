@@ -1,3 +1,5 @@
+import { GatewayEvent } from "./GatewayEvent";
+
 var websocket: WebSocket | undefined;
 
 export function isGatewayOpen() {
@@ -8,7 +10,7 @@ export function sendEvent(type: string, event: any) {
   websocket?.send(JSON.stringify({ ...event, type: type }));
 }
 
-export function createGatway(url: string, setLastEvent: (event: any) => void) {
+export function createGatway(url: string, setLastEvent: (event: GatewayEvent) => void) {
   websocket = new WebSocket(url);
 
   websocket.onopen = () => {
@@ -21,7 +23,7 @@ export function createGatway(url: string, setLastEvent: (event: any) => void) {
     const data = JSON.parse(event.data);
 
     if (data["type"]) {
-      setLastEvent(data);
+      setLastEvent(data as GatewayEvent);
     }
   };
 
