@@ -8,14 +8,15 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
 @ComponentScan
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = ["org.pulse.backend"])
 class PulseApplication(
     private val userService: UserService,
     private val channelService: ChannelService
 ) : CommandLineRunner {
-    @Suppress("UNREACHABLE_CODE")
     override fun run(vararg args: String) {
-        return
+        if (userService.findUserByUsername("Ilya").isPresent) {
+            return
+        }
 
         val ilya = userService.createUser(
             "Ilya",

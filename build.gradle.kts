@@ -1,12 +1,12 @@
 import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
-	id("org.springframework.boot") version "3.3.2"
-	id("io.spring.dependency-management") version "1.1.6"
-	id("com.github.node-gradle.node") version "7.0.2"
-	kotlin("plugin.jpa") version "1.9.24"
-	kotlin("jvm") version "1.9.24"
-	kotlin("plugin.spring") version "1.9.24"
+	id("org.springframework.boot")
+	id("io.spring.dependency-management")
+	id("com.github.node-gradle.node")
+	kotlin("plugin.jpa")
+	kotlin("jvm")
+	kotlin("plugin.spring")
 }
 
 group = "org.pulse"
@@ -30,12 +30,9 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	implementation("com.mysql:mysql-connector-j:9.1.0")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("com.h2database:h2")
 	implementation("io.jsonwebtoken:jjwt:0.12.5")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
@@ -59,8 +56,4 @@ tasks {
 		into("${project.layout.buildDirectory.get()}/resources/main/static")
 		dependsOn("buildFrontend")
 	}
-}
-
-tasks.withType<Test> {
-	useJUnitPlatform()
 }
