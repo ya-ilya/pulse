@@ -2,7 +2,7 @@ import "./CreateChannelDialog.css";
 
 import * as api from "../../api";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CreateChannelDialogProps = {
   showCreateChannelDialog: boolean;
@@ -21,11 +21,26 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
     }
 
     setLoading(true);
-    channelController.createChannel({ name: name }).then(() => {
+    channelController?.createChannel({ name: name }).then(() => {
       props.setShowCreateChannelDialog(false);
       setLoading(false);
     });
   }
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        props.setShowCreateChannelDialog(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  });
 
   return (
     <div

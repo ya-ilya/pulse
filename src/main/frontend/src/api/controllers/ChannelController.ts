@@ -1,3 +1,4 @@
+import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import {
   Channel,
   CreateChannelRequest,
@@ -9,29 +10,27 @@ import {
   User,
 } from "../models";
 import axios, { Axios } from "axios";
-import { useEffect, useState } from "react";
-
-import { axiosClient } from "../..";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useContext, useEffect, useState } from "react";
 
 export function useChannelController() {
+  const [authenticationData] = useContext(AuthenticationContext);
   const [channelController, setChannelController] = useState(
-    createChannelController()
+    authenticationData ? createChannelController(authenticationData) : undefined
   );
-  const [token] = useLocalStorage("accessToken");
 
   useEffect(() => {
-    setChannelController(createChannelController());
-  }, [token]);
+    if (authenticationData) {
+      setChannelController(createChannelController(authenticationData));
+    }
+  }, [authenticationData]);
 
   return channelController;
 }
 
-export function createChannelController() {
-  return new ChannelController(
-    axiosClient,
-    localStorage.getItem("accessToken")!
-  );
+export function createChannelController(
+  authenticationData: AuthenticationData
+) {
+  return new ChannelController(axiosClient, authenticationData.accessToken);
 }
 
 export class ChannelController {

@@ -25,7 +25,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   const channelsQuery = useQuery({
     queryKey: ["channels"],
-    queryFn: () => channelController.getChannels(),
+    queryFn: () => channelController?.getChannels(),
   });
 
   const [, viewportHeight] = useViewportSize() ?? [];

@@ -1,27 +1,33 @@
+import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import {
   UpdateDisplayNameRequest,
   UpdateUsernameRequest,
   User,
 } from "../models";
 import axios, { Axios } from "axios";
-import { useEffect, useState } from "react";
-
-import { axiosClient } from "../..";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useContext, useEffect, useState } from "react";
 
 export function useMeController() {
-  const [meController, setMeController] = useState(createMeController());
-  const [token] = useLocalStorage("accessToken");
+  const [authenticationData] = useContext(AuthenticationContext);
+  const [meController, setMeController] = useState(
+    authenticationData ? createMeController(authenticationData) : undefined
+  );
 
   useEffect(() => {
-    setMeController(createMeController());
-  }, [token]);
+    if (authenticationData) {
+      setMeController(createMeController(authenticationData));
+    }
+  }, [authenticationData]);
 
   return meController;
 }
 
-export function createMeController() {
-  return new MeController(axiosClient, localStorage.getItem("accessToken")!);
+export function createMeController(authenticationData: AuthenticationData) {
+  return new MeController(axiosClient, authenticationData.accessToken);
+}
+
+export function createMeControllerByAccessToken(accessToken: string) {
+  return new MeController(axiosClient, accessToken);
 }
 
 export class MeController {

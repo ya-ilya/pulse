@@ -19,7 +19,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
 
   const isMobile = useIsMobile();
 
-  const self = useContext(AuthenticationContext);
+  const [authenticationData] = useContext(AuthenticationContext);
 
   api.useGatewayContext(
     {
@@ -34,7 +34,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
         props.channel != null &&
         event.channelId == props.channel.id &&
         props.channel.type == api.ChannelType.PrivateChat &&
-        event.userId != self?.id
+        event.userId != authenticationData?.user?.id
       );
     }
   );

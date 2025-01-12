@@ -80,11 +80,10 @@ function pushToMessagesAndSplitByDates(
     previousMessage = messages[messages.length - offset];
   }
 
-  if (!previousMessage) {
-    return [message];
-  }
-
-  if (isDifferentDays(previousMessage.timestamp, message.timestamp)) {
+  if (
+    !previousMessage ||
+    isDifferentDays(previousMessage.timestamp, message.timestamp)
+  ) {
     result.push({
       timestamp: message.timestamp,
       type: api.MessageType.Date,
@@ -110,14 +109,14 @@ function ChannelBody(props: ChannelBodyProps) {
   const messagesQuery = useQuery({
     queryKey: ["messages", props.channel],
     queryFn: () =>
-      props.channel
+      props.channel && channelController
         ? getMessagesAndSplitByDates(channelController, props.channel.id!)
         : [],
   });
 
   const isMobile = useIsMobile();
 
-  const self = useContext(AuthenticationContext);
+  const [authenticationData] = useContext(AuthenticationContext);
 
   useEffect(() => {
     scrollToBottom();
@@ -179,7 +178,7 @@ function ChannelBody(props: ChannelBodyProps) {
           <div className="message-container">
             <div
               className={`message ${
-                message.user?.id == self?.id
+                message.user?.id == authenticationData?.user?.id
                   ? "--message-right"
                   : "--message-left"
               } ${isMobile ? "--message-mobile" : ""}`}

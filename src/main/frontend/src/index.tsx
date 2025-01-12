@@ -16,6 +16,7 @@ import Login from "./components/login/Login.tsx";
 import ReactDOM from "react-dom/client";
 import { User } from "./api/index.ts";
 import axios from "axios";
+import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
 export const axiosClient = axios.create({
   baseURL: window.location.origin,
@@ -29,52 +30,60 @@ const queryClient = new QueryClient({
   },
 });
 
-export const AuthenticationContext = React.createContext<User | null>(null);
+export class AuthenticationData {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+
+  constructor(accessToken: string, refreshToken: string, user: User) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.user = user;
+  }
+}
+
+export const AuthenticationContext = React.createContext<
+  [
+    data: AuthenticationData | null,
+    setData: (data: AuthenticationData | null) => void
+  ]
+>([null, () => {}]);
 
 function ProtectedRoute() {
-  const [authenticated, setAuthenticated] = useState<boolean>();
   const [lastEvent, setLastEvent] = useState<api.GatewayEvent | null>(null);
+  const [authenticationData, setAuthneticationData] =
+    useLocalStorage("authenticationData");
 
   useEffect(() => {
     const check = async () => {
-      if (localStorage.getItem("accessToken")) {
+      if (authenticationData) {
         if (!api.isGatewayOpen()) {
           api.createGatway(
             `${window.location.origin}/api/gateway`,
+            authenticationData.accessToken,
             setLastEvent
           );
         }
-      } else {
-        setAuthenticated(false);
       }
     };
 
-    check();
-  }, []);
+    check().catch((error) => {
+      console.error("Error during authentication check:", error);
+      setAuthneticationData(null);
+    });
+  }, [authenticationData]);
 
   useEffect(() => {
     if (lastEvent?.type == "AuthenticationS2CEvent") {
-      if (lastEvent.state === true) {
-        setAuthenticated(true);
-      } else {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        setAuthenticated(false);
+      if (!lastEvent.state) {
+        setAuthneticationData(null);
       }
     }
   }, [lastEvent]);
 
-  if (authenticated === undefined) {
-    return <div></div>;
-  }
-
-  if (!authenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return (
+  return authenticationData ? (
     <AuthenticationContext.Provider
-      value={JSON.parse(localStorage.getItem("user")!)}
+      value={[authenticationData, setAuthneticationData]}
     >
       <api.GatewayContext.Provider value={lastEvent}>
         <QueryClientProvider client={queryClient}>
@@ -82,6 +91,8 @@ function ProtectedRoute() {
         </QueryClientProvider>
       </api.GatewayContext.Provider>
     </AuthenticationContext.Provider>
+  ) : (
+    <Navigate to="/login" replace />
   );
 }
 

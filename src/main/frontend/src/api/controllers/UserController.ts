@@ -1,23 +1,26 @@
+import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import axios, { Axios } from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { User } from "../models";
-import { axiosClient } from "../..";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export function useUserController() {
-  const [userController, setUserController] = useState(createUserController());
-  const [token] = useLocalStorage("accessToken");
+  const [authenticationData] = useContext(AuthenticationContext);
+  const [userController, setUserController] = useState(
+    authenticationData ? createUserController(authenticationData) : undefined
+  );
 
   useEffect(() => {
-    setUserController(createUserController());
-  }, [token]);
+    if (authenticationData) {
+      setUserController(createUserController(authenticationData));
+    }
+  }, [authenticationData]);
 
   return userController;
 }
 
-export function createUserController() {
-  return new UserController(axiosClient, localStorage.getItem("accessToken")!);
+export function createUserController(authenticationData: AuthenticationData) {
+  return new UserController(axiosClient, authenticationData.accessToken);
 }
 
 export class UserController {

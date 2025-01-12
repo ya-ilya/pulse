@@ -37,3 +37,11 @@
   font-size: 16px;
   font-weight: 500;
 }
+
+.sidebar .account-element {
+  background-color: #e6e6e6;
+}
+
+.sidebar .account-element:hover {
+  cursor: default;
+}

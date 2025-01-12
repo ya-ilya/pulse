@@ -28,7 +28,7 @@ const ChannelBottomBar = forwardRef(
 
     const isMobile = useIsMobile();
 
-    const self = useContext(AuthenticationContext);
+    const [authenticationData] = useContext(AuthenticationContext);
 
     const { sendEvent } = api.useGatewayContext();
 
@@ -41,13 +41,16 @@ const ChannelBottomBar = forwardRef(
         return;
       }
 
-      channelController
-        .createMessage(props.channel?.id!, { content: message })
-        .then(() => setMessage(""));
+      const temporaryMessage = `${message}`;
+      setMessage("");
+
+      channelController?.createMessage(props.channel?.id!, {
+        content: temporaryMessage,
+      });
     }
 
     return props.channel?.type != api.ChannelType.Channel ||
-      props.channel.admin?.id == self!.id ? (
+      props.channel.admin?.id == authenticationData?.user?.id ? (
       <div className="channel-bottom-bar">
         <ReactTextareaAutosize
           minRows={TEXTAREA_MIN_ROWS}

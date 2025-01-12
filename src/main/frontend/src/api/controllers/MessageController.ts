@@ -1,28 +1,27 @@
+import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import { Channel, Message, UpdateMessageRequest } from "../models";
 import axios, { Axios } from "axios";
-import { useEffect, useState } from "react";
-
-import { axiosClient } from "../..";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useContext, useEffect, useState } from "react";
 
 export function useMessageController() {
+  const [authenticationData] = useContext(AuthenticationContext);
   const [messageController, setMessageController] = useState(
-    createMessageController()
+    authenticationData ? createMessageController(authenticationData) : undefined
   );
-  const [token] = useLocalStorage("accessToken");
 
   useEffect(() => {
-    setMessageController(createMessageController());
-  }, [token]);
+    if (authenticationData) {
+      setMessageController(createMessageController(authenticationData));
+    }
+  }, [authenticationData]);
 
   return messageController;
 }
 
-export function createMessageController() {
-  return new MessageController(
-    axiosClient,
-    localStorage.getItem("accessToken")!
-  );
+export function createMessageController(
+  authenticationData: AuthenticationData
+) {
+  return new MessageController(axiosClient, authenticationData.accessToken);
 }
 
 export class MessageController {

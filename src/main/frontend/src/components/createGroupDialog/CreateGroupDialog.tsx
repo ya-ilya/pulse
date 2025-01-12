@@ -2,7 +2,7 @@ import "./CreateGroupDialog.css";
 
 import * as api from "../../api";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { FaUser } from "react-icons/fa";
@@ -21,7 +21,22 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
   const [users, setUsers] = useState<api.User[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const self = useContext(AuthenticationContext);
+  const [authenticationData] = useContext(AuthenticationContext);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        props.setShowCreateGroupDialog(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  });
 
   function handleSubmit() {
     if (name.length <= 2) {
@@ -30,15 +45,15 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
 
     setLoading(true);
     channelController
-      .createGroupChat({ name: name, with: users.map((user) => user.id!) })
-      .then(() => {
+      ?.createGroupChat({ name: name, with: users.map((user) => user.id!) })
+      ?.then(() => {
         props.setShowCreateGroupDialog(false);
       })
-      .finally(() => setLoading(false));
+      ?.finally(() => setLoading(false));
   }
 
   function handleAddUser() {
-    if (self?.username == username) {
+    if (authenticationData?.user?.username == username) {
       return;
     }
 
@@ -48,18 +63,24 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
 
     setLoading(true);
     userController
-      .getUserByUsername(username)
-      .then((user) => {
+      ?.getUserByUsername(username)
+      ?.then((user) => {
         setUsers((users) => [...users, user]);
         setUsername("");
       })
-      .finally(() => setLoading(false));
+      ?.finally(() => setLoading(false));
   }
 
   return (
     <div
       className="create-group-dialog"
       style={{ visibility: props.showCreateGroupDialog ? "visible" : "hidden" }}
+      onKeyDown={(event) => {
+        if (event.key === "ESC") {
+          event.preventDefault();
+          props.setShowCreateGroupDialog(false);
+        }
+      }}
     >
       <div className="header">Create group</div>
       <input

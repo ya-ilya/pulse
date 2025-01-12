@@ -25,7 +25,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - nodejs_data:/app/node_modules
+      - nodejs_data:/home/gradle/src/src/main/frontend/node_modules
     networks:
       - net
     depends_on:

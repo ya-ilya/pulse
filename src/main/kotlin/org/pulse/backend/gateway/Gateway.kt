@@ -37,36 +37,40 @@ class Gateway(
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
-        when (val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)) {
-            is AuthenticationC2SEvent -> {
-                val email = try {
-                    authenticationService.extractEmail(event.token)
-                } catch (ex: Exception) {
-                    ""
-                }
+        try {
+            when (val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)) {
+                is AuthenticationC2SEvent -> {
+                    val email = try {
+                        authenticationService.extractEmail(event.token)
+                    } catch (ex: Exception) {
+                        ""
+                    }
 
-                var state = false
+                    var state = false
 
-                userService.findUserByEmail(email).ifPresent { user ->
-                    if (authenticationService.isAccessTokenValid(event.token, user)) {
-                        this[session]?.userId = user.id
-                        state = true
+                    userService.findUserByEmail(email).ifPresent { user ->
+                        if (authenticationService.isAccessTokenValid(event.token, user)) {
+                            this[session]?.userId = user.id
+                            state = true
+                        }
+                    }
+
+                    this[session]?.sendEvent(AuthenticationS2CEvent(state))
+
+                    if (!state) {
+                        session.close()
                     }
                 }
 
-                this[session]?.sendEvent(AuthenticationS2CEvent(state))
-
-                if (!state) {
-                    session.close()
+                is TypingC2SEvent -> {
+                    dispatchTypingEvent(
+                        channelService.getChannelById(event.channelId),
+                        this[session]!!.user
+                    )
                 }
             }
-
-            is TypingC2SEvent -> {
-                dispatchTypingEvent(
-                    channelService.getChannelById(event.channelId),
-                    this[session]!!.user
-                )
-            }
+        } catch (ex: Exception) {
+            session.close()
         }
     }
 

@@ -2,7 +2,7 @@
 FROM gradle:jdk21-alpine AS build
 
 # Install Node.js and npm
-RUN apk add --no-cache nodejs npm
+RUN apk --no-cache add nodejs npm
 
 # Create app directory
 WORKDIR /home/gradle/src
@@ -27,7 +27,7 @@ COPY --from=build /home/gradle/src/build/libs/*.jar /app/application.jar
 COPY --from=build /home/gradle/src/startup.pulse.sh /app/startup.pulse.sh
 
 # Copy Node.js modules from the build stage
-COPY --from=build /home/gradle/src/src/main/frontend/node_modules /app/node_modules
+COPY --from=build /home/gradle/src/src/main/frontend/node_modules /home/gradle/src/src/main/frontend/node_modules
 
 # Make the startup script executable
 RUN chmod +x /app/startup.pulse.sh

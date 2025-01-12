@@ -10,12 +10,16 @@ export function sendEvent(type: string, event: any) {
   websocket?.send(JSON.stringify({ ...event, type: type }));
 }
 
-export function createGatway(url: string, setLastEvent: (event: GatewayEvent) => void) {
+export function createGatway(
+  url: string,
+  token: string,
+  setLastEvent: (event: GatewayEvent) => void
+) {
   websocket = new WebSocket(url);
 
   websocket.onopen = () => {
     sendEvent("AuthenticationC2SEvent", {
-      token: localStorage.getItem("accessToken")!,
+      token: token,
     });
   };
 

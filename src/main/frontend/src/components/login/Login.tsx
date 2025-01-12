@@ -3,6 +3,7 @@ import "./Login.css";
 import * as api from "../../api";
 
 import { Navigate } from "react-router-dom";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { useState } from "react";
 
 function Login() {
@@ -10,26 +11,27 @@ function Login() {
 
   const [email, setEmail] = useState<string>("ilya@mail.com");
   const [password, setPassword] = useState<string>("password");
-  const [done, setDone] = useState(localStorage.getItem("accessToken") != null);
+  const [authenticationData, setAuthenticationData] =
+    useLocalStorage("authenticationData");
 
   function handleSubmit() {
     authenticationController
       .signIn({ email: email, password: password })
       .then((response) => {
-        localStorage.setItem("accessToken", response.accessToken);
-        localStorage.setItem("refreshToken", response.refreshToken);
-
         api
-          .createMeController()
+          .createMeControllerByAccessToken(response.accessToken)
           .getUser()
           .then((user) => {
-            localStorage.setItem("user", JSON.stringify(user));
-            setDone(true);
+            setAuthenticationData({
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+              user: user,
+            });
           });
       });
   }
 
-  if (done) {
+  if (authenticationData) {
     return <Navigate to="/" replace />;
   }
 
