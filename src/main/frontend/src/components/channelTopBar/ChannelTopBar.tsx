@@ -21,7 +21,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
 
   const [authenticationData] = useContext(AuthenticationContext);
 
-  api.useGatewayContext(
+  api.subscribeToGateway(
     {
       TypingS2CEvent: () => {
         clearTimeout(timeout.current);

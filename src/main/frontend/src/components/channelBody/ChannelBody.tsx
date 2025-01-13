@@ -122,7 +122,7 @@ function ChannelBody(props: ChannelBodyProps) {
     scrollToBottom();
   }, [messagesQuery.data]);
 
-  api.useGatewayContext(
+  api.subscribeToGateway(
     {
       CreateMessageS2CEvent: (event) => {
         queryClient.setQueriesData(

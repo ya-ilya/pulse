@@ -7,6 +7,7 @@ import { forwardRef, useContext, useRef, useState } from "react";
 import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
 import ReactTextareaAutosize from "react-textarea-autosize";
+import { sendEvent } from "../../api";
 import { useIsMobile } from "../../hooks";
 
 const TYPING_EVENT_DELAY = 300;
@@ -29,8 +30,6 @@ const ChannelBottomBar = forwardRef(
     const isMobile = useIsMobile();
 
     const [authenticationData] = useContext(AuthenticationContext);
-
-    const { sendEvent } = api.useGatewayContext();
 
     if (!props.channel) {
       return <div></div>;

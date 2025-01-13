@@ -1,21 +1,23 @@
-import React, { useEffect } from "react";
-
 import { GatewayEvent } from "./GatewayEvent";
-import { sendEvent } from "./Gateway";
+import { useEffect } from "react";
 
-export const GatewayContext = React.createContext<GatewayEvent | null>(null);
-
-export function useGatewayContext(
+export function subscribeToGateway(
   events: { [type: string]: (event: GatewayEvent) => void } = {},
   filter: (event: GatewayEvent) => boolean = () => true
 ) {
-  const lastEvent = React.useContext(GatewayContext);
-
   useEffect(() => {
-    if (lastEvent && lastEvent.type && events[lastEvent.type] && filter(lastEvent)) {
-      events[lastEvent.type].call(undefined, lastEvent);
-    }
-  }, [lastEvent]);
+    function listener(customEvent: CustomEvent) {
+      const event = customEvent.detail;
 
-  return { sendEvent: sendEvent };
+      if (event && event.type && events[event.type] && filter(event)) {
+        events[event.type].call(undefined, event);
+      }
+    }
+
+    window.addEventListener("gatewayevent", listener as EventListener);
+
+    return () => {
+      window.removeEventListener("gatewayevent", listener as EventListener);
+    };
+  });
 }

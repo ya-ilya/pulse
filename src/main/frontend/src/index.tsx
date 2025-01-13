@@ -9,7 +9,7 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 
 import App from "./App.tsx";
 import Login from "./components/login/Login.tsx";
@@ -49,48 +49,49 @@ export const AuthenticationContext = React.createContext<
   ]
 >([null, () => {}]);
 
-function ProtectedRoute() {
-  const [lastEvent, setLastEvent] = useState<api.GatewayEvent | null>(null);
+function AuthenticatableRoute() {
   const [authenticationData, setAuthneticationData] =
     useLocalStorage("authenticationData");
 
-  useEffect(() => {
-    const check = async () => {
-      if (authenticationData) {
-        if (!api.isGatewayOpen()) {
-          api.createGatway(
-            `${window.location.origin}/api/gateway`,
-            authenticationData.accessToken,
-            setLastEvent
-          );
-        }
-      }
-    };
-
-    check().catch((error) => {
-      console.error("Error during authentication check:", error);
-      setAuthneticationData(null);
-    });
-  }, [authenticationData]);
-
-  useEffect(() => {
-    if (lastEvent?.type == "AuthenticationS2CEvent") {
-      if (!lastEvent.state) {
-        setAuthneticationData(null);
-      }
-    }
-  }, [lastEvent]);
-
-  return authenticationData ? (
+  return (
     <AuthenticationContext.Provider
       value={[authenticationData, setAuthneticationData]}
     >
-      <api.GatewayContext.Provider value={lastEvent}>
-        <QueryClientProvider client={queryClient}>
-          <Outlet />
-        </QueryClientProvider>
-      </api.GatewayContext.Provider>
+      <Outlet />
     </AuthenticationContext.Provider>
+  );
+}
+
+function ProtectedRoute() {
+  const [authenticationData, setAuthneticationData] = useContext(
+    AuthenticationContext
+  );
+
+  useEffect(() => {
+    const connectToGateway = async () => {
+      if (api.isGatewayOpen()) return;
+
+      api.connectToGatway(
+        `${window.location.origin}/api/gateway`,
+        authenticationData!.accessToken
+      );
+    };
+
+    if (authenticationData) {
+      connectToGateway();
+    }
+  }, [authenticationData]);
+
+  api.subscribeToGateway({
+    AuthenticationS2CEvent: (event) => {
+      if (!event.state) setAuthneticationData(null);
+    },
+  });
+
+  return authenticationData ? (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
   ) : (
     <Navigate to="/login" replace />
   );
@@ -98,15 +99,20 @@ function ProtectedRoute() {
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    element: <ProtectedRoute />,
+    element: <AuthenticatableRoute />,
     children: [
       {
-        path: "/",
-        element: <App />,
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "/",
+            element: <App />,
+          },
+        ],
       },
     ],
   },

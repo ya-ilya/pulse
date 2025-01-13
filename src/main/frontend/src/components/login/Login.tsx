@@ -2,17 +2,19 @@ import "./Login.css";
 
 import * as api from "../../api";
 
+import { useContext, useState } from "react";
+
+import { AuthenticationContext } from "../..";
 import { Navigate } from "react-router-dom";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { useState } from "react";
 
 function Login() {
   const authenticationController = api.useAuthenticationController();
 
   const [email, setEmail] = useState<string>("ilya@mail.com");
   const [password, setPassword] = useState<string>("password");
-  const [authenticationData, setAuthenticationData] =
-    useLocalStorage("authenticationData");
+  const [authenticationData, setAuthenticationData] = useContext(
+    AuthenticationContext
+  );
 
   function handleSubmit() {
     authenticationController
