@@ -1,16 +1,10 @@
-import com.github.gradle.node.npm.task.NpmTask
-
 plugins {
 	id("org.springframework.boot")
 	id("io.spring.dependency-management")
-	id("com.github.node-gradle.node")
 	kotlin("plugin.jpa")
 	kotlin("jvm")
 	kotlin("plugin.spring")
 }
-
-group = "org.pulse"
-version = "0.1"
 
 java {
 	toolchain {
@@ -38,22 +32,5 @@ dependencies {
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
-	}
-}
-
-tasks {
-	withType<JavaCompile> {
-		dependsOn("copyFrontend")
-	}
-
-	register<NpmTask>("buildFrontend") {
-		workingDir = file("${project.projectDir}/src/main/frontend")
-		args = listOf("run", "build")
-	}
-
-	register<Copy>("copyFrontend") {
-		from("${project.projectDir}/src/main/frontend/dist/")
-		into("${project.layout.buildDirectory.get()}/resources/main/static")
-		dependsOn("buildFrontend")
 	}
 }

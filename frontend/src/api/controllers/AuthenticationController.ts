@@ -10,9 +10,9 @@ import { axiosClient } from "../..";
 import { useState } from "react";
 
 export function useAuthenticationController() {
-  const [authneticationController] = useState(createAuthenticationController());
+  const [authenticationController] = useState(createAuthenticationController());
 
-  return authneticationController;
+  return authenticationController;
 }
 
 export function createAuthenticationController() {

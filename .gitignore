@@ -40,8 +40,7 @@ out/
 .kotlin
 
 ### Frontend ###
-src/main/frontend/node_modules
-src/main/frontend/dist
-database.*
+frontend/node_modules
+frontend/dist
 
 .env

@@ -19,7 +19,7 @@ import axios from "axios";
 import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
 export const axiosClient = axios.create({
-  baseURL: window.location.origin,
+  baseURL: 'http://127.0.0.1:3000',
 });
 
 const queryClient = new QueryClient({
@@ -49,13 +49,13 @@ export const AuthenticationContext = React.createContext<
   ]
 >([null, () => {}]);
 
-function AuthenticatableRoute() {
-  const [authenticationData, setAuthneticationData] =
+function AuthenticationRoute() {
+  const [authenticationData, setAuthenticationData] =
     useLocalStorage("authenticationData");
 
   return (
     <AuthenticationContext.Provider
-      value={[authenticationData, setAuthneticationData]}
+      value={[authenticationData, setAuthenticationData]}
     >
       <Outlet />
     </AuthenticationContext.Provider>
@@ -63,7 +63,7 @@ function AuthenticatableRoute() {
 }
 
 function ProtectedRoute() {
-  const [authenticationData, setAuthneticationData] = useContext(
+  const [authenticationData, setAuthenticationData] = useContext(
     AuthenticationContext
   );
 
@@ -71,8 +71,8 @@ function ProtectedRoute() {
     const connectToGateway = async () => {
       if (api.isGatewayOpen()) return;
 
-      api.connectToGatway(
-        `${window.location.origin}/api/gateway`,
+      api.connectToGateway(
+        `ws://127.0.0.1:3000/gateway`,
         authenticationData!.accessToken
       );
     };
@@ -84,7 +84,7 @@ function ProtectedRoute() {
 
   api.subscribeToGateway({
     AuthenticationS2CEvent: (event) => {
-      if (!event.state) setAuthneticationData(null);
+      if (!event.state) setAuthenticationData(null);
     },
   });
 
@@ -99,7 +99,7 @@ function ProtectedRoute() {
 
 const router = createBrowserRouter([
   {
-    element: <AuthenticatableRoute />,
+    element: <AuthenticationRoute />,
     children: [
       {
         path: "/login",

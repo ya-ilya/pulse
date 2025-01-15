@@ -8,7 +8,7 @@ export function sendEvent(type: string, event: any) {
   websocket?.send(JSON.stringify({ ...event, type: type }));
 }
 
-export function connectToGatway(url: string, token: string) {
+export function connectToGateway(url: string, token: string) {
   websocket = new WebSocket(url);
 
   websocket.onopen = () => {

@@ -1,5 +1,5 @@
-src/main/frontend/dist
-src/main/frontend/node_modules
+frontend/dist
+frontend/node_modules
 .gradle
 .idea
 .kotlin

@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
-@ComponentScan
 @SpringBootApplication(scanBasePackages = ["org.pulse.backend"])
 class PulseApplication(
     private val userService: UserService,

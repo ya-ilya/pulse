@@ -54,7 +54,6 @@ class SecurityConfiguration(
             }
             .authorizeHttpRequests { request ->
                 request
-                    .requestMatchers("/api/gateway").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }
