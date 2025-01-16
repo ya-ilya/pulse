@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-export function useLocalStorage(key: string) {
+export function useLocalStorage<T>(key: string) {
   // Initialize the state with the current value in localStorage
-  const [value, setValue] = useState<any | null>(() => {
+  const [value, setValue] = useState<T | null>(() => {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : null;
   });
@@ -38,7 +38,7 @@ export function useLocalStorage(key: string) {
     };
   }, [key]); // Add key as a dependency
 
-  const setLocalStorageValue = (newValue: any | null) => {
+  const setLocalStorageValue = (newValue: T | null) => {
     if (newValue !== null) {
       const stringValue = JSON.stringify(newValue);
       localStorage.setItem(key, stringValue);

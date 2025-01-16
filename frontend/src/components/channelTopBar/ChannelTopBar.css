@@ -7,9 +7,8 @@
   height: 48px;
   min-height: 48px;
   padding-left: 10px;
-  border: solid;
-  border-width: 0px 0px 1px 0px;
-  border-color: rgb(230, 230, 230);
+  border: 0 solid rgb(230, 230, 230);
+  border-bottom-width: 1px;
 }
 
 .channel-top-bar .name {

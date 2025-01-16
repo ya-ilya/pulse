@@ -13,8 +13,7 @@
   overflow-y: auto;
   width: 100%;
   padding-left: 10px;
-  border: none;
-  border-color: transparent;
+  border: none transparent;
   font-size: 14px;
   font-weight: 400;
 }

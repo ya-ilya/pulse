@@ -23,10 +23,8 @@
 }
 
 .create-group-dialog .name-input {
-  border: solid;
-  border-width: 0px;
+  border: 0 solid rgb(230, 230, 230);
   border-bottom-width: 1px;
-  border-color: rgb(230, 230, 230);
   font-size: 18px;
 }
 
@@ -77,10 +75,8 @@
 
 .create-group-dialog .users .add-user .username-input {
   width: 100%;
-  border: solid;
-  border-width: 0px;
+  border: 0 solid rgb(230, 230, 230);
   border-bottom-width: 1px;
-  border-color: rgb(230, 230, 230);
   font-size: 18px;
 }
 

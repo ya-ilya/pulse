@@ -7,7 +7,7 @@ import { forwardRef, useContext, useRef, useState } from "react";
 import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { sendEvent } from "../../api";
+import { sendGatewayEvent } from "../../api";
 import { useIsMobile } from "../../hooks";
 
 const TYPING_EVENT_DELAY = 300;
@@ -72,7 +72,7 @@ const ChannelBottomBar = forwardRef(
               message.length > 0 &&
               currentTime - lastTypingEventTime.current > TYPING_EVENT_DELAY
             ) {
-              sendEvent("TypingC2SEvent", {
+              sendGatewayEvent("TypingC2SEvent", {
                 channelId: props.channel?.id!,
               });
               lastTypingEventTime.current = currentTime;

@@ -31,7 +31,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
 
-  api.subscribeToGateway({
+  api.onGatewayEvent({
     CreateChannelS2CEvent: (event) => {
       queryClient.setQueriesData(
         ["channels"],

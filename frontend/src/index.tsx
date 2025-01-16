@@ -19,7 +19,7 @@ import axios from "axios";
 import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
 export const axiosClient = axios.create({
-  baseURL: 'http://127.0.0.1:3000',
+  baseURL: "http://127.0.0.1:3000",
 });
 
 const queryClient = new QueryClient({
@@ -51,7 +51,7 @@ export const AuthenticationContext = React.createContext<
 
 function AuthenticationRoute() {
   const [authenticationData, setAuthenticationData] =
-    useLocalStorage("authenticationData");
+    useLocalStorage<AuthenticationData>("authenticationData");
 
   return (
     <AuthenticationContext.Provider
@@ -68,24 +68,26 @@ function ProtectedRoute() {
   );
 
   useEffect(() => {
-    const connectToGateway = async () => {
+    if (authenticationData) {
       if (api.isGatewayOpen()) return;
 
       api.connectToGateway(
         `ws://127.0.0.1:3000/gateway`,
         authenticationData!.accessToken
       );
-    };
-
-    if (authenticationData) {
-      connectToGateway();
+    } else {
+      api.closeGateway();
     }
   }, [authenticationData]);
 
-  api.subscribeToGateway({
+  api.onGatewayEvent({
     AuthenticationS2CEvent: (event) => {
       if (!event.state) setAuthenticationData(null);
     },
+  });
+
+  api.onGatewayClose(() => {
+    if (authenticationData) setAuthenticationData(null);
   });
 
   return authenticationData ? (
