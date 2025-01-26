@@ -1,12 +1,10 @@
 package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.validation.Validator
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.user.User
-import org.pulse.backend.gateway.events.AuthenticationC2SEvent
-import org.pulse.backend.gateway.events.AuthenticationS2CEvent
-import org.pulse.backend.gateway.events.TypingC2SEvent
-import org.pulse.backend.gateway.events.TypingS2CEvent
+import org.pulse.backend.gateway.events.*
 import org.pulse.backend.services.AuthenticationService
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
@@ -24,7 +22,8 @@ class Gateway(
     private val userService: UserService,
     private val memberService: ChannelMemberService,
     private val channelService: ChannelService,
-    private val authenticationService: AuthenticationService
+    private val authenticationService: AuthenticationService,
+    private val validator: Validator
 ) : TextWebSocketHandler() {
     private val activeSessions = Collections.synchronizedSet<GatewaySession>(mutableSetOf())
 
@@ -38,7 +37,17 @@ class Gateway(
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         try {
-            when (val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)) {
+            val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)
+
+            if (validator.validate(event).isNotEmpty()) {
+                this[session]!!.sendEvent(
+                    ErrorS2CEvent(
+                        "Invalid message"
+                    )
+                )
+            }
+
+            when (event) {
                 is AuthenticationC2SEvent -> {
                     val email = try {
                         authenticationService.extractEmail(event.token)

@@ -1,5 +1,6 @@
 package org.pulse.backend.controllers
 
+import jakarta.validation.Valid
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.requests.UpdateDisplayNameRequest
 import org.pulse.backend.requests.UpdateUsernameRequest
@@ -18,7 +19,7 @@ class MeController(private val userService: UserService) {
     }
 
     @PatchMapping("/username")
-    fun updateUsername(@AuthenticationPrincipal user: User, @RequestBody request: UpdateUsernameRequest): User {
+    fun updateUsername(@AuthenticationPrincipal user: User, @Valid @RequestBody request: UpdateUsernameRequest): User {
         if (userService.findUserByUsername(request.username).isPresent) {
             throw ResponseStatusException(HttpStatus.CONFLICT)
         }
@@ -27,7 +28,7 @@ class MeController(private val userService: UserService) {
     }
 
     @PatchMapping("/displayName")
-    fun updateDisplayName(@AuthenticationPrincipal user: User, @RequestBody request: UpdateDisplayNameRequest): User {
+    fun updateDisplayName(@AuthenticationPrincipal user: User, @Valid @RequestBody request: UpdateDisplayNameRequest): User {
         return userService.updateUser(user.apply { this.username = request.displayName })
     }
 }

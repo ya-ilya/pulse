@@ -1,5 +1,6 @@
 package org.pulse.backend.controllers
 
+import jakarta.validation.Valid
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.message.MessageType
@@ -59,7 +60,7 @@ class MessageController(
     fun updateMessage(
         @AuthenticationPrincipal user: User,
         @PathVariable messageId: Long,
-        @RequestBody request: UpdateMessageRequest
+        @Valid @RequestBody request: UpdateMessageRequest
     ): Message {
         val message = messageService.getMessageById(messageId)
 

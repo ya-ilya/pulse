@@ -1,5 +1,6 @@
 package org.pulse.backend.controllers
 
+import jakarta.validation.Valid
 import org.pulse.backend.requests.RefreshTokenRequest
 import org.pulse.backend.requests.SignInRequest
 import org.pulse.backend.requests.SignUpRequest
@@ -14,17 +15,17 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/authentication")
 class AuthenticationController(private val authenticationService: AuthenticationService) {
     @PostMapping("/sign-in")
-    fun signIn(@RequestBody request: SignInRequest): AuthenticationResponse {
+    fun signIn(@Valid @RequestBody request: SignInRequest): AuthenticationResponse {
         return authenticationService.signIn(request.email, request.password)
     }
 
     @PostMapping("/sign-up")
-    fun signUp(@RequestBody request: SignUpRequest): AuthenticationResponse {
+    fun signUp(@Valid @RequestBody request: SignUpRequest): AuthenticationResponse {
         return authenticationService.signUp(request.username, request.email, request.password)
     }
 
     @PostMapping("/refreshToken")
-    fun refreshToken(@RequestBody request: RefreshTokenRequest): AuthenticationResponse {
+    fun refreshToken(@Valid @RequestBody request: RefreshTokenRequest): AuthenticationResponse {
         return authenticationService.refreshToken(request.refreshToken)
     }
 }

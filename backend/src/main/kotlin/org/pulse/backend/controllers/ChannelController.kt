@@ -1,5 +1,6 @@
 package org.pulse.backend.controllers
 
+import jakarta.validation.Valid
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.channel.ChannelType
 import org.pulse.backend.entities.message.Message
@@ -72,7 +73,7 @@ class ChannelController(
     fun createMessage(
         @AuthenticationPrincipal user: User,
         @PathVariable channelId: Long,
-        @RequestBody request: CreateMessageRequest
+        @Valid @RequestBody request: CreateMessageRequest
     ): Message {
         val channel = channelService.getChannelById(channelId)
 
@@ -96,7 +97,7 @@ class ChannelController(
     }
 
     @PostMapping
-    fun createChannel(@AuthenticationPrincipal user: User, @RequestBody request: CreateChannelRequest): Channel {
+    fun createChannel(@AuthenticationPrincipal user: User, @Valid @RequestBody request: CreateChannelRequest): Channel {
         return channelService.createChannel(request.name, user).also {
             channelEventDispatcher.dispatchCreateChannelEvent(it)
         }
@@ -105,7 +106,7 @@ class ChannelController(
     @PostMapping("/privateChat")
     fun createPrivateChatChannel(
         @AuthenticationPrincipal user: User,
-        @RequestBody request: CreatePrivateChatRequest
+        @Valid @RequestBody request: CreatePrivateChatRequest
     ): Channel {
         val other = userService.getUserById(request.with)
 
@@ -121,7 +122,7 @@ class ChannelController(
     @PostMapping("/groupChat")
     fun createGroupChatChannel(
         @AuthenticationPrincipal user: User,
-        @RequestBody request: CreateGroupChatRequest
+        @Valid @RequestBody request: CreateGroupChatRequest
     ): Channel {
         return channelService.createGroupChatChannel(
             request.name,
@@ -136,7 +137,7 @@ class ChannelController(
     fun updateChannel(
         @AuthenticationPrincipal user: User,
         @PathVariable channelId: Long,
-        @RequestBody request: UpdateChannelRequest
+        @Valid @RequestBody request: UpdateChannelRequest
     ): Channel {
         val channel = channelService.getChannelById(channelId)
 

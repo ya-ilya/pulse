@@ -14,6 +14,6 @@ class WebSocketConfiguration(private val gateway: Gateway) : WebSocketConfigurer
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
         registry
             .addHandler(gateway, "/gateway")
-            .setAllowedOrigins("http://localhost:8080")
+            .setAllowedOrigins("http://127.0.0.1:8080", "http://localhost:8080")
     }
 }

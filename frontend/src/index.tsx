@@ -84,6 +84,9 @@ function ProtectedRoute() {
     AuthenticationS2CEvent: (event) => {
       if (!event.state) setAuthenticationData(null);
     },
+    ErrorS2CEvent: (event) => {
+      console.error(event.error)
+    }
   });
 
   api.onGatewayClose(() => {
