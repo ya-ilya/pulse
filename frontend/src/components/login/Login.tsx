@@ -2,7 +2,7 @@ import "./Login.css";
 
 import * as api from "../../api";
 
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { Navigate } from "react-router-dom";
@@ -15,23 +15,41 @@ function Login() {
   const [authenticationData, setAuthenticationData] = useContext(
     AuthenticationContext
   );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit() {
-    authenticationController
-      .signIn({ email: email, password: password })
-      .then((response) => {
-        api
-          .createMeControllerByAccessToken(response.accessToken)
-          .getUser()
-          .then((user) => {
-            setAuthenticationData({
-              accessToken: response.accessToken,
-              refreshToken: response.refreshToken,
-              user: user,
+  const handleSubmit = useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault();
+      setLoading(true);
+      setError(null);
+
+      authenticationController
+        .signIn({ email, password })
+        .then((response) => {
+          api
+            .createMeControllerByAccessToken(response.accessToken)
+            .getUser()
+            .then((user) => {
+              setAuthenticationData({
+                accessToken: response.accessToken,
+                refreshToken: response.refreshToken,
+                user: user,
+              });
+              setLoading(false);
+            })
+            .catch(() => {
+              setError("Failed to fetch user data.");
+              setLoading(false);
             });
-          });
-      });
-  }
+        })
+        .catch(() => {
+          setError("Invalid email or password.");
+          setLoading(false);
+        });
+    },
+    [email, password, authenticationController, setAuthenticationData]
+  );
 
   if (authenticationData) {
     return <Navigate to="/" replace />;
@@ -39,7 +57,7 @@ function Login() {
 
   return (
     <div className="login">
-      <div className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="header">Welcome</div>
         <input
           type="email"
@@ -55,10 +73,11 @@ function Login() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <button type="submit" className="submit" onClick={handleSubmit}>
-          Login
+        {error && <div className="error">{error}</div>}
+        <button type="submit" className="button" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

@@ -8,27 +8,17 @@ import {
   RouterProvider,
   createBrowserRouter,
 } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "react-query";
 import React, { useContext, useEffect } from "react";
 
 import App from "./App.tsx";
 import Login from "./components/login/Login.tsx";
+import { QueryClientProvider } from "react-query";
 import ReactDOM from "react-dom/client";
 import { User } from "./api/index.ts";
-import axios from "axios";
+import { queryClient } from "./config.ts";
 import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
-export const axiosClient = axios.create({
-  baseURL: "http://127.0.0.1:3000",
-});
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-    },
-  },
-});
+export * from "./config.ts";
 
 export class AuthenticationData {
   accessToken: string;
@@ -85,8 +75,8 @@ function ProtectedRoute() {
       if (!event.state) setAuthenticationData(null);
     },
     ErrorS2CEvent: (event) => {
-      console.error(event.error)
-    }
+      console.error(event.error);
+    },
   });
 
   api.onGatewayClose(() => {

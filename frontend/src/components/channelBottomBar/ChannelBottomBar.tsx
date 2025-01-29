@@ -2,7 +2,7 @@ import "./ChannelBottomBar.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useContext, useRef, useState } from "react";
+import { forwardRef, useCallback, useContext, useRef, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
@@ -35,6 +35,28 @@ const ChannelBottomBar = forwardRef(
       return <div></div>;
     }
 
+    const handleKeyDown = useCallback(
+      (event: React.KeyboardEvent) => {
+        if (isMobile || event.key !== "Enter" || event.shiftKey) {
+          return;
+        }
+
+        event.preventDefault();
+
+        if (message.length <= 2) {
+          return;
+        }
+
+        const temporaryMessage = `${message}`;
+        setMessage("");
+
+        channelController?.createMessage(props.channel?.id!, {
+          content: temporaryMessage,
+        });
+      },
+      [message, channelController, props]
+    );
+
     function createMessage() {
       if (message.length <= 2) {
         return;
@@ -56,12 +78,7 @@ const ChannelBottomBar = forwardRef(
           maxRows={isMobile ? TEXTAREA_MAX_ROWS_MOBILE : TEXTAREA_MAX_ROWS_PC}
           className="message-input"
           placeholder="Message"
-          onKeyDown={(event) => {
-            if (!isMobile && event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              createMessage();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           value={message}
           onChange={(event) => {
             setMessage(event.target.value);

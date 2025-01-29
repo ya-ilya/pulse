@@ -2,7 +2,7 @@ import "./CreateGroupDialog.css";
 
 import * as api from "../../api";
 
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { FaUser } from "react-icons/fa";
@@ -28,7 +28,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
     props.setShowCreateGroupDialog(false);
   });
 
-  function handleSubmit() {
+  const handleSubmit = useCallback(() => {
     if (name.length <= 2) {
       return;
     }
@@ -40,9 +40,9 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
         props.setShowCreateGroupDialog(false);
       })
       ?.finally(() => setLoading(false));
-  }
+  }, [name, users, channelController, props]);
 
-  function handleAddUser() {
+  const handleAddUser = useCallback(() => {
     if (authenticationData?.user?.username == username) {
       return;
     }
@@ -59,7 +59,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
         setUsername("");
       })
       ?.finally(() => setLoading(false));
-  }
+  }, [users, username, authenticationData, userController]);
 
   return (
     <div

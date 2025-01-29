@@ -2,8 +2,9 @@ import "./CreateChannelDialog.css";
 
 import * as api from "../../api";
 
+import { useCallback, useState } from "react";
+
 import { useKey } from "../../hooks/useKey";
-import { useState } from "react";
 
 type CreateChannelDialogProps = {
   showCreateChannelDialog: boolean;
@@ -16,7 +17,7 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit() {
+  const handleSubmit = useCallback(() => {
     if (name.length <= 2) {
       return;
     }
@@ -26,7 +27,7 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
       props.setShowCreateChannelDialog(false);
       setLoading(false);
     });
-  }
+  }, [name, channelController, props]);
 
   useKey("Escape", () => {
     props.setShowCreateChannelDialog(false);
