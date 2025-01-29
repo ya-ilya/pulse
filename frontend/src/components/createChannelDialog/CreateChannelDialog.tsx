@@ -2,7 +2,8 @@ import "./CreateChannelDialog.css";
 
 import * as api from "../../api";
 
-import { useEffect, useState } from "react";
+import { useKey } from "../../hooks/useKey";
+import { useState } from "react";
 
 type CreateChannelDialogProps = {
   showCreateChannelDialog: boolean;
@@ -27,19 +28,8 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
     });
   }
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        props.setShowCreateChannelDialog(false);
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+  useKey("Escape", () => {
+    props.setShowCreateChannelDialog(false);
   });
 
   return (

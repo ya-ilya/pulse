@@ -2,10 +2,11 @@ import "./CreateGroupDialog.css";
 
 import * as api from "../../api";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 import { AuthenticationContext } from "../..";
 import { FaUser } from "react-icons/fa";
+import { useKey } from "../../hooks/useKey";
 
 type CreateGroupDialogProps = {
   showCreateGroupDialog: boolean;
@@ -23,19 +24,8 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
 
   const [authenticationData] = useContext(AuthenticationContext);
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        props.setShowCreateGroupDialog(false);
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+  useKey("Escape", () => {
+    props.setShowCreateGroupDialog(false);
   });
 
   function handleSubmit() {
@@ -75,12 +65,6 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
     <div
       className="create-group-dialog"
       style={{ visibility: props.showCreateGroupDialog ? "visible" : "hidden" }}
-      onKeyDown={(event) => {
-        if (event.key === "ESC") {
-          event.preventDefault();
-          props.setShowCreateGroupDialog(false);
-        }
-      }}
     >
       <div className="header">Create group</div>
       <input

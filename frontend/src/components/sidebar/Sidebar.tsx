@@ -1,13 +1,13 @@
 import "./Sidebar.css";
 
-import { useContext, useEffect } from "react";
-
 import { AuthenticationContext } from "../..";
 import { GrGroup } from "react-icons/gr";
 import { IoMdExit } from "react-icons/io";
 import { LuMegaphone } from "react-icons/lu";
 import { VscAccount } from "react-icons/vsc";
+import { useContext } from "react";
 import { useIsMobile } from "../../hooks";
+import { useKey } from "../../hooks/useKey";
 
 type SidebarProps = {
   showSidebar: boolean;
@@ -22,31 +22,14 @@ function Sidebar(props: SidebarProps) {
     AuthenticationContext
   );
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        props.setShowSidebar(false);
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+  useKey("Escape", () => {
+    props.setShowSidebar(false);
   });
 
   return (
     <div
       className={`sidebar ${isMobile ? "--sidebar-mobile" : ""}`}
       style={{ left: props.showSidebar ? "0" : "-100%" }}
-      onKeyDown={(event) => {
-        if (event.key === "ESC") {
-          event.preventDefault();
-          props.setShowSidebar(false);
-        }
-      }}
     >
       <div className="element account-element">
         <VscAccount />
