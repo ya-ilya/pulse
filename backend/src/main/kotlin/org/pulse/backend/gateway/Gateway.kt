@@ -2,11 +2,9 @@ package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
-import org.pulse.backend.entities.channel.Channel
-import org.pulse.backend.entities.user.User
+import org.pulse.backend.gateway.dispatchers.OtherEventDispatcher
 import org.pulse.backend.gateway.events.*
 import org.pulse.backend.services.AuthenticationService
-import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.UserService
 import org.springframework.stereotype.Component
@@ -20,9 +18,9 @@ import java.util.*
 class Gateway(
     private val objectMapper: ObjectMapper,
     private val userService: UserService,
-    private val memberService: ChannelMemberService,
     private val channelService: ChannelService,
     private val authenticationService: AuthenticationService,
+    private val otherEventDispatcher: OtherEventDispatcher,
     private val validator: Validator
 ) : TextWebSocketHandler() {
     private val activeSessions = Collections.synchronizedSet<GatewaySession>(mutableSetOf())
@@ -32,7 +30,37 @@ class Gateway(
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
-        activeSessions.add(GatewaySession(session, objectMapper, userService))
+        activeSessions.add(GatewaySession(session, objectMapper))
+    }
+
+    fun handleAuthenticationEvent(session: WebSocketSession, event: AuthenticationC2SEvent) {
+        val email = try {
+            authenticationService.extractEmail(event.token)
+        } catch (ex: Exception) {
+            ""
+        }
+
+        var state = false
+
+        userService.findUserByEmail(email).ifPresent { user ->
+            if (authenticationService.isAccessTokenValid(event.token, user)) {
+                this[session]?.userId = user.id
+                state = true
+            }
+        }
+
+        this[session]?.sendEvent(AuthenticationS2CEvent(state))
+
+        if (!state) {
+            session.close()
+        }
+    }
+
+    fun handleTypingEvent(session: WebSocketSession, event: TypingC2SEvent) {
+        otherEventDispatcher.dispatchTypingEvent(
+            channelService.getChannelById(event.channelId),
+            this[session]!!.userId!!
+        )
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
@@ -48,35 +76,8 @@ class Gateway(
             }
 
             when (event) {
-                is AuthenticationC2SEvent -> {
-                    val email = try {
-                        authenticationService.extractEmail(event.token)
-                    } catch (ex: Exception) {
-                        ""
-                    }
-
-                    var state = false
-
-                    userService.findUserByEmail(email).ifPresent { user ->
-                        if (authenticationService.isAccessTokenValid(event.token, user)) {
-                            this[session]?.userId = user.id
-                            state = true
-                        }
-                    }
-
-                    this[session]?.sendEvent(AuthenticationS2CEvent(state))
-
-                    if (!state) {
-                        session.close()
-                    }
-                }
-
-                is TypingC2SEvent -> {
-                    dispatchTypingEvent(
-                        channelService.getChannelById(event.channelId),
-                        this[session]!!.user
-                    )
-                }
+                is AuthenticationC2SEvent -> handleAuthenticationEvent(session, event)
+                is TypingC2SEvent -> handleTypingEvent(session, event)
             }
         } catch (ex: Exception) {
             session.close()
@@ -95,10 +96,6 @@ class Gateway(
         return activeSessions.firstOrNull { it.session == session }
     }
 
-    fun isOnline(userId: UUID): Boolean {
-        return get(userId)?.isNotEmpty() == true
-    }
-
     fun sendToUserSessions(userId: UUID, event: GatewayEvent) {
         get(userId)?.forEach {
             try {
@@ -108,12 +105,4 @@ class Gateway(
             }
         }
     }
-
-    fun dispatchTypingEvent(channel: Channel, user: User) =
-        memberService.findMembersByChannel(channel).forEach { (channel, memberUser) ->
-            sendToUserSessions(
-                memberUser.id!!,
-                TypingS2CEvent(channel.id!!, user.id!!)
-            )
-        }
 }

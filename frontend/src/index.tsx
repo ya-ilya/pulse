@@ -14,7 +14,7 @@ import App from "./App.tsx";
 import Login from "./components/login/Login.tsx";
 import { QueryClientProvider } from "react-query";
 import ReactDOM from "react-dom/client";
-import { User } from "./api/index.ts";
+import { User } from "./api";
 import { queryClient } from "./config.ts";
 import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 

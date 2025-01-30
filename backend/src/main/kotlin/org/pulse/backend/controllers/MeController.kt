@@ -28,7 +28,10 @@ class MeController(private val userService: UserService) {
     }
 
     @PatchMapping("/displayName")
-    fun updateDisplayName(@AuthenticationPrincipal user: User, @Valid @RequestBody request: UpdateDisplayNameRequest): User {
+    fun updateDisplayName(
+        @AuthenticationPrincipal user: User,
+        @Valid @RequestBody request: UpdateDisplayNameRequest
+    ): User {
         return userService.updateUser(user.apply { this.username = request.displayName })
     }
 }

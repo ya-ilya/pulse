@@ -112,22 +112,34 @@ class AuthenticationService(
     }
 
     fun isAccessTokenValid(accessToken: String, user: User): Boolean {
-        val email = extractEmail(accessToken)
-        if (email != user.email) return false
-        if (!passwordEncoder.matches(accessToken, user.accessToken)) return false
-        if (isTokenExpired(accessToken)) {
-            user.accessToken = null
-            return false
-        }
-        return true
+        return isTokenValid(
+            accessToken,
+            user.accessToken!!,
+            { user.accessToken = null },
+            user.email
+        )
     }
 
     fun isRefreshTokenValid(refreshToken: String, user: User): Boolean {
-        val email = extractEmail(refreshToken)
-        if (email != user.email) return false
-        if (!passwordEncoder.matches(refreshToken, user.refreshToken)) return false
-        if (isTokenExpired(refreshToken)) {
-            user.refreshToken = null
+        return isTokenValid(
+            refreshToken,
+            user.refreshToken!!,
+            { user.refreshToken = null },
+            user.email
+        )
+    }
+
+    fun isTokenValid(
+        actualToken: String,
+        expectedToken: String,
+        reset: () -> Unit,
+        expectedEmail: String
+    ): Boolean {
+        val email = extractEmail(actualToken)
+        if (email != expectedEmail) return false
+        if (!passwordEncoder.matches(actualToken, expectedToken)) return false
+        if (isTokenExpired(actualToken)) {
+            reset.invoke()
             return false
         }
         return true
