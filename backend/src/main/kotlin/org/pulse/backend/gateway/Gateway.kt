@@ -2,9 +2,9 @@ package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
-import org.pulse.backend.gateway.dispatchers.OtherEventDispatcher
 import org.pulse.backend.gateway.events.*
 import org.pulse.backend.services.AuthenticationService
+import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.UserService
 import org.springframework.stereotype.Component
@@ -20,7 +20,7 @@ class Gateway(
     private val userService: UserService,
     private val channelService: ChannelService,
     private val authenticationService: AuthenticationService,
-    private val otherEventDispatcher: OtherEventDispatcher,
+    private val memberService: ChannelMemberService,
     private val validator: Validator
 ) : TextWebSocketHandler() {
     private val activeSessions = Collections.synchronizedSet<GatewaySession>(mutableSetOf())
@@ -57,10 +57,13 @@ class Gateway(
     }
 
     fun handleTypingEvent(session: WebSocketSession, event: TypingC2SEvent) {
-        otherEventDispatcher.dispatchTypingEvent(
-            channelService.getChannelById(event.channelId),
-            this[session]!!.userId!!
-        )
+        memberService.findMembersByChannel(channelService.getChannelById(event.channelId))
+            .forEach { (channel, memberUser) ->
+                sendToUserSessions(
+                    memberUser.id!!,
+                    TypingS2CEvent(channel.id!!, this[session]!!.userId!!)
+                )
+            }
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {

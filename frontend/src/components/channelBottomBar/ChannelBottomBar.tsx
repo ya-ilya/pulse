@@ -20,6 +20,24 @@ type ChannelBottomBarProps = {
   channel?: api.Channel;
 };
 
+function createMessage(
+  channelId: number,
+  message: string,
+  setMessage: (message: string) => void,
+  controller: api.ChannelController | undefined
+) {
+  if (message.length <= 2) {
+    return;
+  }
+
+  const temporaryMessage = `${message}`;
+  setMessage("");
+
+  controller?.createMessage(channelId, {
+    content: temporaryMessage,
+  });
+}
+
 const ChannelBottomBar = forwardRef(
   (props: ChannelBottomBarProps, ref: any) => {
     const channelController = api.useChannelController();
@@ -31,9 +49,9 @@ const ChannelBottomBar = forwardRef(
 
     const [authenticationData] = useContext(AuthenticationContext);
 
-    if (!props.channel) {
-      return <div></div>;
-    }
+    const handleClick = useCallback(() => {
+      createMessage(props.channel?.id!, message, setMessage, channelController);
+    }, [message, channelController, props]);
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent) => {
@@ -43,31 +61,18 @@ const ChannelBottomBar = forwardRef(
 
         event.preventDefault();
 
-        if (message.length <= 2) {
-          return;
-        }
-
-        const temporaryMessage = `${message}`;
-        setMessage("");
-
-        channelController?.createMessage(props.channel?.id!, {
-          content: temporaryMessage,
-        });
+        createMessage(
+          props.channel?.id!,
+          message,
+          setMessage,
+          channelController
+        );
       },
       [message, channelController, props]
     );
 
-    function createMessage() {
-      if (message.length <= 2) {
-        return;
-      }
-
-      const temporaryMessage = `${message}`;
-      setMessage("");
-
-      channelController?.createMessage(props.channel?.id!, {
-        content: temporaryMessage,
-      });
+    if (!props.channel) {
+      return <div></div>;
     }
 
     return props.channel?.type != api.ChannelType.Channel ||
@@ -97,7 +102,7 @@ const ChannelBottomBar = forwardRef(
           }}
           ref={ref}
         />
-        <div className="icon" onClick={createMessage}>
+        <div className="icon" onClick={handleClick}>
           <IoSend />
         </div>
       </div>

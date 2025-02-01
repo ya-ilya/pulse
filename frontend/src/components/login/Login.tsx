@@ -74,7 +74,7 @@ function Login() {
           onChange={(event) => setPassword(event.target.value)}
         />
         {error && <div className="error">{error}</div>}
-        <button type="submit" className="button" disabled={loading}>
+        <button type="submit" className="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
