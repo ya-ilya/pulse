@@ -173,7 +173,7 @@ function ChannelBody(props: ChannelBodyProps) {
           <div className="message-container">
             <div
               className={`message ${
-                message.user?.id == authenticationData?.user?.id
+                message.user?.id == authenticationData?.userId
                   ? "--message-right"
                   : "--message-left"
               } ${isMobile ? "--message-mobile" : ""}`}

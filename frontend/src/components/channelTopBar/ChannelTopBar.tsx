@@ -34,7 +34,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
         props.channel != null &&
         event.channelId == props.channel.id &&
         props.channel.type == api.ChannelType.PrivateChat &&
-        event.userId != authenticationData?.user?.id
+        event.userId != authenticationData?.username
       );
     }
   );

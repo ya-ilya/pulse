@@ -12,15 +12,13 @@ import java.util.*
 class User(
     @get:JvmName("usernameField")
     @get:JsonProperty("username")
-    var username: String,
-    val displayName: String,
+    val username: String,
+    var displayName: String,
     @JsonIgnore
     val email: String,
     @JsonIgnore
     @get:JvmName("passwordField")
     val password: String,
-    @JsonIgnore
-    var accessToken: String? = null,
     @JsonIgnore
     var refreshToken: String? = null,
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)

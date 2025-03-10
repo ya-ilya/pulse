@@ -12,6 +12,8 @@ import {
 import axios, { Axios } from "axios";
 import { useContext, useEffect, useState } from "react";
 
+import { refreshTokenRequestIntercepter } from ".";
+
 export function useChannelController() {
   const [authenticationData] = useContext(AuthenticationContext);
   const [channelController, setChannelController] = useState(
@@ -44,6 +46,7 @@ export class ChannelController {
         Authorization: `Bearer ${token}`,
       },
     });
+    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
   }
 
   async getChannels(): Promise<Channel[]> {

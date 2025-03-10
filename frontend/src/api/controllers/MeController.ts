@@ -7,6 +7,8 @@ import {
 import axios, { Axios } from "axios";
 import { useContext, useEffect, useState } from "react";
 
+import { refreshTokenRequestIntercepter } from ".";
+
 export function useMeController() {
   const [authenticationData] = useContext(AuthenticationContext);
   const [meController, setMeController] = useState(
@@ -41,6 +43,7 @@ export class MeController {
         Authorization: `Bearer ${token}`,
       },
     });
+    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
   }
 
   async getUser(): Promise<User> {

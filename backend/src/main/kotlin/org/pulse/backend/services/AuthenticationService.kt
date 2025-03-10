@@ -42,7 +42,8 @@ class AuthenticationService(
         return AuthenticationResponse(
             generateAccessToken(user)!!,
             generateRefreshToken(user)!!,
-            user.id!!
+            user.id!!,
+            user.username
         )
     }
 
@@ -69,7 +70,8 @@ class AuthenticationService(
         return AuthenticationResponse(
             generateAccessToken(user)!!,
             generateRefreshToken(user)!!,
-            user.id!!
+            user.id!!,
+            user.username
         )
     }
 
@@ -85,68 +87,53 @@ class AuthenticationService(
         return AuthenticationResponse(
             generateAccessToken(user)!!,
             generateRefreshToken(user)!!,
-            user.id!!
+            user.id!!,
+            user.username
         )
     }
 
     fun generateAccessToken(user: User): String? {
         return generateToken(
-            1 * 24 * 60 * 60 * 1000, // 1 DAY
+            1 * 1 * 15 * 60 * 1000, // 15 MINUTES
             mapOf("id" to user.id!!),
             user
-        )?.also {
-            user.accessToken = passwordEncoder.encode(it)
-            userService.updateUser(user)
-        }
+        )
     }
 
     fun generateRefreshToken(user: User): String? {
         return generateToken(
-            16 * 24 * 60 * 60 * 1000, // 16 DAYS
+            1 * 24 * 60 * 60 * 1000, // 1 DAY
             mapOf("id" to user.id!!),
             user
         )?.also {
-            user.refreshToken = passwordEncoder.encode(it)
+            user.refreshToken = it // TODO: refreshToken encrypting
             userService.updateUser(user)
         }
     }
 
     fun isAccessTokenValid(accessToken: String, user: User): Boolean {
-        return isTokenValid(
-            accessToken,
-            user.accessToken!!,
-            { user.accessToken = null },
-            user.email
-        )
+        val email = extractEmail(accessToken)
+        if (email != user.email) return false
+        if (isTokenExpired(accessToken)) {
+            user.refreshToken = null
+            return false
+        }
+        return true
     }
 
     fun isRefreshTokenValid(refreshToken: String, user: User): Boolean {
-        return isTokenValid(
-            refreshToken,
-            user.refreshToken!!,
-            { user.refreshToken = null },
-            user.email
-        )
-    }
-
-    fun isTokenValid(
-        actualToken: String,
-        expectedToken: String,
-        reset: () -> Unit,
-        expectedEmail: String
-    ): Boolean {
-        val email = extractEmail(actualToken)
-        if (email != expectedEmail) return false
-        if (!passwordEncoder.matches(actualToken, expectedToken)) return false
-        if (isTokenExpired(actualToken)) {
-            reset.invoke()
+        val email = extractEmail(refreshToken)
+        if (email != user.email) return false
+        if (refreshToken != user.refreshToken) return false
+        if (isTokenExpired(refreshToken)) {
+            user.refreshToken = null
             return false
         }
         return true
     }
 
     fun extractEmail(token: String): String {
-        return extractClaim<String>(token, Claims::getSubject)
+        return extractClaim<String>(token, Claims::subject)
     }
 
     private fun <T> extractClaim(token: String, claimsResolvers: (Claims) -> T): T {
@@ -173,7 +160,7 @@ class AuthenticationService(
     }
 
     private fun extractExpiration(token: String): Date {
-        return extractClaim<Date>(token, Claims::getExpiration)
+        return extractClaim<Date>(token, Claims::expiration)
     }
 
     private fun extractAllClaims(token: String): Claims {

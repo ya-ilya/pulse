@@ -3,6 +3,7 @@ import axios, { Axios } from "axios";
 import { useContext, useEffect, useState } from "react";
 
 import { User } from "../models";
+import { refreshTokenRequestIntercepter } from ".";
 
 export function useUserController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -34,6 +35,7 @@ export class UserController {
         Authorization: `Bearer ${token}`,
       },
     });
+    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
   }
 
   async getUserById(userId: string): Promise<User> {

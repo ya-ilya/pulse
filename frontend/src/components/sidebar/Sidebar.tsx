@@ -33,7 +33,7 @@ function Sidebar(props: SidebarProps) {
     >
       <div className="element account-element">
         <VscAccount />
-        <div className="text">{authenticationData?.user?.username}</div>
+        <div className="text">{authenticationData?.username}</div>
       </div>
       <div
         className="element"

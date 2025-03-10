@@ -43,7 +43,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
   }, [name, users, channelController, props]);
 
   const handleAddUser = useCallback(() => {
-    if (authenticationData?.user?.username == username) {
+    if (authenticationData?.username == username) {
       return;
     }
 

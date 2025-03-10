@@ -3,6 +3,8 @@ import { Channel, Message, UpdateMessageRequest } from "../models";
 import axios, { Axios } from "axios";
 import { useContext, useEffect, useState } from "react";
 
+import { refreshTokenRequestIntercepter } from ".";
+
 export function useMessageController() {
   const [authenticationData] = useContext(AuthenticationContext);
   const [messageController, setMessageController] = useState(
@@ -35,6 +37,7 @@ export class MessageController {
         Authorization: `Bearer ${token}`,
       },
     });
+    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
   }
 
   async getMessageById(messageId: number): Promise<Message> {

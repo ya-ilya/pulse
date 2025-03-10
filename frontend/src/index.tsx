@@ -14,7 +14,6 @@ import App from "./App.tsx";
 import Login from "./components/login/Login.tsx";
 import { QueryClientProvider } from "react-query";
 import ReactDOM from "react-dom/client";
-import { User } from "./api";
 import { queryClient } from "./config.ts";
 import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
@@ -23,12 +22,19 @@ export * from "./config.ts";
 export class AuthenticationData {
   accessToken: string;
   refreshToken: string;
-  user: User;
+  userId: string;
+  username: string;
 
-  constructor(accessToken: string, refreshToken: string, user: User) {
+  constructor(
+    accessToken: string,
+    refreshToken: string,
+    userId: string,
+    username: string
+  ) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.user = user;
+    this.userId = userId;
+    this.username = username;
   }
 }
 
@@ -56,7 +62,6 @@ function ProtectedRoute() {
   const [authenticationData, setAuthenticationData] = useContext(
     AuthenticationContext
   );
-
   useEffect(() => {
     if (authenticationData) {
       if (api.isGatewayOpen()) return;

@@ -76,7 +76,7 @@ const ChannelBottomBar = forwardRef(
     }
 
     return props.channel?.type != api.ChannelType.Channel ||
-      props.channel.admin?.id == authenticationData?.user?.id ? (
+      props.channel.admin?.id == authenticationData?.userId ? (
       <div className="channel-bottom-bar">
         <ReactTextareaAutosize
           minRows={TEXTAREA_MIN_ROWS}

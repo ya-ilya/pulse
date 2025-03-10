@@ -27,21 +27,12 @@ function Login() {
       authenticationController
         .signIn({ email, password })
         .then((response) => {
-          api
-            .createMeControllerByAccessToken(response.accessToken)
-            .getUser()
-            .then((user) => {
-              setAuthenticationData({
-                accessToken: response.accessToken,
-                refreshToken: response.refreshToken,
-                user: user,
-              });
-              setLoading(false);
-            })
-            .catch(() => {
-              setError("Failed to fetch user data.");
-              setLoading(false);
-            });
+          setAuthenticationData({
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+            userId: response.userId,
+            username: response.username,
+          });
         })
         .catch(() => {
           setError("Invalid email or password.");
