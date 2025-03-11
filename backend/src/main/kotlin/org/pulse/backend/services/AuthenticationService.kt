@@ -133,7 +133,7 @@ class AuthenticationService(
     }
 
     fun extractEmail(token: String): String {
-        return extractClaim<String>(token, Claims::subject)
+        return extractClaim<String>(token) { it.subject }
     }
 
     private fun <T> extractClaim(token: String, claimsResolvers: (Claims) -> T): T {
@@ -160,7 +160,7 @@ class AuthenticationService(
     }
 
     private fun extractExpiration(token: String): Date {
-        return extractClaim<Date>(token, Claims::expiration)
+        return extractClaim<Date>(token) { it.expiration }
     }
 
     private fun extractAllClaims(token: String): Claims {

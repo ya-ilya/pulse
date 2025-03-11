@@ -1,17 +1,17 @@
 .create-group-dialog {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   position: absolute;
   z-index: 20;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 300px;
-  height: fit-content;
-  padding: 16px;
+  padding: 24px;
   background-color: white;
   border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .create-group-dialog .header {
@@ -20,17 +20,21 @@
   align-items: center;
   font-size: 22px;
   font-weight: bold;
+  color: #333;
 }
 
-.create-group-dialog .name-input {
-  border: 0 solid rgb(230, 230, 230);
-  border-bottom-width: 1px;
-  font-size: 18px;
+.create-group-dialog .name-input,
+.create-group-dialog .username-input {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 16px;
 }
 
-.create-group-dialog .name-input:focus {
+.create-group-dialog .name-input:focus,
+.create-group-dialog .username-input:focus {
   outline: none;
-  border-color: gray;
+  border-color: #007bff;
 }
 
 .create-group-dialog .users {
@@ -38,61 +42,57 @@
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  border: 1px solid gray;
-  border-radius: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .create-group-dialog .users .header {
-  display: flex;
-  align-items: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
-}
-
-.create-group-dialog .users .list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 4px;
+  color: #333;
 }
 
 .create-group-dialog .users .list .element {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .create-group-dialog .users .list .element:hover {
-  cursor: pointer;
+  background-color: #f0f2f5;
 }
 
 .create-group-dialog .users .add-user {
   display: flex;
-  flex-direction: row;
-  gap: 4px;
-}
-
-.create-group-dialog .users .add-user .username-input {
-  width: 100%;
-  border: 0 solid rgb(230, 230, 230);
-  border-bottom-width: 1px;
-  font-size: 18px;
-}
-
-.create-group-dialog .users .add-user .username-input:focus {
-  outline: none;
-  border-color: gray;
+  gap: 8px;
 }
 
 .create-group-dialog .users .add-user .button {
-  border: 1px solid black;
-  border-radius: 4px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.create-group-dialog .users .add-user .button:hover {
+  background-color: #0056b3;
 }
 
 .create-group-dialog .submit {
-  background-color: rgb(230, 230, 230);
-  border-color: transparent;
+  background-color: #007bff;
+  color: white;
+  border: none;
   border-radius: 8px;
-  font-size: 18px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.create-group-dialog .submit:hover {
+  background-color: #0056b3;
 }

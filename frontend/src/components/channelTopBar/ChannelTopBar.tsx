@@ -23,10 +23,21 @@ function ChannelTopBar(props: ChannelTopBarProps) {
 
   api.onGatewayEvent(
     {
-      TypingS2CEvent: () => {
-        clearTimeout(timeout.current);
-        setIsTyping(true);
-        timeout.current = setTimeout(() => setIsTyping(false), 1000);
+      TypingS2CEvent: (event) => {
+        if (
+          props.channel?.id == event.channelId &&
+          authenticationData?.userId != event.userId
+        ) {
+          setIsTyping(true);
+
+          if (timeout.current) {
+            clearTimeout(timeout.current);
+          }
+
+          timeout.current = setTimeout(() => {
+            setIsTyping(false);
+          }, 1000);
+        }
       },
     },
     (event) => {

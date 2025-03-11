@@ -1,99 +1,74 @@
 .channels {
   display: flex;
   flex-direction: column;
-  width: 20%;
-  min-width: 20%;
-  max-width: 20%;
+  width: 250px;
   height: 100%;
-  border: 0 solid rgb(230, 230, 230);
-  border-right-width: 1px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
 }
 
 .--channels-mobile {
   width: 100%;
-  min-width: 100%;
-  max-width: 100%;
 }
 
 .channels .top-bar {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 12px;
   width: 100%;
   height: 48px;
-  min-height: 48px;
-  border: 0 solid rgb(230, 230, 230);
-  border-bottom-width: 1px;
+  padding: 0 16px;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #ddd;
 }
 
 .channels .top-bar .search {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 5px;
-  width: 80%;
-  height: 70%;
-  padding: 5px;
-  background-color: rgb(230, 230, 230);
-  border-radius: 15px;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 8px;
 }
 
 .channels .top-bar .search .input {
   width: 100%;
-  background-color: rgb(230, 230, 230);
   border: none;
-  border-color: transparent;
   font-size: 14px;
-  font-weight: 400;
 }
 
 .channels .top-bar .search .input:focus {
   outline: none;
 }
 
-.channels .top-bar .search .icon {
-  background-color: inherit;
-  text-decoration: inherit;
-}
-
-.channels .top-bar .search .icon:visited,
-.channels .search .icon:hover,
-.channels .search .icon:link {
-  cursor: auto;
-  color: inherit;
-  text-decoration: inherit;
-}
-
-.channels .top-bar .search .icon:hover {
-  cursor: pointer;
-}
-
 .channels .list {
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow-y: auto;
   width: 100%;
   height: 100%;
 }
 
 .channels .channel {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 56px;
   min-height: 56px;
-  padding-left: 10px;
-  border: 0 solid rgb(230, 230, 230);
-  border-bottom-width: 1px;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 16px;
   font-weight: 500;
+  color: #333;
 }
 
 .--selected-channel {
-  background-color: rgb(230, 230, 230);
+  background-color: #f0f2f5;
 }
 
 .channels .channel:hover {
-  cursor: pointer;
+  background-color: #f0f2f5;
 }

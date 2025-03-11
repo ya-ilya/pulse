@@ -1,36 +1,40 @@
 .channel-bottom-bar {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: fit-content;
-  padding: 4px;
+  padding: 8px 16px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
 }
 
 .channel-bottom-bar .message-input {
   resize: none;
   overflow-y: auto;
   width: 100%;
-  padding-left: 10px;
-  border: none transparent;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 400;
 }
 
 .channel-bottom-bar .message-input:focus {
   outline: none;
+  border-color: #007bff;
 }
 
 .channel-bottom-bar .icon {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: fit-content;
-  height: fit-content;
-  padding: 12px;
+  width: 40px;
+  height: 40px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .channel-bottom-bar .icon:hover {
-  cursor: pointer;
+  background-color: #0056b3;
 }

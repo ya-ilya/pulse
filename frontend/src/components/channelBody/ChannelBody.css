@@ -2,78 +2,73 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow: auto;
+  overflow-y: auto;
   width: 100%;
   height: 100%;
   padding: 16px;
-  background-color: lightgray;
+  background-color: #f0f2f5;
 }
 
 .channel-body .date-container {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: fit-content;
+  font-size: 14px;
+  color: #666;
 }
 
 .channel-body .message-container {
   display: flex;
-  flex-direction: row;
   width: 100%;
-  height: fit-content;
 }
 
 .channel-body .message {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  width: fit-content;
-  max-width: 48%;
-  height: fit-content;
-  padding: 6px;
+  gap: 4px;
+  max-width: 60%;
+  padding: 12px;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .--message-mobile {
-  max-width: 90% !important;
+  max-width: 90%;
 }
 
 .channel-body .--message-left {
-  margin-left: 0;
+  align-self: flex-start;
 }
 
 .channel-body .--message-right {
   margin-left: auto;
+  align-self: flex-end;
+  background-color: #007bff;
+  color: white;
 }
 
 .channel-body .message .user {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
+  color: #333;
 }
 
 .channel-body .message .inner {
   display: flex;
-  flex-direction: row;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .channel-body .message .inner .content {
   font-size: 16px;
-  font-weight: 400;
   word-break: break-word;
   white-space: pre-wrap;
 }
 
 .channel-body .message .inner .timestamp {
-  display: flex;
-  align-items: end;
-  position: relative;
-  top: 8px;
-  padding-bottom: 8px;
+  align-self: flex-end;
   font-size: 12px;
-  font-weight: 300;
-  color: lightgray;
+  color: #999;
 }
