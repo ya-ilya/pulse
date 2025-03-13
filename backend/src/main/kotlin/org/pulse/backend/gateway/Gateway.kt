@@ -59,9 +59,14 @@ class Gateway(
     fun handleTypingEvent(session: WebSocketSession, event: TypingC2SEvent) {
         memberService.findMembersByChannel(channelService.getChannelById(event.channelId))
             .forEach { (channel, memberUser) ->
+                val userId = this[session]!!.userId!!
                 sendToUserSessions(
                     memberUser.id!!,
-                    TypingS2CEvent(channel.id!!, this[session]!!.userId!!)
+                    TypingS2CEvent(
+                        channel.id!!,
+                        userId,
+                        userService.getUserById(userId).username
+                    )
                 )
             }
     }

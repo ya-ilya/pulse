@@ -15,6 +15,7 @@ type ChannelTopBarProps = {
 
 function ChannelTopBar(props: ChannelTopBarProps) {
   const [isTyping, setIsTyping] = useState(false);
+  const [typingList, setTypingList] = useState<Set<string>>(new Set());
   const timeout = useRef<NodeJS.Timeout>();
 
   const isMobile = useIsMobile();
@@ -24,28 +25,30 @@ function ChannelTopBar(props: ChannelTopBarProps) {
   api.onGatewayEvent(
     {
       TypingS2CEvent: (event) => {
-        if (
-          props.channel?.id == event.channelId &&
-          authenticationData?.userId != event.userId
-        ) {
-          setIsTyping(true);
+        setIsTyping(true);
+        typingList.add(event.username);
 
-          if (timeout.current) {
-            clearTimeout(timeout.current);
-          }
-
-          timeout.current = setTimeout(() => {
-            setIsTyping(false);
-          }, 1000);
+        if (timeout.current) {
+          clearTimeout(timeout.current);
         }
+
+        timeout.current = setTimeout(() => {
+          setIsTyping(false);
+        }, 1000);
+
+        setTimeout(() => {
+          setTypingList((typingList) => {
+            typingList.delete(event.username);
+            return typingList;
+          });
+        }, 1000);
       },
     },
     (event) => {
       return (
         props.channel != null &&
         event.channelId == props.channel.id &&
-        props.channel.type == api.ChannelType.PrivateChat &&
-        event.userId != authenticationData?.username
+        event.userId != authenticationData?.userId
       );
     }
   );
@@ -62,7 +65,9 @@ function ChannelTopBar(props: ChannelTopBarProps) {
         className="loader"
         style={{ visibility: isTyping ? "visible" : "hidden" }}
       >
-        Typing
+        {props.channel?.type === api.ChannelType.PrivateChat
+          ? "Typing"
+          : `${Array.from(typingList).join(", ")} typing`}
         <span className="dot">.</span>
         <span className="dot">.</span>
         <span className="dot">.</span>

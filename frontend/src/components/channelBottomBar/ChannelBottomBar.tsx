@@ -2,13 +2,14 @@ import "./ChannelBottomBar.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useCallback, useContext, useRef, useState } from "react";
+import { AuthenticationContext, queryClient } from "../..";
+import { forwardRef, useCallback, useContext, useRef } from "react";
 
-import { AuthenticationContext } from "../..";
 import { IoSend } from "react-icons/io5";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { sendGatewayEvent } from "../../api";
 import { useIsMobile } from "../../hooks";
+import { useQuery } from "react-query";
 
 const TYPING_EVENT_DELAY = 300;
 
@@ -20,38 +21,34 @@ type ChannelBottomBarProps = {
   channel?: api.Channel;
 };
 
-function createMessage(
-  channelId: number,
-  message: string,
-  setMessage: (message: string) => void,
-  controller: api.ChannelController | undefined
-) {
-  if (message.length <= 2) {
-    return;
-  }
-
-  const temporaryMessage = `${message}`;
-  setMessage("");
-
-  controller?.createMessage(channelId, {
-    content: temporaryMessage,
-  });
-}
-
 const ChannelBottomBar = forwardRef(
   (props: ChannelBottomBarProps, ref: any) => {
     const channelController = api.useChannelController();
 
-    const [message, setMessage] = useState("");
     const lastTypingEventTime = useRef(Date.now());
 
     const isMobile = useIsMobile();
 
     const [authenticationData] = useContext(AuthenticationContext);
 
-    const handleClick = useCallback(() => {
-      createMessage(props.channel?.id!, message, setMessage, channelController);
-    }, [message, channelController, props]);
+    const messageQuery = useQuery({
+      queryKey: ["message_drafts", props.channel],
+      queryFn: () => "",
+    });
+
+    const createMessage = useCallback(() => {
+      const message = messageQuery.data!;
+
+      if (message.length <= 2) {
+        return;
+      }
+
+      queryClient.setQueriesData(["message_drafts", props.channel], () => "");
+
+      channelController?.createMessage(props.channel?.id!, {
+        content: message,
+      });
+    }, [props.channel, messageQuery, channelController]);
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent) => {
@@ -61,14 +58,11 @@ const ChannelBottomBar = forwardRef(
 
         event.preventDefault();
 
-        createMessage(
-          props.channel?.id!,
-          message,
-          setMessage,
-          channelController
-        );
+        createMessage();
+
+        queryClient.setQueriesData(["message_drafts", props.channel], () => "");
       },
-      [message, channelController, props]
+      [messageQuery.data, channelController, props]
     );
 
     if (!props.channel) {
@@ -84,14 +78,17 @@ const ChannelBottomBar = forwardRef(
           className="message-input"
           placeholder="Message"
           onKeyDown={handleKeyDown}
-          value={message}
+          value={messageQuery.data}
           onChange={(event) => {
-            setMessage(event.target.value);
+            queryClient.setQueriesData(
+              ["message_drafts", props.channel],
+              () => event.target.value
+            );
 
             const currentTime = Date.now();
             if (
               props.channel &&
-              message.length > 0 &&
+              messageQuery.data!.length > 0 &&
               currentTime - lastTypingEventTime.current > TYPING_EVENT_DELAY
             ) {
               sendGatewayEvent("TypingC2SEvent", {
@@ -102,7 +99,7 @@ const ChannelBottomBar = forwardRef(
           }}
           ref={ref}
         />
-        <div className="icon" onClick={handleClick}>
+        <div className="icon" onClick={createMessage}>
           <IoSend />
         </div>
       </div>

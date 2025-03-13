@@ -2,9 +2,10 @@ import "./Channels.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useState } from "react";
+import { forwardRef, useContext, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
+import { AuthenticationContext } from "../..";
 import { FiMenu } from "react-icons/fi";
 import { useIsMobile } from "../../hooks";
 import useViewportSize from "../../hooks/useViewportSize";
@@ -23,9 +24,11 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   const [filter, setFilter] = useState("");
 
+  const [authenticationData] = useContext(AuthenticationContext);
+
   const channelsQuery = useQuery({
-    queryKey: ["channels"],
-    queryFn: () => channelController?.getChannels(),
+    queryKey: ["channels", authenticationData?.userId],
+    queryFn: () => channelController!.getChannels(),
   });
 
   const [, viewportHeight] = useViewportSize() ?? [];
@@ -34,7 +37,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
   api.onGatewayEvent({
     CreateChannelS2CEvent: (event) => {
       queryClient.setQueriesData(
-        ["channels"],
+        ["channels", authenticationData?.userId],
         (channels: api.Channel[] | undefined) => {
           if (!channels) return [event.channel];
 
@@ -44,7 +47,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
     },
     UpdateChannelNameS2CEvent: (event) => {
       queryClient.setQueriesData(
-        ["channels"],
+        ["channels", authenticationData?.userId],
         (channels: api.Channel[] | undefined) => {
           if (!channels) return [];
 
@@ -58,7 +61,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
     },
     DeleteChannelS2CEvent: (event) => {
       queryClient.setQueriesData(
-        ["channels"],
+        ["channels", authenticationData?.userId],
         (channels: api.Channel[] | undefined) => {
           if (!channels) return [];
 

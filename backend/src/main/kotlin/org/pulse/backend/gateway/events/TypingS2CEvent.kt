@@ -5,5 +5,6 @@ import java.util.*
 
 class TypingS2CEvent(
     val channelId: Long,
-    val userId: UUID
+    val userId: UUID,
+    val username: String
 ) : GatewayEvent
