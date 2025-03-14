@@ -2,10 +2,10 @@ package org.pulse.backend.gateway.dispatchers
 
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.gateway.Gateway
-import org.pulse.backend.gateway.events.CreateChannelS2CEvent
-import org.pulse.backend.gateway.events.DeleteChannelS2CEvent
-import org.pulse.backend.gateway.events.UpdateChannelMembersS2CEvent
-import org.pulse.backend.gateway.events.UpdateChannelNameS2CEvent
+import org.pulse.backend.gateway.events_s2c.CreateChannelS2CEvent
+import org.pulse.backend.gateway.events_s2c.DeleteChannelS2CEvent
+import org.pulse.backend.gateway.events_s2c.UpdateChannelMembersS2CEvent
+import org.pulse.backend.gateway.events_s2c.UpdateChannelNameS2CEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 

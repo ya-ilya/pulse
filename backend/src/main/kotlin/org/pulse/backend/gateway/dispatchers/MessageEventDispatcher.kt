@@ -2,9 +2,9 @@ package org.pulse.backend.gateway.dispatchers
 
 import org.pulse.backend.entities.message.Message
 import org.pulse.backend.gateway.Gateway
-import org.pulse.backend.gateway.events.CreateMessageS2CEvent
-import org.pulse.backend.gateway.events.DeleteMessageS2CEvent
-import org.pulse.backend.gateway.events.UpdateMessageContentS2CEvent
+import org.pulse.backend.gateway.events_s2c.CreateMessageS2CEvent
+import org.pulse.backend.gateway.events_s2c.DeleteMessageS2CEvent
+import org.pulse.backend.gateway.events_s2c.UpdateMessageContentS2CEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 

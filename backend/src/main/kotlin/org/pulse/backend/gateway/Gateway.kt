@@ -2,7 +2,11 @@ package org.pulse.backend.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
-import org.pulse.backend.gateway.events.*
+import org.pulse.backend.gateway.events_c2s.AuthenticationC2SEvent
+import org.pulse.backend.gateway.events_c2s.TypingC2SEvent
+import org.pulse.backend.gateway.events_s2c.AuthenticationS2CEvent
+import org.pulse.backend.gateway.events_s2c.ErrorS2CEvent
+import org.pulse.backend.gateway.events_s2c.TypingS2CEvent
 import org.pulse.backend.services.AuthenticationService
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
@@ -40,18 +44,18 @@ class Gateway(
             ""
         }
 
-        var state = false
+        var authenticationState = false
 
         userService.findUserByEmail(email).ifPresent { user ->
             if (authenticationService.isAccessTokenValid(event.token, user)) {
                 this[session]?.userId = user.id
-                state = true
+                authenticationState = true
             }
         }
 
-        this[session]?.sendEvent(AuthenticationS2CEvent(state))
+        this[session]?.sendEvent(AuthenticationS2CEvent(authenticationState))
 
-        if (!state) {
+        if (!authenticationState) {
             session.close()
         }
     }

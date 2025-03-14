@@ -1,14 +1,17 @@
 package org.pulse.backend.entities.channel.member
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.user.User
 
 @Entity
 class ChannelMember(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     val channel: Channel,
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     val user: User,
     @Id
     @GeneratedValue

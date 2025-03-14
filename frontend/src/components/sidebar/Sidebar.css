@@ -35,5 +35,6 @@
 }
 
 .sidebar .account-element:hover {
+  background-color: #007bff;
   cursor: default;
 }
