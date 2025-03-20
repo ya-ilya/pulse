@@ -11,5 +11,4 @@ export * from "./SignUpRequest";
 export * from "./UpdateChannelRequest";
 export * from "./UpdateDisplayNameRequest";
 export * from "./UpdateMessageRequest";
-export * from "./UpdateUsernameRequest";
 export * from "./User";

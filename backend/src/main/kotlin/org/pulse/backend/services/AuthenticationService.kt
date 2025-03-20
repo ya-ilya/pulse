@@ -29,7 +29,6 @@ class AuthenticationService(
             .findUserByEmail(email)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
 
-
         if (!passwordEncoder.matches(password, user.password)) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         }
@@ -76,8 +75,9 @@ class AuthenticationService(
     }
 
     fun refreshToken(refreshToken: String): AuthenticationResponse {
+        val email = extractEmail(refreshToken)
         val user = userService
-            .findUserByRefreshToken(refreshToken)
+            .findUserByEmail(email)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
 
         if (!isRefreshTokenValid(refreshToken, user)) {
@@ -106,7 +106,7 @@ class AuthenticationService(
             mapOf("id" to user.id!!),
             user
         )?.also {
-            user.refreshToken = it // TODO: refreshToken encrypting
+            user.refreshToken = passwordEncoder.encode(it)
             userService.updateUser(user)
         }
     }
@@ -124,7 +124,7 @@ class AuthenticationService(
     fun isRefreshTokenValid(refreshToken: String, user: User): Boolean {
         val email = extractEmail(refreshToken)
         if (email != user.email) return false
-        if (refreshToken != user.refreshToken) return false
+        if (!passwordEncoder.matches(refreshToken, user.refreshToken)) return false
         if (isTokenExpired(refreshToken)) {
             user.refreshToken = null
             return false

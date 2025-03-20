@@ -1,13 +1,11 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import {
   UpdateDisplayNameRequest,
-  UpdateUsernameRequest,
   User,
 } from "../models";
 import axios, { Axios } from "axios";
+import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
-
-import { refreshTokenRequestIntercepter } from ".";
 
 export function useMeController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -44,14 +42,11 @@ export class MeController {
       },
     });
     this.client.interceptors.request.use(refreshTokenRequestIntercepter);
+    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
   }
 
   async getUser(): Promise<User> {
     return (await this.client.get("")).data;
-  }
-
-  async updateUsername(body: UpdateUsernameRequest): Promise<User> {
-    return (await this.client.patch("/username", body)).data;
   }
 
   async updateDisplayName(body: UpdateDisplayNameRequest): Promise<User> {

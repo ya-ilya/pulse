@@ -1,9 +1,8 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import { Channel, Message, UpdateMessageRequest } from "../models";
 import axios, { Axios } from "axios";
+import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
-
-import { refreshTokenRequestIntercepter } from ".";
 
 export function useMessageController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -38,6 +37,7 @@ export class MessageController {
       },
     });
     this.client.interceptors.request.use(refreshTokenRequestIntercepter);
+    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
   }
 
   async getMessageById(messageId: number): Promise<Message> {

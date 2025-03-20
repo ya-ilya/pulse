@@ -1,9 +1,9 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import axios, { Axios } from "axios";
+import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
 
 import { User } from "../models";
-import { refreshTokenRequestIntercepter } from ".";
 
 export function useUserController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -36,6 +36,7 @@ export class UserController {
       },
     });
     this.client.interceptors.request.use(refreshTokenRequestIntercepter);
+    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
   }
 
   async getUserById(userId: string): Promise<User> {
