@@ -1,3 +1,3 @@
 export * from "./controllers";
-export * from "./gateway"
+export * from "./gateway";
 export * from "./models";

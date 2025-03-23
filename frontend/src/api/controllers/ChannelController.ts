@@ -9,9 +9,10 @@ import {
   UpdateChannelRequest,
   User,
 } from "../models";
-import axios, { Axios } from "axios";
-import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
+
+import { Axios } from "axios";
+import { Controller } from "./Controller";
 
 export function useChannelController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -34,19 +35,9 @@ export function createChannelController(
   return new ChannelController(axiosClient, authenticationData.accessToken);
 }
 
-export class ChannelController {
-  client: Axios;
-
+export class ChannelController extends Controller {
   constructor(client: Axios, token: string) {
-    this.client = axios.create({
-      ...client.defaults,
-      baseURL: client.defaults.baseURL + "/api/channels",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
-    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
+    super(client, "/api/channels", token);
   }
 
   async getChannels(): Promise<Channel[]> {

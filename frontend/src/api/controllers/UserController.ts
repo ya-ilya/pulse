@@ -1,8 +1,8 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
-import axios, { Axios } from "axios";
-import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
 
+import { Axios } from "axios";
+import { Controller } from "./Controller";
 import { User } from "../models";
 
 export function useUserController() {
@@ -24,19 +24,9 @@ export function createUserController(authenticationData: AuthenticationData) {
   return new UserController(axiosClient, authenticationData.accessToken);
 }
 
-export class UserController {
-  client: Axios;
-
+export class UserController extends Controller {
   constructor(client: Axios, token: string) {
-    this.client = axios.create({
-      ...client.defaults,
-      baseURL: client.defaults.baseURL + "/api/users",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
-    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
+    super(client, "/api/users", token);
   }
 
   async getUserById(userId: string): Promise<User> {

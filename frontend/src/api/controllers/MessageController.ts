@@ -1,8 +1,9 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
 import { Channel, Message, UpdateMessageRequest } from "../models";
-import axios, { Axios } from "axios";
-import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
 import { useContext, useEffect, useState } from "react";
+
+import { Axios } from "axios";
+import { Controller } from "./Controller";
 
 export function useMessageController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -25,19 +26,9 @@ export function createMessageController(
   return new MessageController(axiosClient, authenticationData.accessToken);
 }
 
-export class MessageController {
-  client: Axios;
-
+export class MessageController extends Controller {
   constructor(client: Axios, token: string) {
-    this.client = axios.create({
-      ...client.defaults,
-      baseURL: client.defaults.baseURL + "/api/messages",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
-    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
+    super(client, "/api/messages", token);
   }
 
   async getMessageById(messageId: number): Promise<Message> {

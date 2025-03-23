@@ -1,11 +1,9 @@
 import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
-import {
-  UpdateDisplayNameRequest,
-  User,
-} from "../models";
-import axios, { Axios } from "axios";
-import { refreshTokenRequestIntercepter, refreshTokenResponseIntercepter } from ".";
+import { UpdateDisplayNameRequest, User } from "../models";
 import { useContext, useEffect, useState } from "react";
+
+import { Axios } from "axios";
+import { Controller } from "./Controller";
 
 export function useMeController() {
   const [authenticationData] = useContext(AuthenticationContext);
@@ -30,19 +28,9 @@ export function createMeControllerByAccessToken(accessToken: string) {
   return new MeController(axiosClient, accessToken);
 }
 
-export class MeController {
-  client: Axios;
-
+export class MeController extends Controller {
   constructor(client: Axios, token: string) {
-    this.client = axios.create({
-      ...client.defaults,
-      baseURL: client.defaults.baseURL + "/api/me",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    this.client.interceptors.request.use(refreshTokenRequestIntercepter);
-    this.client.interceptors.response.use((response) => response, refreshTokenResponseIntercepter);
+    super(client, "/api/me", token);
   }
 
   async getUser(): Promise<User> {
