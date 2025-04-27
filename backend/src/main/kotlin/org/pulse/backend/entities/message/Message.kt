@@ -1,9 +1,9 @@
 package org.pulse.backend.entities.message
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.user.User
+import org.pulse.backend.responses.MessageResponse
 import java.sql.Timestamp
 
 @Entity
@@ -17,9 +17,18 @@ class Message(
     @ManyToOne
     val user: User? = null,
     @OneToOne
-    @JsonIgnore
     var comments: Channel? = null,
     @Id
     @GeneratedValue
     val id: Long? = null
-)
+) {
+    fun toResponse(): MessageResponse {
+        return MessageResponse(
+            type,
+            timestamp,
+            content,
+            user?.toResponse(),
+            id!!
+        )
+    }
+}

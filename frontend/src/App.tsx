@@ -9,6 +9,7 @@ import Channel from "./components/channel/Channel";
 import Channels from "./components/channels/Channels";
 import CreateChannelDialog from "./components/createChannelDialog/CreateChannelDialog";
 import CreateGroupDialog from "./components/createGroupDialog/CreateGroupDialog";
+import CreatePrivateChatDialog from "./components/createPrivateChatDialog/CreatePrivateChatDialog";
 import Sidebar from "./components/sidebar/Sidebar";
 import useOnScreenKeyboardScrollFix from "./hooks/useOnScreenKeyboardScrollFix";
 
@@ -16,6 +17,8 @@ function App() {
   const [channel, setChannel] = useState<api.Channel>();
   const [showSidebar, setShowSidebar] = useState(false);
   const [showChannel, setShowChannel] = useState(false);
+  const [showCreatePrivateChatDialog, setShowCreatePrivateChatDialog] =
+    useState(false);
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false);
 
@@ -42,20 +45,27 @@ function App() {
       <Background
         variables={[
           showSidebar,
+          showCreatePrivateChatDialog,
           showCreateChannelDialog,
           showCreateGroupDialog,
         ]}
         setters={[
           setShowSidebar,
+          setShowCreatePrivateChatDialog,
           setShowCreateChannelDialog,
           setShowCreateGroupDialog,
         ]}
       >
         <Sidebar
           showSidebar={showSidebar}
+          setShowCreatePrivateChatDialog={setShowCreatePrivateChatDialog}
           setShowSidebar={setShowSidebar}
           setShowCreateChannelDialog={setShowCreateChannelDialog}
           setShowCreateGroupDialog={setShowCreateGroupDialog}
+        />
+        <CreatePrivateChatDialog
+          showCreatePrivateChatDialog={showCreatePrivateChatDialog}
+          setShowCreatePrivateChatDialog={setShowCreatePrivateChatDialog}
         />
         <CreateChannelDialog
           showCreateChannelDialog={showCreateChannelDialog}

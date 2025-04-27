@@ -1,13 +1,14 @@
 package org.pulse.backend.controllers
 
 import jakarta.validation.Valid
-import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.channel.ChannelType
-import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.pulse.backend.requests.*
+import org.pulse.backend.responses.ChannelResponse
+import org.pulse.backend.responses.MessageResponse
+import org.pulse.backend.responses.UserResponse
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.MessageService
@@ -28,23 +29,23 @@ class ChannelController(
     private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping
-    fun getChannels(@AuthenticationPrincipal user: User): List<Channel> {
-        return user.channels.map { it.channel }
+    fun getChannels(@AuthenticationPrincipal user: User): List<ChannelResponse> {
+        return user.channels.map { it.channel.toResponse() }
     }
 
     @GetMapping("/{channelId}")
-    fun getChannelById(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): Channel {
+    fun getChannelById(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): ChannelResponse {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel && !channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
 
-        return channel
+        return channel.toResponse()
     }
 
     @GetMapping("/{channelId}/members")
-    fun getMembers(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<User> {
+    fun getMembers(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<UserResponse> {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel && !channel.members.any { it.user.id == user.id }) {
@@ -55,18 +56,18 @@ class ChannelController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        return channel.members.map { it.user }
+        return channel.members.map { it.user.toResponse() }
     }
 
     @GetMapping("/{channelId}/messages")
-    fun getMessages(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<Message> {
+    fun getMessages(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): List<MessageResponse> {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel && !channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
 
-        return channel.messages
+        return channel.messages.map { it.toResponse() }
     }
 
     @PostMapping("/{channelId}/messages")
@@ -74,7 +75,7 @@ class ChannelController(
         @AuthenticationPrincipal user: User,
         @PathVariable channelId: Long,
         @Valid @RequestBody request: CreateMessageRequest
-    ): Message {
+    ): MessageResponse {
         val channel = channelService.getChannelById(channelId)
 
         if (!channel.members.any { it.user.id == user.id }) {
@@ -85,7 +86,7 @@ class ChannelController(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
 
-        return if (channel.type == ChannelType.Channel) {
+        return (if (channel.type == ChannelType.Channel) {
             messageService.createPost(request.content.trim(), channel).also {
                 messageEventDispatcher.dispatchCreateMessageEvent(it)
             }
@@ -93,21 +94,24 @@ class ChannelController(
             messageService.createMessage(request.content.trim(), channel, user).also {
                 messageEventDispatcher.dispatchCreateMessageEvent(it)
             }
-        }
+        }).toResponse()
     }
 
     @PostMapping
-    fun createChannel(@AuthenticationPrincipal user: User, @Valid @RequestBody request: CreateChannelRequest): Channel {
+    fun createChannel(
+        @AuthenticationPrincipal user: User,
+        @Valid @RequestBody request: CreateChannelRequest
+    ): ChannelResponse {
         return channelService.createChannel(request.name, user).also {
             channelEventDispatcher.dispatchCreateChannelEvent(it)
-        }
+        }.toResponse()
     }
 
     @PostMapping("/privateChat")
     fun createPrivateChatChannel(
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody request: CreatePrivateChatRequest
-    ): Channel {
+    ): ChannelResponse {
         val other = userService.getUserById(request.with)
 
         if (user.channels.any { it.channel.type == ChannelType.PrivateChat && it.channel.members.any { it.user.id == other.id } }) {
@@ -116,21 +120,21 @@ class ChannelController(
 
         return channelService.createPrivateChatChannel(user, other).also {
             channelEventDispatcher.dispatchCreateChannelEvent(it)
-        }
+        }.toResponse()
     }
 
     @PostMapping("/groupChat")
     fun createGroupChatChannel(
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody request: CreateGroupChatRequest
-    ): Channel {
+    ): ChannelResponse {
         return channelService.createGroupChatChannel(
             request.name,
             user,
             request.with.map { userService.getUserById(it) }
         ).also {
             channelEventDispatcher.dispatchCreateChannelEvent(it)
-        }
+        }.toResponse()
     }
 
     @PatchMapping("/{channelId}")
@@ -138,7 +142,7 @@ class ChannelController(
         @AuthenticationPrincipal user: User,
         @PathVariable channelId: Long,
         @Valid @RequestBody request: UpdateChannelRequest
-    ): Channel {
+    ): ChannelResponse {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.GroupChat && channel.type != ChannelType.Channel) {
@@ -151,7 +155,7 @@ class ChannelController(
 
         return channelService.updateChannel(channelId, request.name).also {
             channelEventDispatcher.dispatchUpdateChannelNameEvent(it)
-        }
+        }.toResponse()
     }
 
     @DeleteMapping("/{channelId}")
@@ -172,7 +176,7 @@ class ChannelController(
     }
 
     @GetMapping("/{channelId}/join")
-    fun join(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): Channel {
+    fun join(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): ChannelResponse {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel) {
@@ -187,6 +191,6 @@ class ChannelController(
 
         return channelService.getChannelById(channelId).also {
             channelEventDispatcher.dispatchUpdateChannelMembersEvent(it)
-        }
+        }.toResponse()
     }
 }

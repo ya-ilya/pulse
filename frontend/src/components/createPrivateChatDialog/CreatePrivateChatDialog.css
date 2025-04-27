@@ -1,0 +1,96 @@
+.create-private-chat-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.create-private-chat-dialog .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.create-private-chat-dialog .username-input {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 16px;
+}
+
+.create-private-chat-dialog .username-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.create-private-chat-dialog .users {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.create-private-chat-dialog .users .header {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.create-private-chat-dialog .users .list .element {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.create-private-chat-dialog .users .list .element:hover {
+  background-color: #f0f2f5;
+}
+
+.create-private-chat-dialog .users .set-user {
+  display: flex;
+  gap: 8px;
+}
+
+.create-private-chat-dialog .users .set-user .button {
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.create-private-chat-dialog .users .set-user .button:hover {
+  background-color: #0056b3;
+}
+
+.create-private-chat-dialog .submit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.create-private-chat-dialog .submit:hover {
+  background-color: #0056b3;
+}

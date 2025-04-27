@@ -1,12 +1,12 @@
 package org.pulse.backend.controllers
 
 import jakarta.validation.Valid
-import org.pulse.backend.entities.channel.Channel
-import org.pulse.backend.entities.message.Message
 import org.pulse.backend.entities.message.MessageType
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
 import org.pulse.backend.requests.UpdateMessageRequest
+import org.pulse.backend.responses.ChannelResponse
+import org.pulse.backend.responses.MessageResponse
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.MessageService
@@ -24,23 +24,23 @@ class MessageController(
     private val messageEventDispatcher: MessageEventDispatcher
 ) {
     @GetMapping("/{messageId}")
-    fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Message {
+    fun getMessageById(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): MessageResponse {
         val message = messageService.getMessageById(messageId)
 
         if (message.type == MessageType.Message && !message.channel.members.any { it.user.id == user.id }) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
         }
 
-        return message
+        return message.toResponse()
     }
 
     @GetMapping("/{messageId}/comments")
-    fun getComments(@PathVariable messageId: Long): Channel {
-        return messageService.getMessageById(messageId).comments!!
+    fun getComments(@PathVariable messageId: Long): ChannelResponse {
+        return messageService.getMessageById(messageId).comments!!.toResponse()
     }
 
     @GetMapping("/{messageId}/comments/join")
-    fun joinComments(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): Channel {
+    fun joinComments(@AuthenticationPrincipal user: User, @PathVariable messageId: Long): ChannelResponse {
         val message = messageService.getMessageById(messageId)
 
         if (!message.channel.members.any { it.user.id == user.id }) {
@@ -53,7 +53,7 @@ class MessageController(
 
         memberService.createMember(message.comments!!, user)
 
-        return channelService.getChannelById(message.comments!!.id!!)
+        return channelService.getChannelById(message.comments!!.id!!).toResponse()
     }
 
     @PatchMapping("/{messageId}")
@@ -61,7 +61,7 @@ class MessageController(
         @AuthenticationPrincipal user: User,
         @PathVariable messageId: Long,
         @Valid @RequestBody request: UpdateMessageRequest
-    ): Message {
+    ): MessageResponse {
         val message = messageService.getMessageById(messageId)
 
         if (message.type == MessageType.Message && message.user?.id != user.id) {
@@ -74,7 +74,7 @@ class MessageController(
 
         return messageService.updateMessage(messageId, request.content).also {
             messageEventDispatcher.dispatchUpdateMessageContentEvent(it)
-        }
+        }.toResponse()
     }
 
     @DeleteMapping("/{messageId}")

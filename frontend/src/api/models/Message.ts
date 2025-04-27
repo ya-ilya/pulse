@@ -1,11 +1,9 @@
-import { Channel } from "./Channel";
 import { User } from "./User";
 
 export interface Message {
   type: MessageType;
   timestamp: string;
   content: string;
-  channel: Channel;
   user?: User;
   id?: number;
 }
@@ -13,5 +11,7 @@ export interface Message {
 export enum MessageType {
   Message,
   Post,
-  Date
+
+  // This is a client-side message type
+  Date,
 }

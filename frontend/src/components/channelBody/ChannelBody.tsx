@@ -38,7 +38,6 @@ async function getMessagesAndSplitByDates(
     timestamp: previousMessage.timestamp,
     type: api.MessageType.Date,
     content: getTimestampYearAndMonthAndDay(previousMessage.timestamp),
-    channel: previousMessage.channel,
   });
   result.push(previousMessage);
 
@@ -50,7 +49,6 @@ async function getMessagesAndSplitByDates(
         timestamp: message.timestamp,
         type: api.MessageType.Date,
         content: getTimestampYearAndMonthAndDay(message.timestamp),
-        channel: message.channel,
       });
     }
 
@@ -83,7 +81,6 @@ function pushToMessagesAndSplitByDates(
       timestamp: message.timestamp,
       type: api.MessageType.Date,
       content: getTimestampYearAndMonthAndDay(message.timestamp),
-      channel: message.channel,
     });
   }
 

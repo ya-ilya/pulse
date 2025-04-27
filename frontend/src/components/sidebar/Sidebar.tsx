@@ -12,6 +12,9 @@ import { useKey } from "../../hooks/useKey";
 type SidebarProps = {
   showSidebar: boolean;
   setShowSidebar: (showSidebar: boolean) => void;
+  setShowCreatePrivateChatDialog: (
+    showCreatePrivateChatDialog: boolean
+  ) => void;
   setShowCreateChannelDialog: (showCreateChannelDialog: boolean) => void;
   setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void;
 };
@@ -34,6 +37,16 @@ function Sidebar(props: SidebarProps) {
       <div className="element account-element">
         <VscAccount />
         <div className="text">{authenticationData?.username}</div>
+      </div>
+      <div
+        className="element"
+        onClick={() => {
+          props.setShowSidebar(false);
+          props.setShowCreatePrivateChatDialog(true);
+        }}
+      >
+        <GrGroup />
+        <div className="text">Create private chat</div>
       </div>
       <div
         className="element"

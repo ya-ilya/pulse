@@ -18,7 +18,7 @@ class ChannelEventDispatcher(
         memberService.findMembersByChannel(channel).forEach { (_, user) ->
             gateway.sendToUserSessions(
                 user.id!!,
-                CreateChannelS2CEvent(channel)
+                CreateChannelS2CEvent(channel.toResponse())
             )
         }
 
