@@ -96,3 +96,9 @@
 .create-group-dialog .submit:hover {
   background-color: #0056b3;
 }
+
+.create-group-dialog .error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}

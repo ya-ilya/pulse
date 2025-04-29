@@ -21,6 +21,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
   const [username, setUsername] = useState("");
   const [users, setUsers] = useState<api.User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [authenticationData] = useContext(AuthenticationContext);
 
@@ -33,7 +34,9 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
       return;
     }
 
+    setError(null);
     setLoading(true);
+
     channelController
       ?.createGroupChat({ name: name, with: users.map((user) => user.id!) })
       ?.then(() => {
@@ -51,12 +54,18 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
       return;
     }
 
+    setError(null);
     setLoading(true);
+
     userController
       ?.getUserByUsername(username)
       ?.then((user) => {
         setUsers((users) => [...users, user]);
         setUsername("");
+      })
+      ?.catch(() => {
+        setError("User not found");
+        setLoading(false);
       })
       ?.finally(() => setLoading(false));
   }, [users, username, authenticationData, userController]);
@@ -107,6 +116,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
           </button>
         </div>
       </div>
+      {error && <div className="error">{error}</div>}
       <button
         type="button"
         className="submit"

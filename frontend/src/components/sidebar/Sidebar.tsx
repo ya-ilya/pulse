@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 
 import { AuthenticationContext } from "../..";
-import { GrGroup } from "react-icons/gr";
+import { GrGroup, GrUser } from "react-icons/gr";
 import { IoMdExit } from "react-icons/io";
 import { LuMegaphone } from "react-icons/lu";
 import { VscAccount } from "react-icons/vsc";
@@ -45,7 +45,7 @@ function Sidebar(props: SidebarProps) {
           props.setShowCreatePrivateChatDialog(true);
         }}
       >
-        <GrGroup />
+        <GrUser />
         <div className="text">Create private chat</div>
       </div>
       <div

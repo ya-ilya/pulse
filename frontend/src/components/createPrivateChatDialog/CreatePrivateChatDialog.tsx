@@ -22,6 +22,7 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState<api.User>();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [authenticationData] = useContext(AuthenticationContext);
 
@@ -30,11 +31,17 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
   });
 
   const handleSubmit = useCallback(() => {
+    setError(null);
     setLoading(true);
+
     channelController
       ?.createPrivateChat({ with: user?.id! })
       ?.then(() => {
         props.setShowCreatePrivateChatDialog(false);
+      })
+      ?.catch(() => {
+        setError("Private chat with this user already exists");
+        setLoading(false);
       })
       ?.finally(() => setLoading(false));
   }, [name, user, channelController, props]);
@@ -44,12 +51,18 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
       return;
     }
 
+    setError(null);
     setLoading(true);
+
     userController
       ?.getUserByUsername(username)
       ?.then((user) => {
         setUser(user);
         setUsername("");
+      })
+      ?.catch(() => {
+        setError("User not found");
+        setLoading(false);
       })
       ?.finally(() => setLoading(false));
   }, [user, username, authenticationData, userController]);
@@ -65,16 +78,14 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
       <div className="users">
         <div className="header">User</div>
         <div className="list">
-          {user ? (
+          {user && (
             <div className="element" onClick={() => setUser(undefined)}>
               <FaUser />
               <div className="username">{user?.username}</div>
             </div>
-          ) : (
-            <div />
           )}
         </div>
-        {!user ? (
+        {!user && (
           <div className="set-user">
             <input
               type="text"
@@ -92,10 +103,9 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
               +
             </button>
           </div>
-        ) : (
-          <div />
         )}
       </div>
+      {error && <div className="error">{error}</div>}
       <button
         type="button"
         className="submit"

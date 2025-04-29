@@ -94,3 +94,9 @@
 .create-private-chat-dialog .submit:hover {
   background-color: #0056b3;
 }
+
+.create-private-chat-dialog .error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
