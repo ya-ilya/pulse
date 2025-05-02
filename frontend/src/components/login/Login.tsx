@@ -10,8 +10,10 @@ import { Navigate } from "react-router-dom";
 function Login() {
   const authenticationController = api.useAuthenticationController();
 
-  const [email, setEmail] = useState<string>("ilya@mail.com");
-  const [password, setPassword] = useState<string>("password");
+  const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [authenticationData, setAuthenticationData] = useContext(
     AuthenticationContext
   );
@@ -24,22 +26,69 @@ function Login() {
       setLoading(true);
       setError(null);
 
-      authenticationController
-        .signIn({ email, password })
-        .then((response) => {
-          setAuthenticationData({
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
-            userId: response.userId,
-            username: response.username,
+      if (isRegister) {
+        authenticationController
+          .signUp({ email, password, username })
+          .then((response) => {
+            setAuthenticationData({
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+              userId: response.userId,
+              username: response.username,
+            });
+            setIsRegister(false);
+          })
+          .catch((error) => {
+            switch (error.status) {
+              case 400:
+                setError("Invalid email or password. Please try again.");
+                break;
+              case 409:
+                setError(
+                  "User with same email or username already exists. Please try again."
+                );
+                break;
+              default:
+                setError("Registration failed. Please try again.");
+                break;
+            }
+            setLoading(false);
           });
-        })
-        .catch(() => {
-          setError("Invalid email or password.");
-          setLoading(false);
-        });
+      } else {
+        authenticationController
+          .signIn({ email, password })
+          .then((response) => {
+            setAuthenticationData({
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+              userId: response.userId,
+              username: response.username,
+            });
+          })
+          .catch((error) => {
+            switch (error.status) {
+              case 401:
+                setError("Invalid password. Please try again.");
+                break;
+              case 404:
+                setError("User not found. Please try again.");
+                break;
+              default:
+                setError("Login failed. Please try again.");
+                break;
+            }
+            setLoading(false);
+          });
+      }
     },
-    [email, password, authenticationController, setAuthenticationData]
+    [
+      isRegister,
+      email,
+      password,
+      username,
+      authenticationController,
+      setAuthenticationData,
+    ]
   );
 
   if (authenticationData) {
@@ -49,7 +98,16 @@ function Login() {
   return (
     <div className="login">
       <form className="form" onSubmit={handleSubmit}>
-        <div className="header">Welcome</div>
+        <div className="header">{isRegister ? "Register" : "Welcome"}</div>
+        {isRegister && (
+          <input
+            type="text"
+            placeholder="Username"
+            className="input"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+          />
+        )}
         <input
           type="email"
           placeholder="Email"
@@ -66,8 +124,26 @@ function Login() {
         />
         {error && <div className="error">{error}</div>}
         <button type="submit" className="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading
+            ? isRegister
+              ? "Registering..."
+              : "Logging in..."
+            : isRegister
+            ? "Register"
+            : "Login"}
         </button>
+        <div className="toggle">
+          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+          <span
+            className="link"
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError(null);
+            }}
+          >
+            {isRegister ? "Login" : "Register"}
+          </span>
+        </div>
       </form>
     </div>
   );

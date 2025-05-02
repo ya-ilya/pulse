@@ -4,10 +4,10 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Size
 
 class SignUpRequest(
-    @Size(min = 2, max = 20)
+    @field:Size(min = 2, max = 20)
     val username: String,
-    @Email
+    @field:Email
     val email: String,
-    @Size(min = 8, max = 100)
+    @field:Size(min = 8, max = 100)
     val password: String
 )
