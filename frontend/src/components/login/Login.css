@@ -8,6 +8,7 @@
 }
 
 .login .form {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -15,7 +16,6 @@
   padding: 24px;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .login .form .header {
@@ -28,9 +28,9 @@
 }
 
 .login .form .input {
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 12px;
   font-size: 16px;
 }
 
@@ -40,13 +40,13 @@
 }
 
 .login .form .submit {
+  padding: 12px;
   background-color: #007bff;
-  color: white;
+  cursor: pointer;
   border: none;
   border-radius: 8px;
-  padding: 12px;
   font-size: 16px;
-  cursor: pointer;
+  color: white;
 }
 
 .login .form .submit:hover {
@@ -54,19 +54,19 @@
 }
 
 .login .form .error {
-  color: red;
   font-size: 14px;
+  color: red;
   text-align: center;
 }
 
 .login .toggle {
   margin-top: 16px;
-  text-align: center;
   font-size: 14px;
+  text-align: center;
 }
 
 .login .toggle .link {
-  color: #007bff;
   cursor: pointer;
+  color: #007bff;
   text-decoration: underline;
 }

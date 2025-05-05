@@ -20,9 +20,7 @@ export function useMessageController() {
   return messageController;
 }
 
-export function createMessageController(
-  authenticationData: AuthenticationData
-) {
+export function createMessageController(authenticationData: AuthenticationData) {
   return new MessageController(axiosClient, authenticationData.accessToken);
 }
 
@@ -43,10 +41,7 @@ export class MessageController extends Controller {
     return (await this.client.get(`/${messageId}/comments/join`)).data;
   }
 
-  async updateMessage(
-    messageId: number,
-    body: UpdateMessageRequest
-  ): Promise<Message> {
+  async updateMessage(messageId: number, body: UpdateMessageRequest): Promise<Message> {
     return (await this.client.patch(`/${messageId}`, body)).data;
   }
 

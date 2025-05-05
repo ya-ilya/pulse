@@ -1,4 +1,5 @@
 .create-channel-dialog {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -11,7 +12,6 @@
   padding: 24px;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .create-channel-dialog .header {
@@ -24,9 +24,9 @@
 }
 
 .create-channel-dialog .name-input {
+  padding: 3px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 3px;
   font-size: 16px;
 }
 
@@ -36,13 +36,13 @@
 }
 
 .create-channel-dialog .submit {
+  padding: 12px;
   background-color: #007bff;
-  color: white;
+  cursor: pointer;
   border: none;
   border-radius: 8px;
-  padding: 12px;
   font-size: 16px;
-  cursor: pointer;
+  color: white;
 }
 
 .create-channel-dialog .submit:hover {

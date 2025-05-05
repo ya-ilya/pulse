@@ -52,9 +52,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
           if (!channels) return [];
 
           const newElements = [...channels];
-          newElements[
-            channels.findIndex((value) => value.id == event.channelId)
-          ].name = event.name;
+          newElements[channels.findIndex((value) => value.id == event.channelId)].name = event.name;
           return newElements;
         }
       );
@@ -80,11 +78,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
     <div
       className={`channels ${isMobile ? "--channels-mobile" : ""}`}
       style={{
-        visibility: isMobile
-          ? props.showChannel
-            ? "hidden"
-            : "visible"
-          : "visible",
+        visibility: isMobile ? (props.showChannel ? "hidden" : "visible") : "visible",
         maxHeight: viewportHeight,
       }}
     >
@@ -100,14 +94,15 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
           />
         </div>
       </div>
-      <div className="list" ref={ref}>
+      <div
+        className="list"
+        ref={ref}
+      >
         {channelsQuery.data
           ?.filter((value) => value.name?.includes(filter))
           .map((value) => (
             <div
-              className={`channel ${
-                value.id == props.channel?.id ? "--selected-channel" : ""
-              }`}
+              className={`channel ${value.id == props.channel?.id ? "--selected-channel" : ""}`}
               onClick={() => {
                 props.setChannel(value);
                 props.setShowChannel(true);

@@ -1,4 +1,5 @@
 .sidebar {
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -7,7 +8,6 @@
   height: 100%;
   transition: 250ms;
   background-color: #fff;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .--sidebar-mobile {
@@ -19,10 +19,10 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
+  cursor: pointer;
   font-size: 16px;
   font-weight: 500;
   color: #333;
-  cursor: pointer;
 }
 
 .sidebar .element:hover {

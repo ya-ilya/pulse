@@ -17,9 +17,7 @@ export async function refreshTokenResponseIntercepter(error: any) {
   const authenticationDataString = localStorage.getItem("authenticationData");
   if (!authenticationDataString) return Promise.reject(error);
 
-  let authenticationData = JSON.parse(
-    authenticationDataString
-  ) as AuthenticationData;
+  let authenticationData = JSON.parse(authenticationDataString) as AuthenticationData;
 
   if (error.response.status === 403 || error.response.status === 401) {
     if (isTokenExpired(authenticationData.refreshToken)) {
@@ -31,10 +29,9 @@ export async function refreshTokenResponseIntercepter(error: any) {
     try {
       console.info("[response-intercepter] Refreshing token");
 
-      const refreshTokenResponse =
-        await createAuthenticationController().refreshToken({
-          refreshToken: authenticationData.refreshToken,
-        });
+      const refreshTokenResponse = await createAuthenticationController().refreshToken({
+        refreshToken: authenticationData.refreshToken,
+      });
 
       const newAuthenticationData = JSON.stringify({
         accessToken: refreshTokenResponse.accessToken,
@@ -71,9 +68,7 @@ export async function refreshTokenRequestIntercepter(
   const authenticationDataString = localStorage.getItem("authenticationData");
   if (!authenticationDataString) return config;
 
-  let authenticationData = JSON.parse(
-    authenticationDataString
-  ) as AuthenticationData;
+  let authenticationData = JSON.parse(authenticationDataString) as AuthenticationData;
 
   if (!isTokenExpired(authenticationData.accessToken)) return config;
   if (isTokenExpired(authenticationData.refreshToken)) {
@@ -85,10 +80,9 @@ export async function refreshTokenRequestIntercepter(
   try {
     console.info("[request-intercepter] Refreshing token");
 
-    const refreshTokenResponse =
-      await createAuthenticationController().refreshToken({
-        refreshToken: authenticationData.refreshToken,
-      });
+    const refreshTokenResponse = await createAuthenticationController().refreshToken({
+      refreshToken: authenticationData.refreshToken,
+    });
 
     const newAuthenticationData = JSON.stringify({
       accessToken: refreshTokenResponse.accessToken,
@@ -108,9 +102,7 @@ export async function refreshTokenRequestIntercepter(
       })
     );
 
-    config.headers[
-      "Authorization"
-    ] = `Bearer ${refreshTokenResponse.accessToken}`;
+    config.headers["Authorization"] = `Bearer ${refreshTokenResponse.accessToken}`;
 
     console.info("[request-intercepter] Token refreshed");
   } catch (err) {

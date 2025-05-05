@@ -3,9 +3,7 @@ import { useEffect } from "react";
 const useOnScreenKeyboardScrollFix = () => {
   useEffect(() => {
     const handleScroll = () => {
-      (
-        document.getElementsByClassName("home")[0] as HTMLElement
-      ).scrollIntoView({
+      (document.getElementsByClassName("home")[0] as HTMLElement).scrollIntoView({
         block: "start",
       });
     };

@@ -10,9 +10,7 @@ import { useKey } from "../../hooks/useKey";
 
 type CreatePrivateChatDialogProps = {
   showCreatePrivateChatDialog: boolean;
-  setShowCreatePrivateChatDialog: (
-    showCreatePrivateChatDialog: boolean
-  ) => void;
+  setShowCreatePrivateChatDialog: (showCreatePrivateChatDialog: boolean) => void;
 };
 
 function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
@@ -79,7 +77,10 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
         <div className="header">User</div>
         <div className="list">
           {user && (
-            <div className="element" onClick={() => setUser(undefined)}>
+            <div
+              className="element"
+              onClick={() => setUser(undefined)}
+            >
               <FaUser />
               <div className="username">{user?.username}</div>
             </div>

@@ -89,9 +89,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
           {users.map((user) => (
             <div
               className="element"
-              onClick={() =>
-                setUsers((users) => users.filter((user) => user != user))
-              }
+              onClick={() => setUsers((users) => users.filter((user) => user != user))}
             >
               <FaUser />
               <div className="username">{user.username}</div>

@@ -39,7 +39,10 @@ function Channel(props: ChannelProps) {
         channel={props.channel}
         shards={[...props.shards, channelBottomBarRef]}
       />
-      <ChannelBottomBar channel={props.channel} ref={channelBottomBarRef} />
+      <ChannelBottomBar
+        channel={props.channel}
+        ref={channelBottomBarRef}
+      />
     </div>
   );
 }

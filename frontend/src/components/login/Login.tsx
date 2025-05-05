@@ -14,9 +14,7 @@ function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [authenticationData, setAuthenticationData] = useContext(
-    AuthenticationContext
-  );
+  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,9 +42,7 @@ function Login() {
                 setError("Invalid email or password. Please try again.");
                 break;
               case 409:
-                setError(
-                  "User with same email or username already exists. Please try again."
-                );
+                setError("User with same email or username already exists. Please try again.");
                 break;
               default:
                 setError("Registration failed. Please try again.");
@@ -81,23 +77,24 @@ function Login() {
           });
       }
     },
-    [
-      isRegister,
-      email,
-      password,
-      username,
-      authenticationController,
-      setAuthenticationData,
-    ]
+    [isRegister, email, password, username, authenticationController, setAuthenticationData]
   );
 
   if (authenticationData) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
   }
 
   return (
     <div className="login">
-      <form className="form" onSubmit={handleSubmit}>
+      <form
+        className="form"
+        onSubmit={handleSubmit}
+      >
         <div className="header">{isRegister ? "Register" : "Welcome"}</div>
         {isRegister && (
           <input
@@ -123,14 +120,12 @@ function Login() {
           onChange={(event) => setPassword(event.target.value)}
         />
         {error && <div className="error">{error}</div>}
-        <button type="submit" className="submit" disabled={loading}>
-          {loading
-            ? isRegister
-              ? "Registering..."
-              : "Logging in..."
-            : isRegister
-            ? "Register"
-            : "Login"}
+        <button
+          type="submit"
+          className="submit"
+          disabled={loading}
+        >
+          {loading ? (isRegister ? "Registering..." : "Logging in...") : isRegister ? "Register" : "Login"}
         </button>
         <div className="toggle">
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}

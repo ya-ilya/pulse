@@ -2,12 +2,7 @@ import "./index.css";
 
 import * as api from "./api/index.ts";
 
-import {
-  Navigate,
-  Outlet,
-  RouterProvider,
-  createBrowserRouter,
-} from "react-router-dom";
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import React, { useContext, useEffect } from "react";
 
 import App from "./App.tsx";
@@ -25,12 +20,7 @@ export class AuthenticationData {
   userId: string;
   username: string;
 
-  constructor(
-    accessToken: string,
-    refreshToken: string,
-    userId: string,
-    username: string
-  ) {
+  constructor(accessToken: string, refreshToken: string, userId: string, username: string) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
     this.userId = userId;
@@ -39,10 +29,7 @@ export class AuthenticationData {
 }
 
 export const AuthenticationContext = React.createContext<
-  [
-    data: AuthenticationData | null,
-    setData: (data: AuthenticationData | null) => void
-  ]
+  [data: AuthenticationData | null, setData: (data: AuthenticationData | null) => void]
 >([null, () => {}]);
 
 function AuthenticationRoute() {
@@ -50,26 +37,20 @@ function AuthenticationRoute() {
     useLocalStorage<AuthenticationData>("authenticationData");
 
   return (
-    <AuthenticationContext.Provider
-      value={[authenticationData, setAuthenticationData]}
-    >
+    <AuthenticationContext.Provider value={[authenticationData, setAuthenticationData]}>
       <Outlet />
     </AuthenticationContext.Provider>
   );
 }
 
 function ProtectedRoute() {
-  const [authenticationData, setAuthenticationData] = useContext(
-    AuthenticationContext
-  );
+  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
+
   useEffect(() => {
     if (authenticationData) {
       if (api.isGatewayOpen()) return;
 
-      api.connectToGateway(
-        `ws://127.0.0.1:3000/gateway`,
-        authenticationData!.accessToken
-      );
+      api.connectToGateway(`ws://127.0.0.1:3000/gateway`, authenticationData!.accessToken);
     } else {
       api.closeGateway();
     }
@@ -93,7 +74,10 @@ function ProtectedRoute() {
       <Outlet />
     </QueryClientProvider>
   ) : (
-    <Navigate to="/login" replace />
+    <Navigate
+      to="/login"
+      replace
+    />
   );
 }
 

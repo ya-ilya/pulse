@@ -17,8 +17,7 @@ function App() {
   const [channel, setChannel] = useState<api.Channel>();
   const [showSidebar, setShowSidebar] = useState(false);
   const [showChannel, setShowChannel] = useState(false);
-  const [showCreatePrivateChatDialog, setShowCreatePrivateChatDialog] =
-    useState(false);
+  const [showCreatePrivateChatDialog, setShowCreatePrivateChatDialog] = useState(false);
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false);
 
@@ -43,12 +42,7 @@ function App() {
         setShowChannel={setShowChannel}
       />
       <Background
-        variables={[
-          showSidebar,
-          showCreatePrivateChatDialog,
-          showCreateChannelDialog,
-          showCreateGroupDialog,
-        ]}
+        variables={[showSidebar, showCreatePrivateChatDialog, showCreateChannelDialog, showCreateGroupDialog]}
         setters={[
           setShowSidebar,
           setShowCreatePrivateChatDialog,

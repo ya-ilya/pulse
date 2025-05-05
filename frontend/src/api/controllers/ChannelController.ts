@@ -29,9 +29,7 @@ export function useChannelController() {
   return channelController;
 }
 
-export function createChannelController(
-  authenticationData: AuthenticationData
-) {
+export function createChannelController(authenticationData: AuthenticationData) {
   return new ChannelController(axiosClient, authenticationData.accessToken);
 }
 
@@ -56,10 +54,7 @@ export class ChannelController extends Controller {
     return (await this.client.get(`/${channelId}/messages`)).data;
   }
 
-  async createMessage(
-    channelId: number,
-    body: CreateMessageRequest
-  ): Promise<Message> {
+  async createMessage(channelId: number, body: CreateMessageRequest): Promise<Message> {
     return (await this.client.post(`/${channelId}/messages`, body)).data;
   }
 
@@ -75,10 +70,7 @@ export class ChannelController extends Controller {
     return (await this.client.post("/groupChat", body)).data;
   }
 
-  async updateChannel(
-    channelId: number,
-    body: UpdateChannelRequest
-  ): Promise<Channel> {
+  async updateChannel(channelId: number, body: UpdateChannelRequest): Promise<Channel> {
     return (await this.client.patch(`/${channelId}`, body)).data;
   }
 

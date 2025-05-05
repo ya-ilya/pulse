@@ -1,7 +1,8 @@
 import "./Sidebar.css";
 
-import { AuthenticationContext } from "../..";
 import { GrGroup, GrUser } from "react-icons/gr";
+
+import { AuthenticationContext } from "../..";
 import { IoMdExit } from "react-icons/io";
 import { LuMegaphone } from "react-icons/lu";
 import { VscAccount } from "react-icons/vsc";
@@ -12,18 +13,14 @@ import { useKey } from "../../hooks/useKey";
 type SidebarProps = {
   showSidebar: boolean;
   setShowSidebar: (showSidebar: boolean) => void;
-  setShowCreatePrivateChatDialog: (
-    showCreatePrivateChatDialog: boolean
-  ) => void;
+  setShowCreatePrivateChatDialog: (showCreatePrivateChatDialog: boolean) => void;
   setShowCreateChannelDialog: (showCreateChannelDialog: boolean) => void;
   setShowCreateGroupDialog: (showCreateGroupDialog: boolean) => void;
 };
 
 function Sidebar(props: SidebarProps) {
   const isMobile = useIsMobile();
-  const [authenticationData, setAuthenticationData] = useContext(
-    AuthenticationContext
-  );
+  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
 
   useKey("Escape", () => {
     props.setShowSidebar(false);

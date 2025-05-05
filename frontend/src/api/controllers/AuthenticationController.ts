@@ -1,9 +1,4 @@
-import {
-  AuthenticationResponse,
-  RefreshTokenRequest,
-  SignInRequest,
-  SignUpRequest,
-} from "../models";
+import { AuthenticationResponse, RefreshTokenRequest, SignInRequest, SignUpRequest } from "../models";
 
 import { Axios } from "axios";
 import { Controller } from "./Controller";
@@ -33,9 +28,7 @@ export class AuthenticationController extends Controller {
     return (await this.client.post("/sign-up", body)).data;
   }
 
-  async refreshToken(
-    body: RefreshTokenRequest
-  ): Promise<AuthenticationResponse> {
+  async refreshToken(body: RefreshTokenRequest): Promise<AuthenticationResponse> {
     return (await this.client.post("/refreshToken", body)).data;
   }
 }
