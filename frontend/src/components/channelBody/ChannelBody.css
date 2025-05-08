@@ -34,10 +34,6 @@
   border-radius: 12px;
 }
 
-.--message-mobile {
-  max-width: 90%;
-}
-
 .channel-body .--message-left {
   align-self: flex-start;
 }
@@ -47,6 +43,15 @@
   margin-left: auto;
   background-color: #007bff;
   color: white;
+}
+
+.channel-body .--message-mobile {
+  max-width: 90%;
+}
+
+.channel-body .--message-edit {
+  background-color: #e7f3ff;
+  color: #0056b3;
 }
 
 .channel-body .message .user {

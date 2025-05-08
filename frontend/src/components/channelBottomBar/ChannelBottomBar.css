@@ -23,7 +23,8 @@
   border-color: #007bff;
 }
 
-.channel-bottom-bar .icon {
+.channel-bottom-bar .cancel-edit-icon,
+.channel-bottom-bar .send-icon {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,9 +33,16 @@
   background-color: #007bff;
   cursor: pointer;
   border-radius: 50%;
-  color: white;
 }
 
-.channel-bottom-bar .icon:hover {
+.channel-bottom-bar .send-icon {
+  color: white
+}
+
+.channel-bottom-bar .send-icon:hover {
   background-color: #0056b3;
+}
+
+.channel-bottom-bar .cancel-edit-icon {
+  color: red
 }

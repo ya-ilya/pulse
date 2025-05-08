@@ -29,9 +29,16 @@ function ChannelBody(props: ChannelBodyProps) {
         : [],
   });
 
+  const editMessageQuery = useQuery<number | null>({
+    queryKey: ["edit_message", props.channel],
+    queryFn: () => null,
+  });
+
   const isMobile = useIsMobile();
   const [viewportWidth, _] = useViewportSize() ?? [];
+
   const [authenticationData] = useContext(AuthenticationContext);
+
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -51,7 +58,8 @@ function ChannelBody(props: ChannelBodyProps) {
   };
 
   const handleEditMessage = (message: api.Message) => {
-    console.log("Edit message:", message);
+    queryClient.setQueriesData(["edit_message", props.channel], () => message.id);
+    queryClient.setQueriesData(["message_drafts", props.channel], () => message.content);
     setContextMenu(null);
   };
 
@@ -158,7 +166,9 @@ function ChannelBody(props: ChannelBodyProps) {
             <div
               className={`message ${
                 message.user?.id === authenticationData?.userId ? "--message-right" : "--message-left"
-              } ${isMobile ? "--message-mobile" : ""}`}
+              } ${isMobile ? "--message-mobile" : ""} ${
+                editMessageQuery.data === message.id ? "--message-edit" : ""
+              }`}
               onContextMenu={(event) => handleContextMenu(event, message)}
               style={{ userSelect: isMobile ? "none" : "auto" }}
             >

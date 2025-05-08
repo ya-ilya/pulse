@@ -45,6 +45,7 @@ class SecurityConfiguration(
                         "POST",
                         "PUT",
                         "DELETE",
+                        "PATCH",
                         "OPTIONS"
                     )
                     corsConfiguration.allowedHeaders = listOf("*")

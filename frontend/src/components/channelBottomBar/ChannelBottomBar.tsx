@@ -3,6 +3,7 @@ import "./ChannelBottomBar.css";
 import * as api from "../../api";
 
 import { AuthenticationContext, queryClient } from "../..";
+import { MdCancel, MdEdit } from "react-icons/md";
 import { forwardRef, useCallback, useContext, useRef } from "react";
 
 import { IoSend } from "react-icons/io5";
@@ -23,6 +24,7 @@ type ChannelBottomBarProps = {
 
 const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => {
   const channelController = api.useChannelController();
+  const messageController = api.useMessageController();
 
   const lastTypingEventTime = useRef(Date.now());
 
@@ -35,6 +37,11 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
     queryFn: () => "",
   });
 
+  const editMessageQuery = useQuery<number | null>({
+    queryKey: ["edit_message", props.channel],
+    queryFn: () => null,
+  });
+
   const createMessage = useCallback(() => {
     const message = messageQuery.data!;
 
@@ -44,9 +51,17 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
 
     queryClient.setQueriesData(["message_drafts", props.channel], () => "");
 
-    channelController?.createMessage(props.channel?.id!, {
-      content: message,
-    });
+    if (editMessageQuery.data) {
+      messageController?.updateMessage(editMessageQuery.data, {
+        content: message,
+      });
+
+      queryClient.setQueriesData(["edit_message", props.channel], () => null);
+    } else {
+      channelController?.createMessage(props.channel?.id!, {
+        content: message,
+      });
+    }
   }, [props.channel, messageQuery, channelController]);
 
   const handleKeyDown = useCallback(
@@ -58,8 +73,6 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
       event.preventDefault();
 
       createMessage();
-
-      queryClient.setQueriesData(["message_drafts", props.channel], () => "");
     },
     [messageQuery.data, channelController, props]
   );
@@ -94,11 +107,22 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
           ref={ref}
         />
         <div
-          className="icon"
+          className="send-icon"
           onClick={createMessage}
         >
-          <IoSend />
+          {editMessageQuery.data ? <MdEdit /> : <IoSend />}
         </div>
+        {editMessageQuery.data && (
+          <div
+            className="cancel-edit-icon"
+            onClick={() => {
+              queryClient.setQueriesData(["edit_message", props.channel], () => null);
+              queryClient.setQueriesData(["message_drafts", props.channel], () => "");
+            }}
+          >
+            <MdCancel />
+          </div>
+        )}
       </div>
     )
   );
