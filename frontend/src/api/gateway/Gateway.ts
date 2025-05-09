@@ -29,16 +29,10 @@ export function onGatewayEvent(
       }
     }
 
-    window.addEventListener(
-      "gatewayevent",
-      gatewayEventListener as EventListener
-    );
+    window.addEventListener("gatewayevent", gatewayEventListener as EventListener);
 
     return () => {
-      window.removeEventListener(
-        "gatewayevent",
-        gatewayEventListener as EventListener
-      );
+      window.removeEventListener("gatewayevent", gatewayEventListener as EventListener);
     };
   });
 }
@@ -49,16 +43,10 @@ export function onGatewayClose(listener: (event: CloseEvent) => void) {
       listener.call(undefined, customEvent.detail);
     }
 
-    window.addEventListener(
-      "gatewayclose",
-      gatewayCloseListener as EventListener
-    );
+    window.addEventListener("gatewayclose", gatewayCloseListener as EventListener);
 
     return () => {
-      window.removeEventListener(
-        "gatewayclose",
-        gatewayCloseListener as EventListener
-      );
+      window.removeEventListener("gatewayclose", gatewayCloseListener as EventListener);
     };
   });
 }

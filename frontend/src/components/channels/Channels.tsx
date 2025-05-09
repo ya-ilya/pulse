@@ -74,6 +74,8 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
     },
   });
 
+  const filteredChannels = channelsQuery.data?.filter((value) => value.name?.includes(filter));
+
   return (
     <div
       className={`channels ${isMobile ? "--channels-mobile" : ""}`}
@@ -98,19 +100,19 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         className="list"
         ref={ref}
       >
-        {channelsQuery.data
-          ?.filter((value) => value.name?.includes(filter))
-          .map((value) => (
-            <div
-              className={`channel ${value.id == props.channel?.id ? "--selected-channel" : ""}`}
-              onClick={() => {
-                props.setChannel(value);
-                props.setShowChannel(true);
-              }}
-            >
-              {value.name}
-            </div>
-          ))}
+        {filteredChannels && filteredChannels.length > 0
+          ? filteredChannels.map((value) => (
+              <div
+                className={`channel ${value.id == props.channel?.id ? "--selected-channel" : ""}`}
+                onClick={() => {
+                  props.setChannel(value);
+                  props.setShowChannel(true);
+                }}
+              >
+                {value.name}
+              </div>
+            ))
+          : filter != "" && <div className="nothing-found">Nothing found</div>}
       </div>
     </div>
   );

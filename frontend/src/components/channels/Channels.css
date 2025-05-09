@@ -65,10 +65,21 @@
   color: #333;
 }
 
-.--selected-channel {
+.channels .--selected-channel {
   background-color: #f0f2f5;
 }
 
 .channels .channel:hover {
   background-color: #f0f2f5;
+}
+
+.channels .nothing-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  min-height: 56px;
+  font-size: 14px;
+  color: gray;
+  text-align: center;
 }
