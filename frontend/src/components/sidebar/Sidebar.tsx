@@ -20,7 +20,7 @@ type SidebarProps = {
 
 function Sidebar(props: SidebarProps) {
   const isMobile = useIsMobile();
-  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
+  const [session, setSession] = useContext(AuthenticationContext);
 
   useKey("Escape", () => {
     props.setShowSidebar(false);
@@ -33,7 +33,7 @@ function Sidebar(props: SidebarProps) {
     >
       <div className="element account-element">
         <VscAccount />
-        <div className="text">{authenticationData?.username}</div>
+        <div className="text">{session?.username}</div>
       </div>
       <div
         className="element"
@@ -69,7 +69,7 @@ function Sidebar(props: SidebarProps) {
         className="element"
         onClick={() => {
           props.setShowSidebar(false);
-          setAuthenticationData(null);
+          setSession(null);
         }}
         style={{ color: "red" }}
       >

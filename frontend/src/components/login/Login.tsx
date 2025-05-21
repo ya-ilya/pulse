@@ -14,7 +14,7 @@ function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
+  const [session, setSession] = useContext(AuthenticationContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +28,7 @@ function Login() {
         authenticationController
           .signUp({ email, password, username })
           .then((response) => {
-            setAuthenticationData({
+            setSession({
               accessToken: response.accessToken,
               refreshToken: response.refreshToken,
               userId: response.userId,
@@ -54,7 +54,7 @@ function Login() {
         authenticationController
           .signIn({ email, password })
           .then((response) => {
-            setAuthenticationData({
+            setSession({
               accessToken: response.accessToken,
               refreshToken: response.refreshToken,
               userId: response.userId,
@@ -77,10 +77,10 @@ function Login() {
           });
       }
     },
-    [isRegister, email, password, username, authenticationController, setAuthenticationData]
+    [isRegister, email, password, username, authenticationController, setSession]
   );
 
-  if (authenticationData) {
+  if (session) {
     return (
       <Navigate
         to="/"

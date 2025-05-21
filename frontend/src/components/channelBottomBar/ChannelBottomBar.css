@@ -36,7 +36,7 @@
 }
 
 .channel-bottom-bar .send-icon {
-  color: white
+  color: white;
 }
 
 .channel-bottom-bar .send-icon:hover {
@@ -44,5 +44,5 @@
 }
 
 .channel-bottom-bar .cancel-edit-icon {
-  color: red
+  color: red;
 }

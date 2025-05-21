@@ -1,4 +1,4 @@
-import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
+import { AuthenticationContext, Session, axiosClient } from "../..";
 import {
   Channel,
   CreateChannelRequest,
@@ -15,22 +15,22 @@ import { Axios } from "axios";
 import { Controller } from "./Controller";
 
 export function useChannelController() {
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
   const [channelController, setChannelController] = useState(
-    authenticationData ? createChannelController(authenticationData) : undefined
+    session ? createChannelController(session) : undefined
   );
 
   useEffect(() => {
-    if (authenticationData) {
-      setChannelController(createChannelController(authenticationData));
+    if (session) {
+      setChannelController(createChannelController(session));
     }
-  }, [authenticationData]);
+  }, [session]);
 
   return channelController;
 }
 
-export function createChannelController(authenticationData: AuthenticationData) {
-  return new ChannelController(axiosClient, authenticationData.accessToken);
+export function createChannelController(session: Session) {
+  return new ChannelController(axiosClient, session.accessToken);
 }
 
 export class ChannelController extends Controller {

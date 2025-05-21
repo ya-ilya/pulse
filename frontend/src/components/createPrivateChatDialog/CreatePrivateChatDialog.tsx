@@ -22,18 +22,20 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
   useKey("Escape", () => {
     props.setShowCreatePrivateChatDialog(false);
   });
 
   const handleSubmit = useCallback(() => {
+    if (!user) return;
+
     setError(null);
     setLoading(true);
 
     channelController
-      ?.createPrivateChat({ with: user?.id! })
+      ?.createPrivateChat({ with: user!.id! })
       ?.then(() => {
         props.setShowCreatePrivateChatDialog(false);
       })
@@ -42,10 +44,10 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
         setLoading(false);
       })
       ?.finally(() => setLoading(false));
-  }, [name, user, channelController, props]);
+  }, [user, channelController, props]);
 
   const handleSetUser = useCallback(() => {
-    if (authenticationData?.username == username) {
+    if (!username || session?.username === username) {
       return;
     }
 
@@ -63,7 +65,7 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
         setLoading(false);
       })
       ?.finally(() => setLoading(false));
-  }, [user, username, authenticationData, userController]);
+  }, [username, session, userController]);
 
   return (
     <div
@@ -82,7 +84,7 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
               onClick={() => setUser(undefined)}
             >
               <FaUser />
-              <div className="username">{user?.username}</div>
+              <div className="username">{user.username}</div>
             </div>
           )}
         </div>
@@ -99,7 +101,7 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
               type="button"
               className="button"
               onClick={handleSetUser}
-              disabled={loading}
+              disabled={loading || !username || session?.username === username}
             >
               +
             </button>
@@ -111,7 +113,7 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
         type="button"
         className="submit"
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={loading || !user}
       >
         Done
       </button>

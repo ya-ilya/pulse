@@ -27,11 +27,11 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   const [filter, setFilter] = useState("");
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
   const channelsQuery = useQuery({
-    queryKey: ["channels", authenticationData?.userId],
-    queryFn: () => channelController!.getChannels(),
+    queryKey: ["channels", session?.userId],
+    queryFn: () => channelController?.getChannels() ?? [],
   });
 
   const [, viewportHeight] = useViewportSize() ?? [];
@@ -48,14 +48,14 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         handleClick: leaveChannel,
         style: { color: "red" },
         condition: (channel) =>
-          channel.type == api.ChannelType.GroupChat && channel.admin?.id != authenticationData?.userId,
+          channel.type == api.ChannelType.GroupChat && channel.admin?.id != session?.userId,
       },
       {
         text: "Delete group",
         handleClick: deleteChannel,
         style: { color: "red" },
         condition: (channel) =>
-          channel.type == api.ChannelType.GroupChat && channel.admin?.id == authenticationData?.userId,
+          channel.type == api.ChannelType.GroupChat && channel.admin?.id == session?.userId,
       },
       {
         text: "Delete chat",
@@ -68,78 +68,66 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         handleClick: leaveChannel,
         style: { color: "red" },
         condition: (channel) =>
-          channel.type == api.ChannelType.Channel && channel.admin?.id != authenticationData?.userId,
+          channel.type == api.ChannelType.Channel && channel.admin?.id != session?.userId,
       },
       {
         text: "Delete channel",
         handleClick: deleteChannel,
         style: { color: "red" },
         condition: (channel) =>
-          channel.type == api.ChannelType.Channel && channel.admin?.id == authenticationData?.userId,
+          channel.type == api.ChannelType.Channel && channel.admin?.id == session?.userId,
       },
     ],
   });
 
   api.onGatewayEvent({
     CreateChannelS2CEvent: (event) => {
-      queryClient.setQueriesData(
-        ["channels", authenticationData?.userId],
-        (channels: api.Channel[] | undefined) => {
-          if (!channels) return [event.channel];
+      queryClient.setQueriesData(["channels", session?.userId], (channels: api.Channel[] | undefined) => {
+        if (!channels) return [event.channel];
 
-          return [...channels, event.channel];
-        }
-      );
+        return [...channels, event.channel];
+      });
     },
     UpdateChannelNameS2CEvent: (event) => {
-      queryClient.setQueriesData(
-        ["channels", authenticationData?.userId],
-        (channels: api.Channel[] | undefined) => {
-          if (!channels) return [];
+      queryClient.setQueriesData(["channels", session?.userId], (channels: api.Channel[] | undefined) => {
+        if (!channels) return [];
 
-          const newElements = [...channels];
-          newElements[channels.findIndex((value) => value.id == event.channelId)].name = event.name;
-          return newElements;
-        }
-      );
+        const newElements = [...channels];
+        newElements[channels.findIndex((value) => value.id == event.channelId)].name = event.name;
+        return newElements;
+      });
     },
     DeleteChannelS2CEvent: (event) => {
-      queryClient.setQueriesData(
-        ["channels", authenticationData?.userId],
-        (channels: api.Channel[] | undefined) => {
-          if (!channels) return [];
+      queryClient.setQueriesData(["channels", session?.userId], (channels: api.Channel[] | undefined) => {
+        if (!channels) return [];
 
-          const newElements = [...channels];
+        const newElements = [...channels];
+        newElements.splice(
+          channels.findIndex((value) => value.id == event.channelId),
+          1
+        );
+        return newElements;
+      });
+    },
+    MemberLeftS2CEvent: (event) => {
+      queryClient.setQueriesData(["channels", session?.userId], (channels: api.Channel[] | undefined) => {
+        if (!channels) return [];
+
+        const newElements = [...channels];
+
+        if (event.user.id == session?.userId) {
           newElements.splice(
             channels.findIndex((value) => value.id == event.channelId),
             1
           );
-          return newElements;
         }
-      );
-    },
-    MemberLeftS2CEvent: (event) => {
-      queryClient.setQueriesData(
-        ["channels", authenticationData?.userId],
-        (channels: api.Channel[] | undefined) => {
-          if (!channels) return [];
 
-          const newElements = [...channels];
-
-          if (event.user.id == authenticationData?.userId) {
-            newElements.splice(
-              channels.findIndex((value) => value.id == event.channelId),
-              1
-            );
-          }
-
-          return newElements;
-        }
-      );
+        return newElements;
+      });
     },
   });
 
-  const filteredChannels = channelsQuery.data?.filter((value) => value.name?.includes(filter));
+  const filteredChannels = channelsQuery.data?.filter((value) => value.name?.includes(filter)) ?? [];
 
   return (
     <div
@@ -165,10 +153,11 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         className="list"
         ref={ref}
       >
-        {filteredChannels && filteredChannels.length > 0
+        {filteredChannels.length > 0
           ? filteredChannels.map((value) => (
               <div
-                className={`channel ${value.id == props.channel?.id ? "--selected-channel" : ""}`}
+                className={`channel ${value.id === props.channel?.id ? "--selected-channel" : ""}`}
+                key={value.id}
                 onContextMenu={(event) => handleContextMenu(event, value)}
                 onClick={() => {
                   props.setChannel(value);
@@ -178,7 +167,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
                 {value.name}
               </div>
             ))
-          : filter != "" && <div className="nothing-found">Nothing found</div>}
+          : filter !== "" && <div className="nothing-found">Nothing found</div>}
       </div>
       {contextMenu}
     </div>

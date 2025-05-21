@@ -23,7 +23,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
   useKey("Escape", () => {
     props.setShowCreateGroupDialog(false);
@@ -46,7 +46,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
   }, [name, users, channelController, props]);
 
   const handleAddUser = useCallback(() => {
-    if (authenticationData?.username == username) {
+    if (session?.username == username) {
       return;
     }
 
@@ -68,7 +68,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
         setLoading(false);
       })
       ?.finally(() => setLoading(false));
-  }, [users, username, authenticationData, userController]);
+  }, [users, username, session, userController]);
 
   return (
     <div
@@ -89,7 +89,8 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
           {users.map((user) => (
             <div
               className="element"
-              onClick={() => setUsers((users) => users.filter((user) => user != user))}
+              key={user.id}
+              onClick={() => setUsers((users) => users.filter((u) => u.id !== user.id))}
             >
               <FaUser />
               <div className="username">{user.username}</div>

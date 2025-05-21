@@ -1,5 +1,5 @@
-import { AuthenticationData } from "../..";
 import { InternalAxiosRequestConfig } from "axios";
+import { Session } from "../..";
 import { createAuthenticationController } from "./AuthenticationController";
 
 export * from "./AuthenticationController";
@@ -14,15 +14,15 @@ function isTokenExpired(token: string): boolean {
 }
 
 export async function refreshTokenResponseIntercepter(error: any) {
-  const authenticationDataString = localStorage.getItem("authenticationData");
-  if (!authenticationDataString) return Promise.reject(error);
+  const serializedSession = localStorage.getItem("session");
+  if (!serializedSession) return Promise.reject(error);
 
-  let authenticationData = JSON.parse(authenticationDataString) as AuthenticationData;
+  let session = JSON.parse(serializedSession) as Session;
 
   if (error.response.status === 403 || error.response.status === 401) {
-    if (isTokenExpired(authenticationData.refreshToken)) {
+    if (isTokenExpired(session.refreshToken)) {
       console.error("[response-intercepter] refreshToken expired");
-      localStorage.removeItem("authenticationData");
+      localStorage.removeItem("session");
       return Promise.reject(error);
     }
 
@@ -30,23 +30,23 @@ export async function refreshTokenResponseIntercepter(error: any) {
       console.info("[response-intercepter] Refreshing token");
 
       const refreshTokenResponse = await createAuthenticationController().refreshToken({
-        refreshToken: authenticationData.refreshToken,
+        refreshToken: session.refreshToken,
       });
 
-      const newAuthenticationData = JSON.stringify({
+      const newSession = JSON.stringify({
         accessToken: refreshTokenResponse.accessToken,
         refreshToken: refreshTokenResponse.refreshToken,
         userId: refreshTokenResponse.userId,
         username: refreshTokenResponse.username,
       });
 
-      localStorage.setItem("authenticationData", newAuthenticationData);
+      localStorage.setItem("session", newSession);
 
       window.dispatchEvent(
         new CustomEvent("localStorageChange", {
           detail: {
-            key: "authenticationData",
-            newValue: newAuthenticationData,
+            key: "session",
+            newValue: newSession,
           },
         })
       );
@@ -65,15 +65,15 @@ export async function refreshTokenRequestIntercepter(
 ): Promise<InternalAxiosRequestConfig<any>> {
   if (!config.headers["Authorization"]) return config;
 
-  const authenticationDataString = localStorage.getItem("authenticationData");
-  if (!authenticationDataString) return config;
+  const serializedSession = localStorage.getItem("session");
+  if (!serializedSession) return config;
 
-  let authenticationData = JSON.parse(authenticationDataString) as AuthenticationData;
+  let session = JSON.parse(serializedSession) as Session;
 
-  if (!isTokenExpired(authenticationData.accessToken)) return config;
-  if (isTokenExpired(authenticationData.refreshToken)) {
+  if (!isTokenExpired(session.accessToken)) return config;
+  if (isTokenExpired(session.refreshToken)) {
     console.error("[request-intercepter] refreshToken expired");
-    localStorage.removeItem("authenticationData");
+    localStorage.removeItem("session");
     return config;
   }
 
@@ -81,23 +81,23 @@ export async function refreshTokenRequestIntercepter(
     console.info("[request-intercepter] Refreshing token");
 
     const refreshTokenResponse = await createAuthenticationController().refreshToken({
-      refreshToken: authenticationData.refreshToken,
+      refreshToken: session.refreshToken,
     });
 
-    const newAuthenticationData = JSON.stringify({
+    const newSession = JSON.stringify({
       accessToken: refreshTokenResponse.accessToken,
       refreshToken: refreshTokenResponse.refreshToken,
       userId: refreshTokenResponse.userId,
       username: refreshTokenResponse.username,
     });
 
-    localStorage.setItem("authenticationData", newAuthenticationData);
+    localStorage.setItem("session", newSession);
 
     window.dispatchEvent(
       new CustomEvent("localStorageChange", {
         detail: {
-          key: "authenticationData",
-          newValue: newAuthenticationData,
+          key: "session",
+          newValue: newSession,
         },
       })
     );

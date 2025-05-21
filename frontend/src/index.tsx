@@ -14,7 +14,7 @@ import { useLocalStorage } from "./hooks/useLocalStorage.ts";
 
 export * from "./config.ts";
 
-export class AuthenticationData {
+export class Session {
   accessToken: string;
   refreshToken: string;
   userId: string;
@@ -29,36 +29,35 @@ export class AuthenticationData {
 }
 
 export const AuthenticationContext = React.createContext<
-  [data: AuthenticationData | null, setData: (data: AuthenticationData | null) => void]
+  [session: Session | null, setSession: (session: Session | null) => void]
 >([null, () => {}]);
 
 function AuthenticationRoute() {
-  const [authenticationData, setAuthenticationData] =
-    useLocalStorage<AuthenticationData>("authenticationData");
+  const [session, setSession] = useLocalStorage<Session>("session");
 
   return (
-    <AuthenticationContext.Provider value={[authenticationData, setAuthenticationData]}>
+    <AuthenticationContext.Provider value={[session, setSession]}>
       <Outlet />
     </AuthenticationContext.Provider>
   );
 }
 
 function ProtectedRoute() {
-  const [authenticationData, setAuthenticationData] = useContext(AuthenticationContext);
+  const [session, setSession] = useContext(AuthenticationContext);
 
   useEffect(() => {
-    if (authenticationData) {
+    if (session) {
       if (api.isGatewayOpen()) return;
 
-      api.connectToGateway(`ws://127.0.0.1:3000/gateway`, authenticationData!.accessToken);
+      api.connectToGateway(`ws://127.0.0.1:3000/gateway`, session!.accessToken);
     } else {
       api.closeGateway();
     }
-  }, [authenticationData]);
+  }, [session]);
 
   api.onGatewayEvent({
     AuthenticationS2CEvent: (event) => {
-      if (!event.state) setAuthenticationData(null);
+      if (!event.state) setSession(null);
     },
     ErrorS2CEvent: (event) => {
       console.error(event.error);
@@ -66,10 +65,10 @@ function ProtectedRoute() {
   });
 
   api.onGatewayClose(() => {
-    if (authenticationData) setAuthenticationData(null);
+    if (session) setSession(null);
   });
 
-  return authenticationData ? (
+  return session ? (
     <QueryClientProvider client={queryClient}>
       <Outlet />
     </QueryClientProvider>

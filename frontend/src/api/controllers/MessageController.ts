@@ -1,4 +1,4 @@
-import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
+import { AuthenticationContext, Session, axiosClient } from "../..";
 import { Channel, Message, UpdateMessageRequest } from "../models";
 import { useContext, useEffect, useState } from "react";
 
@@ -6,22 +6,22 @@ import { Axios } from "axios";
 import { Controller } from "./Controller";
 
 export function useMessageController() {
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
   const [messageController, setMessageController] = useState(
-    authenticationData ? createMessageController(authenticationData) : undefined
+    session ? createMessageController(session) : undefined
   );
 
   useEffect(() => {
-    if (authenticationData) {
-      setMessageController(createMessageController(authenticationData));
+    if (session) {
+      setMessageController(createMessageController(session));
     }
-  }, [authenticationData]);
+  }, [session]);
 
   return messageController;
 }
 
-export function createMessageController(authenticationData: AuthenticationData) {
-  return new MessageController(axiosClient, authenticationData.accessToken);
+export function createMessageController(session: Session) {
+  return new MessageController(axiosClient, session.accessToken);
 }
 
 export class MessageController extends Controller {

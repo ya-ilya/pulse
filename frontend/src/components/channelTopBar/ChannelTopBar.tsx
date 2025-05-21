@@ -20,7 +20,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
 
   const isMobile = useIsMobile();
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
   api.onGatewayEvent(
     {
@@ -45,11 +45,7 @@ function ChannelTopBar(props: ChannelTopBarProps) {
       },
     },
     (event) => {
-      return (
-        props.channel != null &&
-        event.channelId == props.channel.id &&
-        event.userId != authenticationData?.userId
-      );
+      return props.channel != null && event.channelId == props.channel.id && event.userId != session?.userId;
     }
   );
 

@@ -30,7 +30,7 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
 
   const isMobile = useIsMobile();
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
   const messageQuery = useQuery({
     queryKey: ["message_drafts", props.channel],
@@ -43,7 +43,7 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
   });
 
   const createMessage = useCallback(() => {
-    const message = messageQuery.data!;
+    const message = messageQuery.data ?? "";
 
     if (message.length <= 2) {
       return;
@@ -62,7 +62,7 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
         content: message,
       });
     }
-  }, [props.channel, messageQuery, channelController]);
+  }, [props.channel, messageQuery.data, channelController, messageController, editMessageQuery.data]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -74,13 +74,12 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
 
       createMessage();
     },
-    [messageQuery.data, channelController, props]
+    [isMobile, createMessage]
   );
 
   return (
     props.channel &&
-    (props.channel?.type != api.ChannelType.Channel ||
-      props.channel.admin?.id == authenticationData?.userId) && (
+    (props.channel?.type !== api.ChannelType.Channel || props.channel.admin?.id === session?.userId) && (
       <div className="channel-bottom-bar">
         <ReactTextareaAutosize
           minRows={TEXTAREA_MIN_ROWS}
@@ -88,14 +87,14 @@ const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => 
           className="message-input"
           placeholder="Message"
           onKeyDown={handleKeyDown}
-          value={messageQuery.data}
+          value={messageQuery.data ?? ""}
           onChange={(event) => {
             queryClient.setQueriesData(["message_drafts", props.channel], () => event.target.value);
 
             const currentTime = Date.now();
             if (
               props.channel &&
-              messageQuery.data!.length > 0 &&
+              event.target.value.length > 0 &&
               currentTime - lastTypingEventTime.current > TYPING_EVENT_DELAY
             ) {
               sendGatewayEvent("TypingC2SEvent", {

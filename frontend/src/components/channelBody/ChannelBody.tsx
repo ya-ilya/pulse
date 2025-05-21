@@ -128,9 +128,17 @@ function ChannelBody(props: ChannelBodyProps) {
     >
       {messagesQuery.data?.map((message) =>
         message.type === api.MessageType.Date ? (
-          <div className="date-container">{message.content}</div>
+          <div
+            className="date-container"
+            key={`date-${message.timestamp}`}
+          >
+            {message.content}
+          </div>
         ) : (
-          <div className="message-container">
+          <div
+            className="message-container"
+            key={message.id}
+          >
             <div
               className={`message ${
                 message.user?.id === authenticationData?.userId ? "--message-right" : "--message-left"

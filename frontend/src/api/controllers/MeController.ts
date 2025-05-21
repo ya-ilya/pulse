@@ -1,4 +1,4 @@
-import { AuthenticationContext, AuthenticationData, axiosClient } from "../..";
+import { AuthenticationContext, Session, axiosClient } from "../..";
 import { UpdateDisplayNameRequest, User } from "../models";
 import { useContext, useEffect, useState } from "react";
 
@@ -6,22 +6,20 @@ import { Axios } from "axios";
 import { Controller } from "./Controller";
 
 export function useMeController() {
-  const [authenticationData] = useContext(AuthenticationContext);
-  const [meController, setMeController] = useState(
-    authenticationData ? createMeController(authenticationData) : undefined
-  );
+  const [session] = useContext(AuthenticationContext);
+  const [meController, setMeController] = useState(session ? createMeController(session) : undefined);
 
   useEffect(() => {
-    if (authenticationData) {
-      setMeController(createMeController(authenticationData));
+    if (session) {
+      setMeController(createMeController(session));
     }
-  }, [authenticationData]);
+  }, [session]);
 
   return meController;
 }
 
-export function createMeController(authenticationData: AuthenticationData) {
-  return new MeController(axiosClient, authenticationData.accessToken);
+export function createMeController(session: Session) {
+  return new MeController(axiosClient, session.accessToken);
 }
 
 export function createMeControllerByAccessToken(accessToken: string) {
