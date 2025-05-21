@@ -7,8 +7,11 @@ import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { FiMenu } from "react-icons/fi";
+import { useContextMenu } from "../contextMenu/ContextMenu";
 import { useIsMobile } from "../../hooks";
 import useViewportSize from "../../hooks/useViewportSize";
+
+const CONTEXT_MENU_WIDTH = 150;
 
 type ChannelsProps = {
   channel?: api.Channel;
@@ -33,6 +36,49 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
 
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
+
+  const leaveChannel = async (channel: api.Channel) => await channelController?.leaveChannel(channel.id!);
+  const deleteChannel = async (channel: api.Channel) => await channelController?.deleteChannel(channel.id!);
+
+  const [handleContextMenu, contextMenu] = useContextMenu<api.Channel>({
+    width: CONTEXT_MENU_WIDTH,
+    buttons: [
+      {
+        text: "Leave group",
+        handleClick: leaveChannel,
+        style: { color: "red" },
+        condition: (channel) =>
+          channel.type == api.ChannelType.GroupChat && channel.admin?.id != authenticationData?.userId,
+      },
+      {
+        text: "Delete group",
+        handleClick: deleteChannel,
+        style: { color: "red" },
+        condition: (channel) =>
+          channel.type == api.ChannelType.GroupChat && channel.admin?.id == authenticationData?.userId,
+      },
+      {
+        text: "Delete chat",
+        handleClick: deleteChannel,
+        style: { color: "red" },
+        condition: (channel) => channel.type == api.ChannelType.PrivateChat,
+      },
+      {
+        text: "Leave channel",
+        handleClick: leaveChannel,
+        style: { color: "red" },
+        condition: (channel) =>
+          channel.type == api.ChannelType.Channel && channel.admin?.id != authenticationData?.userId,
+      },
+      {
+        text: "Delete channel",
+        handleClick: deleteChannel,
+        style: { color: "red" },
+        condition: (channel) =>
+          channel.type == api.ChannelType.Channel && channel.admin?.id == authenticationData?.userId,
+      },
+    ],
+  });
 
   api.onGatewayEvent({
     CreateChannelS2CEvent: (event) => {
@@ -72,6 +118,25 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         }
       );
     },
+    MemberLeftS2CEvent: (event) => {
+      queryClient.setQueriesData(
+        ["channels", authenticationData?.userId],
+        (channels: api.Channel[] | undefined) => {
+          if (!channels) return [];
+
+          const newElements = [...channels];
+
+          if (event.user.id == authenticationData?.userId) {
+            newElements.splice(
+              channels.findIndex((value) => value.id == event.channelId),
+              1
+            );
+          }
+
+          return newElements;
+        }
+      );
+    },
   });
 
   const filteredChannels = channelsQuery.data?.filter((value) => value.name?.includes(filter));
@@ -104,6 +169,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
           ? filteredChannels.map((value) => (
               <div
                 className={`channel ${value.id == props.channel?.id ? "--selected-channel" : ""}`}
+                onContextMenu={(event) => handleContextMenu(event, value)}
                 onClick={() => {
                   props.setChannel(value);
                   props.setShowChannel(true);
@@ -114,6 +180,7 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
             ))
           : filter != "" && <div className="nothing-found">Nothing found</div>}
       </div>
+      {contextMenu}
     </div>
   );
 });

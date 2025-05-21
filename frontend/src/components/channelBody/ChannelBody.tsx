@@ -3,13 +3,15 @@ import "./ChannelBody.css";
 import * as api from "../../api";
 
 import { MdDelete, MdEdit } from "react-icons/md";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { RemoveScroll } from "react-remove-scroll";
+import { useContextMenu } from "../contextMenu/ContextMenu";
 import { useIsMobile } from "../../hooks";
-import useViewportSize from "../../hooks/useViewportSize";
+
+const CONTEXT_MENU_WIDTH = 150;
 
 type ChannelBodyProps = {
   channel?: api.Channel;
@@ -35,78 +37,44 @@ function ChannelBody(props: ChannelBodyProps) {
   });
 
   const isMobile = useIsMobile();
-  const [viewportWidth, _] = useViewportSize() ?? [];
 
   const [authenticationData] = useContext(AuthenticationContext);
 
-  const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-    message: api.Message | null;
-  } | null>(null);
-  const contextMenuRef = useRef<HTMLDivElement | null>(null);
-
-  const handleDeleteMessage = async (messageId: number) => {
+  const handleDeleteMessage = async (message: api.Message) => {
     if (!messageController) return;
 
-    await messageController.deleteMessage(messageId);
+    const { id } = message!;
+
+    await messageController.deleteMessage(id!);
     queryClient.setQueriesData(["messages", props.channel], (messages: api.Message[] | undefined) => {
       if (!messages) return [];
-      return messages.filter((message) => message.id !== messageId);
-    });
-    setContextMenu(null);
-  };
-
-  const handleEditMessage = (message: api.Message) => {
-    queryClient.setQueriesData(["edit_message", props.channel], () => message.id);
-    queryClient.setQueriesData(["message_drafts", props.channel], () => message.content);
-    setContextMenu(null);
-  };
-
-  const handleContextMenu = (event: React.MouseEvent, message: api.Message) => {
-    if (message.user?.id !== authenticationData?.userId) {
-      return;
-    }
-
-    event.preventDefault();
-
-    const menuWidth = 150;
-
-    let x = event.clientX;
-    let y = event.clientY;
-
-    if (x + menuWidth > viewportWidth!) {
-      x = viewportWidth! - menuWidth;
-    }
-
-    setContextMenu({
-      x,
-      y,
-      message,
+      return messages.filter((message) => message.id !== id);
     });
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
-        setContextMenu(null);
-      }
-    };
+  const handleEditMessage = async (message: api.Message) => {
+    const { id, content } = message!;
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    queryClient.setQueriesData(["edit_message", props.channel], () => id);
+    queryClient.setQueriesData(["message_drafts", props.channel], () => content);
+  };
 
-  useEffect(() => {
-    function handleResize() {
-      setContextMenu(null);
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [handleContextMenu, contextMenu] = useContextMenu<api.Message>({
+    width: CONTEXT_MENU_WIDTH,
+    buttons: [
+      {
+        icon: <MdEdit />,
+        text: "Edit",
+        handleClick: handleEditMessage,
+      },
+      {
+        icon: <MdDelete />,
+        text: "Delete",
+        handleClick: handleDeleteMessage,
+        style: { color: "red" },
+      },
+    ],
+  });
 
   useEffect(() => {
     scrollToBottom();
@@ -184,28 +152,7 @@ function ChannelBody(props: ChannelBodyProps) {
           </div>
         )
       )}
-      {contextMenu && (
-        <div
-          className="context-menu"
-          ref={contextMenuRef}
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-        >
-          <button
-            className="item"
-            onClick={() => handleEditMessage(contextMenu.message!)}
-          >
-            <MdEdit />
-            Edit
-          </button>
-          <button
-            className="item-delete"
-            onClick={() => handleDeleteMessage(contextMenu.message!.id!)}
-          >
-            <MdDelete />
-            Delete
-          </button>
-        </div>
-      )}
+      {contextMenu}
     </RemoveScroll>
   );
 }

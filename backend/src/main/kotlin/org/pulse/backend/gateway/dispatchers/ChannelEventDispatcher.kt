@@ -1,11 +1,9 @@
 package org.pulse.backend.gateway.dispatchers
 
 import org.pulse.backend.entities.channel.Channel
+import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.Gateway
-import org.pulse.backend.gateway.events_s2c.CreateChannelS2CEvent
-import org.pulse.backend.gateway.events_s2c.DeleteChannelS2CEvent
-import org.pulse.backend.gateway.events_s2c.UpdateChannelMembersS2CEvent
-import org.pulse.backend.gateway.events_s2c.UpdateChannelNameS2CEvent
+import org.pulse.backend.gateway.events_s2c.*
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 
@@ -43,6 +41,14 @@ class ChannelEventDispatcher(
             gateway.sendToUserSessions(
                 user.id!!,
                 UpdateChannelMembersS2CEvent(channel.id!!)
+            )
+        }
+
+    fun dispatchMemberLeftEvent(channel: Channel, user: User) =
+        memberService.findMembersByChannel(channel).forEach { (channel, user) ->
+            gateway.sendToUserSessions(
+                user.id!!,
+                MemberLeftS2CEvent(channel.id!!, user.toResponse())
             )
         }
 }

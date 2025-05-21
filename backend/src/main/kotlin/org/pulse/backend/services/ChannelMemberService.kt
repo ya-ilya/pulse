@@ -15,4 +15,8 @@ class ChannelMemberService(private val memberRepository: ChannelMemberRepository
     fun createMember(channel: Channel, user: User): ChannelMember {
         return memberRepository.save(ChannelMember(channel, user))
     }
+
+    fun deleteMember(channel: Channel, user: User) {
+        memberRepository.deleteByChannelAndUser(channel, user)
+    }
 }

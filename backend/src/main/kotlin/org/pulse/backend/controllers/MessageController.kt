@@ -85,8 +85,7 @@ class MessageController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        messageService.deleteMessage(messageId).also {
-            messageEventDispatcher.dispatchDeleteMessageEvent(message)
-        }
+        messageEventDispatcher.dispatchDeleteMessageEvent(message)
+        messageService.deleteMessage(messageId)
     }
 }

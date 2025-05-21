@@ -16,7 +16,7 @@ class Message(
     val channel: Channel,
     @ManyToOne
     val user: User? = null,
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     var comments: Channel? = null,
     @Id
     @GeneratedValue

@@ -158,6 +158,23 @@ class ChannelController(
         }.toResponse()
     }
 
+    @GetMapping("/{channelId}/leave")
+    fun leaveChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long) {
+        val channel = channelService.getChannelById(channelId)
+
+        if (!channel.members.any { it.user.id == user.id }) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        if (channel.admin?.id == user.id) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
+        memberService.deleteMember(channel, user).also {
+            channelEventDispatcher.dispatchMemberLeftEvent(channel, user)
+        }
+    }
+
     @DeleteMapping("/{channelId}")
     fun deleteChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long) {
         val channel = channelService.getChannelById(channelId)
@@ -170,9 +187,8 @@ class ChannelController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        channelService.deleteChannel(channelId).also {
-            channelEventDispatcher.dispatchDeleteChannelEvent(channel)
-        }
+        channelEventDispatcher.dispatchDeleteChannelEvent(channel)
+        channelService.deleteChannel(channelId)
     }
 
     @GetMapping("/{channelId}/join")

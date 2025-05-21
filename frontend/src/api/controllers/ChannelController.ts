@@ -78,6 +78,10 @@ export class ChannelController extends Controller {
     this.client.delete(`/${channelId}`);
   }
 
+  async leaveChannel(channelId: number) {
+    this.client.get(`/${channelId}/leave`);
+  }
+
   async join(channelId: number): Promise<Channel> {
     return (await this.client.get(`/${channelId}/join`)).data;
   }

@@ -15,9 +15,9 @@ class Channel(
     val admin: User? = null,
     @OneToOne(mappedBy = "comments")
     val post: Message? = null,
-    @OneToMany(mappedBy = "channel", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "channel", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val members: MutableList<ChannelMember> = mutableListOf(),
-    @OneToMany(mappedBy = "channel")
+    @OneToMany(mappedBy = "channel", cascade = [CascadeType.ALL])
     val messages: MutableList<Message> = mutableListOf(),
     @Id
     @GeneratedValue

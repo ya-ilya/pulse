@@ -1,0 +1,29 @@
+.context-menu {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  z-index: 1000;
+  width: 150px;
+  padding: 8px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.context-menu .item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: none;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+.context-menu .item:hover {
+  background-color: #f0f2f5;
+}
