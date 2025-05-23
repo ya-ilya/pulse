@@ -51,7 +51,19 @@ class MessageService(
         ).also { it.comments = channelService.createCommentsChannel(it) }
     }
 
+    fun createStatus(content: String, channel: Channel): Message {
+        return messageRepository.save(
+            Message(
+                MessageType.Status,
+                Timestamp.from(Instant.now()),
+                content,
+                channel
+            )
+        )
+    }
+
     fun deleteMessage(messageId: Long) {
         messageRepository.deleteById(messageId)
+        messageRepository.flush()
     }
 }

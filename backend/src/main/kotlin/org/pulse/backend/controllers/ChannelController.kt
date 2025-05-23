@@ -1,10 +1,12 @@
 package org.pulse.backend.controllers
 
+import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import org.pulse.backend.entities.channel.ChannelType
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.dispatchers.ChannelEventDispatcher
 import org.pulse.backend.gateway.dispatchers.MessageEventDispatcher
+import org.pulse.backend.gateway.events_s2c.UpdateChannelMembersS2CEvent
 import org.pulse.backend.requests.*
 import org.pulse.backend.responses.ChannelResponse
 import org.pulse.backend.responses.MessageResponse
@@ -158,23 +160,6 @@ class ChannelController(
         }.toResponse()
     }
 
-    @GetMapping("/{channelId}/leave")
-    fun leaveChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long) {
-        val channel = channelService.getChannelById(channelId)
-
-        if (!channel.members.any { it.user.id == user.id }) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        }
-
-        if (channel.admin?.id == user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
-
-        memberService.deleteMember(channel, user).also {
-            channelEventDispatcher.dispatchMemberLeftEvent(channel, user)
-        }
-    }
-
     @DeleteMapping("/{channelId}")
     fun deleteChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long) {
         val channel = channelService.getChannelById(channelId)
@@ -192,7 +177,7 @@ class ChannelController(
     }
 
     @GetMapping("/{channelId}/join")
-    fun join(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): ChannelResponse {
+    fun joinChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long): ChannelResponse {
         val channel = channelService.getChannelById(channelId)
 
         if (channel.type != ChannelType.Channel) {
@@ -206,7 +191,44 @@ class ChannelController(
         memberService.createMember(channel, user)
 
         return channelService.getChannelById(channelId).also {
-            channelEventDispatcher.dispatchUpdateChannelMembersEvent(it)
+            channelEventDispatcher.dispatchUpdateChannelMembersEvent(
+                it,
+                user,
+                UpdateChannelMembersS2CEvent.Action.Join
+            )
         }.toResponse()
+    }
+
+    @Transactional
+    @GetMapping("/{channelId}/leave")
+    fun leaveChannel(@AuthenticationPrincipal user: User, @PathVariable channelId: Long) {
+        val channel = channelService.getChannelById(channelId)
+
+        when {
+            channel.members.none { it.user.id == user.id } ->
+                throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+            channel.admin?.id == user.id ->
+                throw ResponseStatusException(HttpStatus.FORBIDDEN)
+
+            channel.type == ChannelType.PrivateChat ->
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+
+        val member = channel.members.single { it.user.id == user.id }
+        memberService.deleteMember(member)
+
+        channelEventDispatcher.dispatchUpdateChannelMembersEvent(
+            channel,
+            user,
+            UpdateChannelMembersS2CEvent.Action.Leave,
+            extraUser = user
+        )
+
+        if (channel.type == ChannelType.GroupChat) {
+            messageService.createStatus("@${user.username} left the group", channel).also {
+                messageEventDispatcher.dispatchCreateMessageEvent(it)
+            }
+        }
     }
 }

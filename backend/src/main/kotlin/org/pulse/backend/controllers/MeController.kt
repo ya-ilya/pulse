@@ -12,17 +12,13 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/me")
 class MeController(private val userService: UserService) {
     @GetMapping
-    fun getUser(@AuthenticationPrincipal user: User): UserResponse {
-        return user.toResponse()
-    }
+    fun getUser(@AuthenticationPrincipal user: User): UserResponse =
+        user.toResponse()
 
     @PatchMapping("/displayName")
     fun updateDisplayName(
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody request: UpdateDisplayNameRequest
-    ): UserResponse {
-        return userService
-            .updateUser(user.apply { this.displayName = request.displayName })
-            .toResponse()
-    }
+    ): UserResponse =
+        userService.updateUser(user.apply { displayName = request.displayName }).toResponse()
 }

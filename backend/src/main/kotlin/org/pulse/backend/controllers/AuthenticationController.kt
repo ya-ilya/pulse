@@ -14,18 +14,16 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/authentication")
 class AuthenticationController(private val authenticationService: AuthenticationService) {
+
     @PostMapping("/sign-in")
-    fun signIn(@Valid @RequestBody request: SignInRequest): AuthenticationResponse {
-        return authenticationService.signIn(request.email, request.password)
-    }
+    fun signIn(@Valid @RequestBody request: SignInRequest): AuthenticationResponse =
+        authenticationService.signIn(request.email, request.password)
 
     @PostMapping("/sign-up")
-    fun signUp(@Valid @RequestBody request: SignUpRequest): AuthenticationResponse {
-        return authenticationService.signUp(request.username, request.email, request.password)
-    }
+    fun signUp(@Valid @RequestBody request: SignUpRequest): AuthenticationResponse =
+        authenticationService.signUp(request.username, request.email, request.password)
 
     @PostMapping("/refreshToken")
-    fun refreshToken(@Valid @RequestBody request: RefreshTokenRequest): AuthenticationResponse {
-        return authenticationService.refreshToken(request.refreshToken)
-    }
+    fun refreshToken(@Valid @RequestBody request: RefreshTokenRequest): AuthenticationResponse =
+        authenticationService.refreshToken(request.refreshToken)
 }

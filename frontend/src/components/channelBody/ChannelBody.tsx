@@ -134,6 +134,13 @@ function ChannelBody(props: ChannelBodyProps) {
           >
             {message.content}
           </div>
+        ) : message.type === api.MessageType.Status ? (
+          <div
+            className="status-container"
+            key={message.id}
+          >
+            {message.content}
+          </div>
         ) : (
           <div
             className="message-container"

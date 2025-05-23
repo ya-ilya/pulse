@@ -64,12 +64,20 @@ class MessageController(
     ): MessageResponse {
         val message = messageService.getMessageById(messageId)
 
-        if (message.type == MessageType.Message && message.user?.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
+        when (message.type) {
+            MessageType.Message -> {
+                if (message.user?.id != user.id) {
+                    throw ResponseStatusException(HttpStatus.FORBIDDEN)
+                }
+            }
 
-        if (message.type == MessageType.Post && message.channel.admin?.id != user.id) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            MessageType.Post -> {
+                if (message.channel.admin?.id != user.id) {
+                    throw ResponseStatusException(HttpStatus.FORBIDDEN)
+                }
+            }
+
+            MessageType.Status -> throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
         return messageService.updateMessage(messageId, request.content).also {
@@ -81,7 +89,10 @@ class MessageController(
     fun deleteMessage(@AuthenticationPrincipal user: User, @PathVariable messageId: Long) {
         val message = messageService.getMessageById(messageId)
 
-        if (message.user?.id != user.id && message.channel.admin?.id != user.id) {
+        val isOwner = message.user?.id == user.id
+        val isAdmin = message.channel.admin?.id == user.id
+
+        if (!isOwner && !isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 

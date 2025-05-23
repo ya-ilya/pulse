@@ -3,7 +3,10 @@ package org.pulse.backend.gateway.dispatchers
 import org.pulse.backend.entities.channel.Channel
 import org.pulse.backend.entities.user.User
 import org.pulse.backend.gateway.Gateway
-import org.pulse.backend.gateway.events_s2c.*
+import org.pulse.backend.gateway.events_s2c.CreateChannelS2CEvent
+import org.pulse.backend.gateway.events_s2c.DeleteChannelS2CEvent
+import org.pulse.backend.gateway.events_s2c.UpdateChannelMembersS2CEvent
+import org.pulse.backend.gateway.events_s2c.UpdateChannelNameS2CEvent
 import org.pulse.backend.services.ChannelMemberService
 import org.springframework.stereotype.Component
 
@@ -36,19 +39,26 @@ class ChannelEventDispatcher(
             )
         }
 
-    fun dispatchUpdateChannelMembersEvent(channel: Channel) =
-        memberService.findMembersByChannel(channel).forEach { (channel, user) ->
+    fun dispatchUpdateChannelMembersEvent(
+        channel: Channel,
+        user1: User,
+        action: UpdateChannelMembersS2CEvent.Action,
+        extraUser: User? = null
+    ) {
+        memberService.findMembersByChannel(channel).forEach { (channel, user2) ->
             gateway.sendToUserSessions(
-                user.id!!,
-                UpdateChannelMembersS2CEvent(channel.id!!)
+                user2.id!!,
+                UpdateChannelMembersS2CEvent(channel.id!!, user1.toResponse(), action)
             )
         }
 
-    fun dispatchMemberLeftEvent(channel: Channel, user: User) =
-        memberService.findMembersByChannel(channel).forEach { (channel, user) ->
+        if (extraUser?.id != null &&
+            memberService.findMembersByChannel(channel).none { it.user.id == extraUser.id }
+        ) {
             gateway.sendToUserSessions(
-                user.id!!,
-                MemberLeftS2CEvent(channel.id!!, user.toResponse())
+                extraUser.id,
+                UpdateChannelMembersS2CEvent(channel.id!!, user1.toResponse(), action)
             )
         }
+    }
 }

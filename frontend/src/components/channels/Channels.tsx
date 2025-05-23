@@ -109,17 +109,21 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
         return newElements;
       });
     },
-    MemberLeftS2CEvent: (event) => {
+    UpdateChannelMembersS2CEvent: (event) => {
       queryClient.setQueriesData(["channels", session?.userId], (channels: api.Channel[] | undefined) => {
         if (!channels) return [];
 
         const newElements = [...channels];
 
-        if (event.user.id == session?.userId) {
+        if (event.action == "Leave" && event.user.id == session?.userId) {
           newElements.splice(
             channels.findIndex((value) => value.id == event.channelId),
             1
           );
+
+          if (event.channelId == props.channel?.id) {
+            props.setChannel(undefined);
+          }
         }
 
         return newElements;

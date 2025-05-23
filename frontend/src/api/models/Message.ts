@@ -9,9 +9,10 @@ export interface Message {
 }
 
 export enum MessageType {
-  Message,
-  Post,
+  Message = "Message",
+  Post = "Post",
+  Status = "Status",
 
   // This is a client-side message type
-  Date,
+  Date = "Date",
 }

@@ -18,6 +18,15 @@
   color: #666;
 }
 
+.channel-body .status-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: 14px;
+  color: #666;
+}
+
 .channel-body .message-container {
   display: flex;
   width: 100%;
