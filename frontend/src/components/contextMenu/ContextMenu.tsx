@@ -4,7 +4,7 @@ import { CSSProperties, ReactNode, useCallback, useEffect, useRef, useState } fr
 
 import useViewportSize from "../../hooks/useViewportSize";
 
-type ContextMenuButton<T> = {
+export type ContextMenuButton<T> = {
   icon?: ReactNode;
   text: string;
   style?: CSSProperties;
@@ -93,31 +93,31 @@ function ContextMenu<T>(props: ContextMenuProps<T>) {
     return () => window.removeEventListener("resize", handleResize);
   }, [props.setContextMenu]);
 
-  if (!props.contextMenu) return null;
-
   return (
-    <div
-      className="context-menu"
-      ref={contextMenuRef}
-      style={{ top: props.contextMenu.y, left: props.contextMenu.x }}
-    >
-      {props.buttons
-        .filter((it) => (it.condition ? it.condition(props.contextMenu!.element!) : true))
-        .map((it, idx) => (
-          <button
-            className="item"
-            key={it.text + idx}
-            onClick={async () => {
-              await it.handleClick(props.contextMenu!.element!);
-              props.setContextMenu?.(null);
-            }}
-            style={{ ...it.style }}
-          >
-            {it.icon}
-            {it.text}
-          </button>
-        ))}
-    </div>
+    props.contextMenu && (
+      <div
+        className="context-menu"
+        ref={contextMenuRef}
+        style={{ top: props.contextMenu.y, left: props.contextMenu.x }}
+      >
+        {props.buttons
+          .filter((it) => (it.condition ? it.condition(props.contextMenu!.element!) : true))
+          .map((it, idx) => (
+            <button
+              className="item"
+              key={it.text + idx}
+              onClick={async () => {
+                await it.handleClick(props.contextMenu!.element!);
+                props.setContextMenu?.(null);
+              }}
+              style={{ ...it.style }}
+            >
+              {it.icon}
+              {it.text}
+            </button>
+          ))}
+      </div>
+    )
   );
 }
 

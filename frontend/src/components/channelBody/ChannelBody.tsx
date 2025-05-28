@@ -2,13 +2,13 @@ import "./ChannelBody.css";
 
 import * as api from "../../api";
 
+import { ContextMenuButton, useContextMenu } from "../contextMenu/ContextMenu";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { RemoveScroll } from "react-remove-scroll";
-import { useContextMenu } from "../contextMenu/ContextMenu";
 import { useIsMobile } from "../../hooks";
 
 const CONTEXT_MENU_WIDTH = 150;
@@ -38,34 +38,37 @@ function ChannelBody(props: ChannelBodyProps) {
 
   const isMobile = useIsMobile();
 
-  const [authenticationData] = useContext(AuthenticationContext);
+  const [session] = useContext(AuthenticationContext);
 
-  const handleDeleteMessage = async (message: api.Message) => {
-    if (!messageController) return;
+  const handleDeleteMessage = useCallback(
+    async (message: api.Message) => {
+      if (!messageController) return;
+      const { id } = message!;
+      await messageController.deleteMessage(id!);
+      queryClient.setQueriesData(["messages", props.channel], (messages: api.Message[] | undefined) => {
+        if (!messages) return [];
+        return messages.filter((message) => message.id !== id);
+      });
+    },
+    [messageController, queryClient, props.channel]
+  );
 
-    const { id } = message!;
+  const handleEditMessage = useCallback(
+    async (message: api.Message) => {
+      const { id, content } = message!;
+      queryClient.setQueriesData(["edit_message", props.channel], () => id);
+      queryClient.setQueriesData(["message_drafts", props.channel], () => content);
+    },
+    [queryClient, props.channel]
+  );
 
-    await messageController.deleteMessage(id!);
-    queryClient.setQueriesData(["messages", props.channel], (messages: api.Message[] | undefined) => {
-      if (!messages) return [];
-      return messages.filter((message) => message.id !== id);
-    });
-  };
-
-  const handleEditMessage = async (message: api.Message) => {
-    const { id, content } = message!;
-
-    queryClient.setQueriesData(["edit_message", props.channel], () => id);
-    queryClient.setQueriesData(["message_drafts", props.channel], () => content);
-  };
-
-  const [handleContextMenu, contextMenu] = useContextMenu<api.Message>({
-    width: CONTEXT_MENU_WIDTH,
-    buttons: [
+  const buttons = useMemo<ContextMenuButton<api.Message>[]>(
+    () => [
       {
         icon: <MdEdit />,
         text: "Edit",
         handleClick: handleEditMessage,
+        condition: (message) => message.user?.id === session?.userId,
       },
       {
         icon: <MdDelete />,
@@ -74,6 +77,12 @@ function ChannelBody(props: ChannelBodyProps) {
         style: { color: "red" },
       },
     ],
+    [handleEditMessage, handleDeleteMessage]
+  );
+
+  const [handleContextMenu, contextMenu] = useContextMenu<api.Message>({
+    width: CONTEXT_MENU_WIDTH,
+    buttons: buttons,
   });
 
   useEffect(() => {
@@ -148,11 +157,17 @@ function ChannelBody(props: ChannelBodyProps) {
           >
             <div
               className={`message ${
-                message.user?.id === authenticationData?.userId ? "--message-right" : "--message-left"
+                message.user?.id === session?.userId ? "--message-right" : "--message-left"
               } ${isMobile ? "--message-mobile" : ""} ${
                 editMessageQuery.data === message.id ? "--message-edit" : ""
               }`}
-              onContextMenu={(event) => handleContextMenu(event, message)}
+              onContextMenu={(event) => {
+                const isOwn = message.user?.id === session?.userId;
+                const isAdmin = props.channel?.admin === session?.userId;
+                if (isOwn || isAdmin) {
+                  handleContextMenu(event, message);
+                }
+              }}
               style={{ userSelect: isMobile ? "none" : "auto" }}
             >
               {props.channel?.type !== api.ChannelType.PrivateChat &&

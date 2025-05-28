@@ -31,6 +31,7 @@ function CreateGroupDialog(props: CreateGroupDialogProps) {
 
   const handleSubmit = useCallback(() => {
     if (name.length <= 2) {
+      setError("Group name must be at least 3 characters long");
       return;
     }
 

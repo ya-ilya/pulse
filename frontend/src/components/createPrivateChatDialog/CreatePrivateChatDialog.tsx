@@ -29,7 +29,10 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
   });
 
   const handleSubmit = useCallback(() => {
-    if (!user) return;
+    if (!user) {
+      setError("Please select a user to create a private chat with");
+      return;
+    }
 
     setError(null);
     setLoading(true);
@@ -47,7 +50,8 @@ function CreatePrivateChatDialog(props: CreatePrivateChatDialogProps) {
   }, [user, channelController, props]);
 
   const handleSetUser = useCallback(() => {
-    if (!username || session?.username === username) {
+    if (!username || session?.username === username || username.length < 3) {
+      setError("Please enter a valid username");
       return;
     }
 

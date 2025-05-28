@@ -48,3 +48,9 @@
 .create-channel-dialog .submit:hover {
   background-color: #0056b3;
 }
+
+.create-channel-dialog .error {
+  font-size: 14px;
+  color: red;
+  text-align: center;
+}

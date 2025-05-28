@@ -17,6 +17,7 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class Gateway(
@@ -27,17 +28,13 @@ class Gateway(
     private val memberService: ChannelMemberService,
     private val validator: Validator
 ) : TextWebSocketHandler() {
-    private val activeSessions = Collections.synchronizedSet<GatewaySession>(mutableSetOf())
+    private val activeSessions = ConcurrentHashMap.newKeySet<GatewaySession>()
 
     init {
         objectMapper.registerSubtypes(GatewayEvent::class.java)
     }
 
-    override fun afterConnectionEstablished(session: WebSocketSession) {
-        activeSessions.add(GatewaySession(session, objectMapper))
-    }
-
-    fun handleAuthenticationEvent(session: WebSocketSession, event: AuthenticationC2SEvent) {
+    fun handleAuthenticationEvent(gatewaySession: GatewaySession, event: AuthenticationC2SEvent) {
         val email = try {
             authenticationService.extractEmail(event.token)
         } catch (ex: Exception) {
@@ -48,28 +45,34 @@ class Gateway(
 
         userService.findUserByEmail(email).ifPresent { user ->
             if (authenticationService.isAccessTokenValid(event.token, user)) {
-                this[session]?.userId = user.id
+                gatewaySession.userId = user.id
                 authenticationState = true
             }
         }
 
-        this[session]?.sendEvent(AuthenticationS2CEvent(authenticationState))
+        gatewaySession.sendEvent(AuthenticationS2CEvent(authenticationState))
 
         if (!authenticationState) {
-            session.close()
+            gatewaySession.close()
         }
     }
 
-    fun handleTypingEvent(session: WebSocketSession, event: TypingC2SEvent) {
-        memberService.findMembersByChannel(channelService.getChannelById(event.channelId))
+    fun handleTypingEvent(gatewaySession: GatewaySession, event: TypingC2SEvent) {
+        val channel = channelService.getChannelById(event.channelId)
+        val user = userService.getUserById(gatewaySession.userId!!)
+
+        if (user.channels.none { it.channel.id == channel.id }) {
+            return
+        }
+
+        memberService.findMembersByChannel(channel)
             .forEach { (channel, memberUser) ->
-                val userId = this[session]!!.userId!!
                 sendToUserSessions(
                     memberUser.id!!,
                     TypingS2CEvent(
                         channel.id!!,
-                        userId,
-                        userService.getUserById(userId).username
+                        user.id!!,
+                        user.username
                     )
                 )
             }
@@ -77,23 +80,43 @@ class Gateway(
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         try {
+            val gatewaySession = this[session] ?: return
             val event = objectMapper.readValue(message.payload, GatewayEvent::class.java)
 
             if (validator.validate(event).isNotEmpty()) {
-                this[session]!!.sendEvent(
+                gatewaySession.sendEvent(
                     ErrorS2CEvent(
                         "Invalid message"
                     )
                 )
+                return
             }
 
             when (event) {
-                is AuthenticationC2SEvent -> handleAuthenticationEvent(session, event)
-                is TypingC2SEvent -> handleTypingEvent(session, event)
+                is AuthenticationC2SEvent -> handleAuthenticationEvent(gatewaySession, event)
+                else -> {
+                    if (gatewaySession.userId == null) {
+                        gatewaySession.sendEvent(
+                            ErrorS2CEvent(
+                                "You must be authorized"
+                            )
+                        )
+                        return
+                    }
+
+                    when (event) {
+                        is TypingC2SEvent -> handleTypingEvent(gatewaySession, event)
+                    }
+                }
             }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             session.close()
         }
+    }
+
+    override fun afterConnectionEstablished(session: WebSocketSession) {
+        activeSessions.add(GatewaySession(session, objectMapper))
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {

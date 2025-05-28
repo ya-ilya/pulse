@@ -25,7 +25,11 @@ export function onGatewayEvent(
       const listener = listeners[event.type];
 
       if (event && event.type && listener && filter(event)) {
-        listener.call(undefined, event);
+        try {
+          listener.call(undefined, event);
+        } catch (e) {
+          console.error("Gateway event listener error:", e);
+        }
       }
     }
 

@@ -2,12 +2,12 @@ import "./Channels.css";
 
 import * as api from "../../api";
 
-import { forwardRef, useContext, useState } from "react";
+import { ContextMenuButton, useContextMenu } from "../contextMenu/ContextMenu";
+import { forwardRef, useCallback, useContext, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
 import { FiMenu } from "react-icons/fi";
-import { useContextMenu } from "../contextMenu/ContextMenu";
 import { useIsMobile } from "../../hooks";
 import useViewportSize from "../../hooks/useViewportSize";
 
@@ -37,12 +37,17 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
   const [, viewportHeight] = useViewportSize() ?? [];
   const isMobile = useIsMobile();
 
-  const leaveChannel = async (channel: api.Channel) => await channelController?.leaveChannel(channel.id!);
-  const deleteChannel = async (channel: api.Channel) => await channelController?.deleteChannel(channel.id!);
+  const leaveChannel = useCallback(
+    async (channel: api.Channel) => await channelController?.leaveChannel(channel.id!),
+    [channelController]
+  );
+  const deleteChannel = useCallback(
+    async (channel: api.Channel) => await channelController?.deleteChannel(channel.id!),
+    [channelController]
+  );
 
-  const [handleContextMenu, contextMenu] = useContextMenu<api.Channel>({
-    width: CONTEXT_MENU_WIDTH,
-    buttons: [
+  const buttons = useMemo<ContextMenuButton<api.Channel>[]>(
+    () => [
       {
         text: "Leave group",
         handleClick: leaveChannel,
@@ -78,6 +83,12 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
           channel.type == api.ChannelType.Channel && channel.admin?.id == session?.userId,
       },
     ],
+    [leaveChannel, deleteChannel, session?.userId]
+  );
+
+  const [handleContextMenu, contextMenu] = useContextMenu<api.Channel>({
+    width: CONTEXT_MENU_WIDTH,
+    buttons: buttons,
   });
 
   api.onGatewayEvent({
@@ -131,7 +142,10 @@ const Channels = forwardRef((props: ChannelsProps, ref: any) => {
     },
   });
 
-  const filteredChannels = channelsQuery.data?.filter((value) => value.name?.includes(filter)) ?? [];
+  const filteredChannels = useMemo(
+    () => channelsQuery.data?.filter((value) => value.name?.includes(filter)) ?? [],
+    [channelsQuery.data, filter]
+  );
 
   return (
     <div

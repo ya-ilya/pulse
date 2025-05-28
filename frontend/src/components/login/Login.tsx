@@ -25,6 +25,12 @@ function Login() {
       setError(null);
 
       if (isRegister) {
+        if (username.length < 3) {
+          setError("Username must be at least 3 characters long.");
+          setLoading(false);
+          return;
+        }
+
         authenticationController
           .signUp({ email, password, username })
           .then((response) => {

@@ -16,13 +16,17 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(() => {
     if (name.length <= 2) {
+      setError("Channel name must be at least 3 characters long");
       return;
     }
 
+    setError(null);
     setLoading(true);
+
     channelController?.createChannel({ name: name }).then(() => {
       props.setShowCreateChannelDialog(false);
       setLoading(false);
@@ -48,6 +52,7 @@ function CreateChannelDialog(props: CreateChannelDialogProps) {
         value={name}
         onChange={(event) => setName(event.target.value)}
       />
+      {error && <div className="error">{error}</div>}
       <button
         type="button"
         className="submit"

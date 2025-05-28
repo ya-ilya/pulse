@@ -26,7 +26,12 @@ function ChannelTopBar(props: ChannelTopBarProps) {
     {
       TypingS2CEvent: (event) => {
         setIsTyping(true);
-        typingList.add(event.username);
+
+        setTypingList((prev) => {
+          const newSet = new Set(prev);
+          newSet.add(event.username);
+          return newSet;
+        });
 
         if (timeout.current) {
           clearTimeout(timeout.current);
@@ -37,9 +42,10 @@ function ChannelTopBar(props: ChannelTopBarProps) {
         }, 1000);
 
         setTimeout(() => {
-          setTypingList((typingList) => {
-            typingList.delete(event.username);
-            return typingList;
+          setTypingList((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(event.username);
+            return newSet;
           });
         }, 1000);
       },
@@ -49,26 +55,24 @@ function ChannelTopBar(props: ChannelTopBarProps) {
     }
   );
 
-  if (!props.channel) {
-    return <div></div>;
-  }
-
   return (
-    <div className="channel-top-bar">
-      {isMobile && <BiArrowBack onClick={() => props.setShowChannel(false)} />}
-      <div className="name">{props.channel?.name}</div>
-      <div
-        className="loader"
-        style={{ visibility: isTyping ? "visible" : "hidden" }}
-      >
-        {props.channel?.type === api.ChannelType.PrivateChat
-          ? "Typing"
-          : `${Array.from(typingList).join(", ")} typing`}
-        <span className="dot">.</span>
-        <span className="dot">.</span>
-        <span className="dot">.</span>
+    props.channel && (
+      <div className="channel-top-bar">
+        {isMobile && <BiArrowBack onClick={() => props.setShowChannel(false)} />}
+        <div className="name">{props.channel?.name}</div>
+        <div
+          className="loader"
+          style={{ visibility: isTyping ? "visible" : "hidden" }}
+        >
+          {props.channel?.type === api.ChannelType.PrivateChat
+            ? "Typing"
+            : `${Array.from(typingList).join(", ")} typing`}
+          <span className="dot">.</span>
+          <span className="dot">.</span>
+          <span className="dot">.</span>
+        </div>
       </div>
-    </div>
+    )
   );
 }
 

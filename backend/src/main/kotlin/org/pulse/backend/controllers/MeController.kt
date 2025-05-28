@@ -20,5 +20,5 @@ class MeController(private val userService: UserService) {
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody request: UpdateDisplayNameRequest
     ): UserResponse =
-        userService.updateUser(user.apply { displayName = request.displayName }).toResponse()
+        userService.updateDisplayName(user, request.displayName).toResponse()
 }

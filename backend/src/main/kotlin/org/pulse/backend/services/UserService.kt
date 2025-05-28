@@ -34,10 +34,6 @@ class UserService(
         return userRepository.findByEmail(email)
     }
 
-    fun findUserByRefreshToken(refreshToken: String): Optional<User> {
-        return userRepository.findByRefreshToken(refreshToken)
-    }
-
     fun createUser(username: String, email: String, password: String): User {
         return userRepository.save(
             User(
@@ -51,6 +47,11 @@ class UserService(
 
     fun updateUser(user: User): User {
         return userRepository.save(user)
+    }
+
+    fun updateDisplayName(user: User, displayName: String): User {
+        user.displayName = displayName
+        return updateUser(user)
     }
 
     override fun loadUserByUsername(username: String): UserDetails {

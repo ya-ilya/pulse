@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 class GatewaySession(
     val session: WebSocketSession,
@@ -12,6 +13,13 @@ class GatewaySession(
     var userId: UUID? = null
 
     fun sendEvent(event: GatewayEvent) {
-        session.sendMessage(TextMessage(objectMapper.writeValueAsString(event)))
+        val message = TextMessage(objectMapper.writeValueAsString(event))
+        CompletableFuture.runAsync {
+            session.sendMessage(message)
+        }
+    }
+
+    fun close() {
+        session.close()
     }
 }
