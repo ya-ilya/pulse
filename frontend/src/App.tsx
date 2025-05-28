@@ -21,7 +21,7 @@ function App() {
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false);
   const [showCreateGroupDialog, setShowCreateGroupDialog] = useState(false);
 
-  const channelsRef = useRef<HTMLDivElement>();
+  const channelsRef = useRef<HTMLDivElement>(null);
 
   useOnScreenKeyboardScrollFix();
 

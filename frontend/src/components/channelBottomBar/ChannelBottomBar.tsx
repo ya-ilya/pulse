@@ -3,8 +3,8 @@ import "./ChannelBottomBar.css";
 import * as api from "../../api";
 
 import { AuthenticationContext, queryClient } from "../..";
+import { LegacyRef, forwardRef, useCallback, useContext, useRef } from "react";
 import { MdCancel, MdEdit } from "react-icons/md";
-import { forwardRef, useCallback, useContext, useRef } from "react";
 
 import { IoSend } from "react-icons/io5";
 import ReactTextareaAutosize from "react-textarea-autosize";
@@ -22,7 +22,7 @@ type ChannelBottomBarProps = {
   channel?: api.Channel;
 };
 
-const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: any) => {
+const ChannelBottomBar = forwardRef((props: ChannelBottomBarProps, ref: LegacyRef<HTMLTextAreaElement>) => {
   const channelController = api.useChannelController();
   const messageController = api.useMessageController();
 

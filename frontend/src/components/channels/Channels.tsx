@@ -3,7 +3,7 @@ import "./Channels.css";
 import * as api from "../../api";
 
 import { ContextMenuButton, useContextMenu } from "../contextMenu/ContextMenu";
-import { forwardRef, useCallback, useContext, useMemo, useState } from "react";
+import { LegacyRef, forwardRef, useCallback, useContext, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 
 import { AuthenticationContext } from "../..";
@@ -21,7 +21,7 @@ type ChannelsProps = {
   setShowChannel: (showChannel: boolean) => void;
 };
 
-const Channels = forwardRef((props: ChannelsProps, ref: any) => {
+const Channels = forwardRef((props: ChannelsProps, ref: LegacyRef<HTMLDivElement>) => {
   const queryClient = useQueryClient();
   const channelController = api.useChannelController();
 

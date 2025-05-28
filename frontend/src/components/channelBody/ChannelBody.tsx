@@ -15,7 +15,7 @@ const CONTEXT_MENU_WIDTH = 150;
 
 type ChannelBodyProps = {
   channel?: api.Channel;
-  shards: any[];
+  shards: (HTMLElement | React.RefObject<any>)[];
 };
 
 function ChannelBody(props: ChannelBodyProps) {

@@ -11,6 +11,7 @@ import org.pulse.backend.services.AuthenticationService
 import org.pulse.backend.services.ChannelMemberService
 import org.pulse.backend.services.ChannelService
 import org.pulse.backend.services.UserService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
@@ -29,6 +30,7 @@ class Gateway(
     private val validator: Validator
 ) : TextWebSocketHandler() {
     private val activeSessions = ConcurrentHashMap.newKeySet<GatewaySession>()
+    private val logger = LoggerFactory.getLogger(Gateway::class.java)
 
     init {
         objectMapper.registerSubtypes(GatewayEvent::class.java)
@@ -110,7 +112,7 @@ class Gateway(
                 }
             }
         } catch (ex: Exception) {
-            ex.printStackTrace()
+            logger.error("WebSocket error", ex)
             session.close()
         }
     }
